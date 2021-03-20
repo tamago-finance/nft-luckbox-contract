@@ -1,24 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import styled from 'styled-components'
+import { Web3ReactProvider } from '@web3-react/core'
+import { ethers } from "ethers";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Redirect,
+  Route
+} from "react-router-dom";
+import Navbar from "./components/Navbar"
+import Routes from "./components/Routes"
+
+const getLibrary = (provider) => {
+  const library = new ethers.providers.Web3Provider(provider)
+  library.pollingInterval = 12000
+  return library
+}
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Web3ReactProvider getLibrary={getLibrary} >
+      <Router>
+        <Navbar/> 
+        <Routes/>
+      </Router>
+    </Web3ReactProvider>
   );
 }
 
