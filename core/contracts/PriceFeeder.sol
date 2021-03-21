@@ -10,7 +10,7 @@ import "./interfaces/IPriceFeeder.sol";
 // TODO : Use this Chainlink node https://docs.chain.link/docs/tiingo-eod-stock-price-oracle
 
 contract PriceFeeder is Whitelist, IPriceFeeder {
-    uint256 public value = 100000; // wad
+    uint256 public value = 100000; // wad unit
     uint256 private timestamp;
     
     string public name;

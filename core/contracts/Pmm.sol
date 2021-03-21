@@ -13,7 +13,7 @@ import "./TokenFactory.sol";
 import "./utility/DODOMath.sol";
 
 /**
- * @title PMM contract
+ * @title PMM contract (inspired by DODOEx)
  */
 
 contract Pmm is Lockable, Whitelist, IPmm {
@@ -45,6 +45,14 @@ contract Pmm is Lockable, Whitelist, IPmm {
     event CreatedPMM();
 
     event Deposit(
+        address indexed payer,
+        address indexed receiver,
+        bool isBaseToken,
+        uint256 amount,
+        uint256 lpTokenAmount
+    );
+
+    event Withdraw(
         address indexed payer,
         address indexed receiver,
         bool isBaseToken,
@@ -94,9 +102,29 @@ contract Pmm is Lockable, Whitelist, IPmm {
         return depositQuoteTo(msg.sender, amount);
     }
 
+    // Withdraw base token
+    function withdrawBase(uint256 amount) external returns (uint256) {
+        return withdrawBaseTo(msg.sender, amount);
+    }
+
+    // Withdraw quote token
+    function withdrawQuote(uint256 amount) external returns (uint256) {
+        return withdrawQuoteTo(msg.sender, amount);
+    }
+
     // Total supply of baseCapitalToken  
     function getTotalBaseCapital() public view returns (uint256) {
         return baseCapitalToken.totalSupply();
+    }
+
+    // Retreive base capital token balance of the given address
+    function getBaseCapitalBalanceOf(address lp) public view returns (uint256) {
+        return baseCapitalToken.balanceOf(lp);
+    }
+
+    // Retreive quote capital token balance of the given address
+    function getQuoteCapitalBalanceOf(address lp) public view returns (uint256) {
+        return quoteCapitalToken.balanceOf(lp);
     }
 
     // Total supply of quoteCapitalToken
@@ -150,6 +178,61 @@ contract Pmm is Lockable, Whitelist, IPmm {
 
         emit Deposit(msg.sender, to, true, amount, capital);
         return capital;
+    }
+
+    function withdrawQuoteTo(address to, uint256 amount)
+        public
+        nonReentrant()
+        returns (uint256)
+    {
+        // calculate capital
+        (, uint256 quoteTarget) = getExpectedTarget();
+        uint256 totalQuoteCapital = getTotalQuoteCapital();
+        require(totalQuoteCapital > 0, "NO_QUOTE_LP");
+
+        uint256 requireQuoteCapital = amount.mul(totalQuoteCapital).div(quoteTarget);
+        require(
+            requireQuoteCapital <= getQuoteCapitalBalanceOf(msg.sender),
+            "LP_QUOTE_CAPITAL_BALANCE_NOT_ENOUGH"
+        );
+
+        // settlement
+        targetQuoteTokenAmount = targetQuoteTokenAmount.sub(amount);
+        quoteCapitalToken.transferFrom(msg.sender, address(this), requireQuoteCapital);
+        _burnQuoteCapital(requireQuoteCapital);
+        _quoteTokenTransferOut(to, amount ); 
+
+        emit Withdraw(msg.sender, to, false, amount , requireQuoteCapital);
+
+        return amount;
+    }
+
+    function withdrawBaseTo(address to, uint256 amount)
+        public
+        nonReentrant()
+        returns (uint256)
+    {
+        // calculate capital
+        (uint256 baseTarget, ) = getExpectedTarget();
+        uint256 totalBaseCapital = getTotalBaseCapital();
+        require(totalBaseCapital > 0, "NO_BASE_LP");
+
+        uint256 requireBaseCapital = amount.mul(totalBaseCapital).div(baseTarget);
+        require(
+            requireBaseCapital <= getBaseCapitalBalanceOf(msg.sender),
+            "LP_BASE_CAPITAL_BALANCE_NOT_ENOUGH"
+        );
+
+        // settlement
+        targetBaseTokenAmount = targetBaseTokenAmount.sub(amount);
+        baseCapitalToken.transferFrom(msg.sender, address(this), requireBaseCapital);
+        _burnBaseCapital(requireBaseCapital);
+        
+        _baseTokenTransferOut(to, amount);
+
+        emit Withdraw(msg.sender, to, true, amount , requireBaseCapital);
+
+        return amount;
     }
 
     // calculate quote token -> base token
@@ -292,6 +375,14 @@ contract Pmm is Lockable, Whitelist, IPmm {
 
     function _mintQuoteCapital(address user, uint256 amount) internal {
         quoteCapitalToken.mint(user, amount);
+    }
+
+    function _burnBaseCapital(uint256 amount) internal {
+        baseCapitalToken.burn(amount);
+    }
+
+    function _burnQuoteCapital(uint256 amount) internal {
+        quoteCapitalToken.burn(amount);
     }
 
     function _queryBuyBaseToken(uint256 amount)
