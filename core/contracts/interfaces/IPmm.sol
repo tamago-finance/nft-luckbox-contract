@@ -22,4 +22,20 @@ interface IPmm {
     // overridden by state variable
     function quoteCapitalToken() external view returns (IExpandedIERC20);
 
+    // spot price
+    function getMidPrice() external view returns (uint256);
+
+    // deposit base token
+    function depositBase(uint256 value) external returns (uint256);
+
+    // deposit quote token
+    function depositQuote(uint256 value) external returns (uint256);
+
+    // withdraw base token
+    function withdrawBase(uint256 value) external returns (uint256);
+
+    // withdraw quote token
+    function withdrawQuote(uint256 value) external returns (uint256);
+
+
 }

@@ -32,6 +32,8 @@ contract Pmm is Lockable, Whitelist, IPmm {
     // Share tokens created by this contract.
     IExpandedIERC20 public override baseCapitalToken;
     IExpandedIERC20 public override quoteCapitalToken;
+    // Perpetual contract address (for tracking only)
+    address perpetual;
     // Variables for PMM Algorithm
     uint256 public k;
     RStatus public rStatus; // reverse status of K
@@ -65,6 +67,7 @@ contract Pmm is Lockable, Whitelist, IPmm {
     
     constructor(
         address _tokenFactoryAddress,
+        address _perpertualAddress,
         address _baseToken,
         address _quoteToken,
         address _priceFeeder,
@@ -73,10 +76,13 @@ contract Pmm is Lockable, Whitelist, IPmm {
         require(address(_priceFeeder) != address(0), "Invalid PriceFeeder address");
         require(address(_quoteToken) != address(0), "Invalid QuoteToken address");
         require(address(_baseToken) != address(0), "Invalid BaseToken address");
+        require(address(_tokenFactoryAddress) != address(0), "Invalid TokenFactory address");
+        require(address(_perpertualAddress) != address(0), "Invalid perpertual addresss");
 
         priceFeeder = IPriceFeeder(_priceFeeder);
         baseToken = IERC20(_baseToken);
         quoteToken = IERC20(_quoteToken);
+        perpetual = _perpertualAddress;
 
         // Setup LP tokens
         TokenFactory tf = TokenFactory(_tokenFactoryAddress);
@@ -87,28 +93,29 @@ contract Pmm is Lockable, Whitelist, IPmm {
         rStatus = RStatus.ONE;
 
         addAddress(msg.sender);
+        addAddress(_perpertualAddress); 
         emit CreatedPMM();
 
         _valiateParameters();
     }
 
     // Deposit base token
-    function depositBase(uint256 amount) external returns (uint256) {
+    function depositBase(uint256 amount) external override returns (uint256) {
         return depositBaseTo(msg.sender, amount);
     }
 
     // Deposit quote token
-    function depositQuote(uint256 amount) external returns (uint256) {
+    function depositQuote(uint256 amount) external override returns (uint256) {
         return depositQuoteTo(msg.sender, amount);
     }
 
     // Withdraw base token
-    function withdrawBase(uint256 amount) external returns (uint256) {
+    function withdrawBase(uint256 amount) external override returns (uint256) {
         return withdrawBaseTo(msg.sender, amount);
     }
 
     // Withdraw quote token
-    function withdrawQuote(uint256 amount) external returns (uint256) {
+    function withdrawQuote(uint256 amount) external override returns (uint256) {
         return withdrawQuoteTo(msg.sender, amount);
     }
 
@@ -321,7 +328,8 @@ contract Pmm is Lockable, Whitelist, IPmm {
         return receiveQuote;
     }
 
-    function getMidPrice() public view returns (uint256 midPrice) {
+    // get spot price
+    function getMidPrice() external override view returns (uint256 midPrice) {
         (uint256 baseTarget, uint256 quoteTarget) = getExpectedTarget();
         if (rStatus == RStatus.BELOW_ONE) {
             uint256 R = (quoteTarget.mul(quoteTarget).div(quoteBalance)).wdiv(quoteBalance);

@@ -30,10 +30,11 @@ contract('Pmm', accounts => {
 
         await priceFeed.updateValue(web3.utils.toWei("100"))
 
-        tokenFactory = await TokenFactory.new()
+        const tokenFactory = await TokenFactory.new()
 
         pmm = await Pmm.new(
             tokenFactory.address,
+            "0x0000000000000000000000000000000000000001",
             baseToken.address,
             quoteToken.address,
             priceFeed.address,
