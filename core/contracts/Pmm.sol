@@ -135,6 +135,7 @@ contract Pmm is Lockable, Whitelist, IPmm {
     function depositQuoteTo(address to, uint256 amount)
         public
         nonReentrant()
+        onlyWhitelisted()
         returns (uint256)
     {
         (, uint256 quoteTarget) = getExpectedTarget();
@@ -159,6 +160,7 @@ contract Pmm is Lockable, Whitelist, IPmm {
     function depositBaseTo(address to, uint256 amount)
         public
         nonReentrant()
+        onlyWhitelisted()
         returns (uint256)
     {
         (uint256 baseTarget, ) = getExpectedTarget();
@@ -183,6 +185,7 @@ contract Pmm is Lockable, Whitelist, IPmm {
     function withdrawQuoteTo(address to, uint256 amount)
         public
         nonReentrant()
+        onlyWhitelisted()
         returns (uint256)
     {
         // calculate capital
@@ -210,6 +213,7 @@ contract Pmm is Lockable, Whitelist, IPmm {
     function withdrawBaseTo(address to, uint256 amount)
         public
         nonReentrant()
+        onlyWhitelisted()
         returns (uint256)
     {
         // calculate capital
@@ -250,7 +254,8 @@ contract Pmm is Lockable, Whitelist, IPmm {
     // Buy base token
     function buyBaseToken(uint256 amount, uint256 maxPayQuote)
         external
-        nonReentrant() 
+        nonReentrant()
+        onlyWhitelisted()
         returns (uint256)
     {
         // query price
@@ -286,7 +291,7 @@ contract Pmm is Lockable, Whitelist, IPmm {
     function sellBaseToken(
         uint256 amount,
         uint256 minReceiveQuote
-    ) external nonReentrant() returns (uint256) {
+    ) external nonReentrant() onlyWhitelisted() returns (uint256) {
         // query price
         (
             uint256 receiveQuote,

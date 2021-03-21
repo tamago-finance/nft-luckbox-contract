@@ -40,6 +40,10 @@ contract('Pmm', accounts => {
             web3.utils.toWei("0.99") // K 
         )
 
+        // Add Alice, Bob to the whitelist
+        await pmm.addAddress(alice)
+        await pmm.addAddress(bob)
+
         const baseCapitalTokenAddress = await pmm.baseCapitalToken()
         const quoteCapitalTokenAddress = await pmm.quoteCapitalToken()
 
