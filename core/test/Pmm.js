@@ -96,6 +96,38 @@ contract('Pmm', accounts => {
 
     })
 
+    it('Buy base token and then sell when price is increased', async () => {
+        // TEST/USD -> 100
+        await priceFeed.updateValue(web3.utils.toWei("100"))
+
+        // Deposit 10 TEST to PMM
+        await baseToken.approve( pmm.address , web3.utils.toWei("1000000"))
+        await pmm.depositBase(web3.utils.toWei("100"))
+        // Deposit 1000 USD to PMM
+        await quoteToken.approve( pmm.address , web3.utils.toWei("1000000"))
+        await pmm.depositQuote(web3.utils.toWei("10000"))
+
+        const aliceOriginalBalance = await quoteToken.balanceOf(alice)
+
+        // Buy 1 TEST
+        await quoteToken.approve( pmm.address , web3.utils.toWei("100000") , { from : alice })
+        await pmm.buyBaseToken(web3.utils.toWei("1"), web3.utils.toWei("100000") , { from : alice })
+        const aliceBalanceFirstTrade = await quoteToken.balanceOf(alice)
+
+        assert(Number(web3.utils.fromWei(aliceOriginalBalance)) - Number(web3.utils.fromWei(aliceBalanceFirstTrade)),101)  // buy at 101
+
+        // TEST/USD -> 120
+        await priceFeed.updateValue(web3.utils.toWei("120"))
+
+        // Sell 1 TEST
+        await baseToken.approve( pmm.address , web3.utils.toWei("100000") , { from : alice })
+        await pmm.sellBaseToken(web3.utils.toWei("1"), web3.utils.toWei("0") , { from : alice })
+        const aliceBalanceSecondTrade = await quoteToken.balanceOf(alice)
+
+        assert(Number(web3.utils.fromWei(aliceBalanceSecondTrade)) - Number(web3.utils.fromWei(aliceBalanceFirstTrade)), 120.79718986527587 ) // sell at 120.79718986527587
+
+    })
+
     it('Buy base token from one-side funded PMM', async () => {
         // Set TEST/USD to 10
         await priceFeed.updateValue(web3.utils.toWei("10"))
