@@ -247,13 +247,13 @@ contract Pmm is Lockable, Whitelist, IPmm {
     }
 
     // calculate quote token -> base token
-    function queryBuyBaseToken(uint256 amount) external view returns (uint256 payQuote) {
+    function queryBuyBaseToken(uint256 amount) external override view returns (uint256 payQuote) {
         (payQuote,  , , ) = _queryBuyBaseToken(amount);
         return payQuote;
     }
 
     // calculate base token -> quote token
-    function querySellBaseToken(uint256 amount) external view returns (uint256 receiveQuote) {
+    function querySellBaseToken(uint256 amount) external override view returns (uint256 receiveQuote) {
         (receiveQuote,  , , ) = _querySellBaseToken(amount);
         return receiveQuote;
     }
@@ -261,6 +261,7 @@ contract Pmm is Lockable, Whitelist, IPmm {
     // Buy base token
     function buyBaseToken(uint256 amount, uint256 maxPayQuote)
         external
+        override
         nonReentrant()
         onlyWhitelisted()
         returns (uint256)
@@ -298,7 +299,7 @@ contract Pmm is Lockable, Whitelist, IPmm {
     function sellBaseToken(
         uint256 amount,
         uint256 minReceiveQuote
-    ) external nonReentrant() onlyWhitelisted() returns (uint256) {
+    ) external override nonReentrant() onlyWhitelisted() returns (uint256) {
         // query price
         (
             uint256 receiveQuote,

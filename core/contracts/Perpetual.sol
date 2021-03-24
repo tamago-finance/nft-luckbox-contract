@@ -22,22 +22,33 @@ contract Perpetual is Lockable, Whitelist {
     using SafeERC20 for IERC20;
 
     enum Leverage {ONE, TWO, THREE, FOUR}
-    enum Side {FLAT, SHORT, LONG}
+    enum Side {FLAT, SHORT, LONG} 
 
-    struct LiquidityData {
+    struct LiquidityProvider {
         // Raw collateral value
         uint256 rawCollateral;
         // Total tokens have been minted
         uint256 totalMinted;
     }
 
+    struct LiquidityData {
+        // synthetic
+        uint256 base;
+        uint256 availableBase;
+        // collateral
+        uint256 quote;
+        uint256 availableQuote;
+    }
+
     struct PositionData {
-        // Raw collateral value
-        int256 rawCollateral;
-        uint256 size;
+        uint256 rawCollateral;
+        uint256 leveragedAmount;
+        uint256 positionSize;
         Side side;
-        uint256 entryValue;
         Leverage leverage;
+        uint256 entryValue;
+        uint entryTimestamp;
+        bool locked;
     }
 
     // Price feeder contract.
@@ -48,20 +59,26 @@ contract Perpetual is Lockable, Whitelist {
     IERC20 public collateralCurrency;
     // Synthetic token created by this contract.
     IExpandedIERC20 public tokenCurrency;
-    // Liquidity Data
-    mapping (address => LiquidityData) public liquidityProviders;
+    // Liquidity Provider Data
+    mapping (address => LiquidityProvider) public liquidityProviders;
+    // Maps sponsor addresses to their positions. Each sponsor can have only one position.
+    mapping(address => PositionData) public positions;
+    // Keep track of the raw collateral across all positions
+    uint256 public rawTotalPositionCollateral;
     // Total liquidity
-    uint256 public totalLiquidity;
-    // Total available liquidity for margin trade
-    uint256 public availableLiquidity;
-
+    LiquidityData public totalLiquidity;
+    
     uint256 constant MAX = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
-    uint256 constant ONE = 1000000000000000000;
+    uint256 constant ONE = 1000000000000000000; // 1
+    uint256 constant liquidationRatio = 1250000000000000000; // 1.25
+    uint256 constant maintenanceRatio = 1500000000000000000; // 1.5
 
     event CreatedPerpetual();
     event AddLiquidity(address indexed sender, uint256 collateralAmount, uint256 numTokens);
     event RemoveLiquidity(address indexed sender, uint256 collateralAmount, uint256 numTokens);
     event NewLiquidityProvider(address indexed sponsor);
+    event PositionCreated(address indexed sender, uint256 collateralAmount, uint256 positionSize, Side side, Leverage leverage, uint256 price);
+
 
     constructor(
         string memory _name,
@@ -92,6 +109,7 @@ contract Perpetual is Lockable, Whitelist {
         require( address(tokenCurrency) ==  address(pmm.baseToken()),"Invalid PMM base token");
         require( address(collateralCurrency) == address(pmm.quoteToken()) ,"Invalid PMM quote token");
         tokenCurrency.approve(pmmAddress , MAX);
+        collateralCurrency.approve(pmmAddress , MAX);
         // Initial fund PMM with 1 SYNTH
         tokenCurrency.mint(address(this), ONE);
         pmm.depositBase(ONE);
@@ -104,18 +122,43 @@ contract Perpetual is Lockable, Whitelist {
         return address(tokenCurrency);
     }
 
-    // deposit
-    function depositForTrade(uint256 collateralAmount)
+    // trade functions
+    
+    // open long position
+    function openLongPosition(uint256 positionSize, uint256 maxCollateralAmount, Leverage leverage)
         public
         nonReentrant()
         pmmRequired()
     {
-        require(collateralAmount > 0, "amount must be greater than 0");
+        PositionData storage positionData = positions[msg.sender];
 
+        require(positionSize > 0, "amount must be greater than 0");
+        require(positionData.locked == false , "Position is locked");
+
+        uint256 leveragedSize = positionSize.mul(_resolveLeverage(leverage));
+
+        uint256 borrowingAmount = pmm.queryBuyBaseToken(leveragedSize);
+        uint256 currentPrice = borrowingAmount.wdiv(leveragedSize);
+        uint256 collateralAmount = positionSize.wmul(currentPrice);
+
+        require(maxCollateralAmount >= collateralAmount, "collateralAmount > maxCollateralAmount");
+        require(borrowingAmount < totalLiquidity.availableQuote, "Not enough liquidity");
+
+        pmm.buyBaseToken(leveragedSize, borrowingAmount);
+
+        // Increase the position and global collateral balance by collateral amount.
+        _incrementCollateralBalances(positionData, collateralAmount, borrowingAmount, leveragedSize, Side.LONG, leverage, currentPrice );
+
+        totalLiquidity.availableQuote = totalLiquidity.availableQuote.sub(borrowingAmount);
+        totalLiquidity.availableBase = totalLiquidity.availableBase.add(leveragedSize);
+        totalLiquidity.base = totalLiquidity.base.add(leveragedSize);
+
+        emit PositionCreated(msg.sender, collateralAmount, leveragedSize, Side.LONG, leverage, currentPrice);
+
+        collateralCurrency.transferFrom(msg.sender, address(this), collateralAmount);
     }
 
-
-    // withdraw
+    // open short position
 
     // add liquidity
     function addLiquidity(uint256 collateralAmount) 
@@ -125,7 +168,7 @@ contract Perpetual is Lockable, Whitelist {
     {
         require(collateralAmount > 0, "amount must be greater than 0");
 
-        LiquidityData storage liquidityData = liquidityProviders[msg.sender];
+        LiquidityProvider storage liquidityData = liquidityProviders[msg.sender];
 
         if (liquidityData.totalMinted == 0) {
             emit NewLiquidityProvider(msg.sender);
@@ -136,8 +179,8 @@ contract Perpetual is Lockable, Whitelist {
         liquidityData.totalMinted = liquidityData.totalMinted.add(numTokens);
         liquidityData.rawCollateral = liquidityData.rawCollateral.add(collateralAmount);
 
-        totalLiquidity = totalLiquidity.add(collateralAmount);
-        availableLiquidity = availableLiquidity.add(collateralAmount);
+        totalLiquidity.quote = totalLiquidity.quote.add(collateralAmount);
+        totalLiquidity.availableQuote = totalLiquidity.availableQuote.add(collateralAmount);
 
         require(tokenCurrency.mint(address(this), numTokens), "Minting synthetic tokens failed");
 
@@ -157,18 +200,18 @@ contract Perpetual is Lockable, Whitelist {
         require(percentage <= ONE, "percentage>1");
         require(percentage > 0, "percentage=0");
 
-        LiquidityData storage liquidityData = liquidityProviders[msg.sender];
+        LiquidityProvider storage liquidityData = liquidityProviders[msg.sender];
 
         uint256 collateral = liquidityData.rawCollateral.wmul(percentage);
         uint256 numTokens = liquidityData.totalMinted.wmul(percentage);
 
-        require( availableLiquidity >= collateral , "Insufficient available collateral" );
+        require( totalLiquidity.availableQuote >= collateral , "Insufficient available collateral" );
 
         liquidityData.totalMinted = liquidityData.totalMinted.sub(numTokens);
         liquidityData.rawCollateral = liquidityData.rawCollateral.sub(collateral);
 
-        totalLiquidity = totalLiquidity.sub(collateral);
-        availableLiquidity = availableLiquidity.sub(collateral);
+        totalLiquidity.quote = totalLiquidity.quote.sub(collateral);
+        totalLiquidity.availableQuote = totalLiquidity.availableQuote.sub(collateral);
 
         // Withdraw synthetics from PMM and burn
         pmm.withdrawBase(numTokens);
@@ -185,6 +228,40 @@ contract Perpetual is Lockable, Whitelist {
     modifier pmmRequired() {
         require(address(pmm) != address(0), "no pmm is set");
         _;
+    }
+
+    function _resolveLeverage(Leverage leverage) pure internal returns (uint256) {
+        if (leverage == Leverage.FOUR) {
+            return 4;
+        } else if (leverage == Leverage.THREE) {
+            return 3;
+        } else if (leverage == Leverage.TWO) {
+            return 2;
+        } else {
+            return 1;
+        }
+    }
+
+    function _incrementCollateralBalances(
+        PositionData storage positionData,
+        uint256 collateralAmount,
+        uint256 leveragedAmount,
+        uint256 size,
+        Side side,
+        Leverage leverage,
+        uint256 price
+    ) internal {
+        positionData.rawCollateral = positionData.rawCollateral.add(collateralAmount);
+        rawTotalPositionCollateral = rawTotalPositionCollateral.add(collateralAmount);
+
+        positionData.leveragedAmount = positionData.leveragedAmount.add(leveragedAmount);
+        positionData.positionSize = positionData.positionSize.add(size);
+        positionData.side = side;
+        positionData.leverage = leverage;
+        positionData.entryValue = price;
+        positionData.entryTimestamp = block.timestamp;
+        positionData.locked = true;
+
     }
 
 }
