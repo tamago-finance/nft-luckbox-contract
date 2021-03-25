@@ -6,6 +6,8 @@ const Perpetual = artifacts.require('Perpetual')
 const SyntheticToken = artifacts.require('SyntheticToken')
 
 
+const { calculateLongPnl , calculateShortPnl } = require("./helpers/Utils")
+
 let priceFeed
 let colleteralToken
 let syntheticToken
@@ -117,17 +119,44 @@ contract('Perpetual', accounts => {
         assert(alicePosition.locked, true)
 
         // Risen AAPL from 120 -> 135
-
-        console.log("base --> ", web3.utils.fromWei(await syntheticToken.balanceOf(pmm.address)) )
-        console.log("quote --> ", web3.utils.fromWei(await colleteralToken.balanceOf(pmm.address)))
-
-        console.log(web3.utils.fromWei(await pmm.querySellBaseToken( web3.utils.toWei("2") ) ))
-
         await priceFeed.updateValue(web3.utils.toWei("135"))
-
-        console.log(web3.utils.fromWei(await pmm.querySellBaseToken( web3.utils.toWei("2") ) ))
+        // Looks for profit / loss
+        const pnl = await calculateLongPnl(pmm, alicePosition)
+        assert(pnl, 23.26563304047943)
 
     })
 
+    it('open a short position with x2 leverage', async () => {
+        // Adding liquidity first and acquire some synthetic tokens into the reserve
+        await colleteralToken.approve(perpetual.address, web3.utils.toWei("1000000"), { from: admin })
+        await perpetual.addLiquidity(web3.utils.toWei("5000"), { from: admin })
+        await perpetual.openLongPosition(web3.utils.toWei("3"), web3.utils.toWei("500"), Leverage.TWO, { from: admin })
+
+        // Check if we have enough liquidity
+        assert(Number(web3.utils.fromWei((await perpetual.totalLiquidity()).availableBase)) > 1, true)
+
+        // open a short position from Alice
+        await colleteralToken.approve(perpetual.address, web3.utils.toWei("1000000"), { from: alice })
+        await perpetual.openShortPosition(web3.utils.toWei("1"), web3.utils.toWei("200"), Leverage.TWO, { from: alice })
+
+        const alicePosition = await perpetual.positions(alice)
+
+        assert(web3.utils.fromWei(alicePosition.rawCollateral), "153.740689655172414")
+        assert(web3.utils.fromWei(alicePosition.leveragedAmount) , "307.481379310344828")
+        assert(web3.utils.fromWei(alicePosition.positionSize) , "2")
+
+        assert(Number(alicePosition.side),1)
+        assert(Number(alicePosition.leverage), 1)
+
+        assert(web3.utils.fromWei(alicePosition.entryValue) , "153.740689655172414")
+        assert(alicePosition.locked, true)
+
+        // Lower AAPL from 120 -> 110
+        await priceFeed.updateValue(web3.utils.toWei("110"))
+        // Looks for profit / loss
+        const pnl = await calculateShortPnl(pmm, alicePosition)
+        assert(pnl, 21.275392617589205)
+
+    })
 
 })

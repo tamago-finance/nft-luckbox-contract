@@ -16,3 +16,13 @@ module.exports.setupSystem = async (accounts) => {
     }
 
 }
+
+
+module.exports.calculateLongPnl = async (pmm, position) => {
+    return (Number(web3.utils.fromWei(await pmm.querySellBaseToken(position.positionSize))))-(Number(web3.utils.fromWei(position.positionSize)) * Number(web3.utils.fromWei(position.entryValue)))
+}
+
+module.exports.calculateShortPnl = async (pmm, position) => {
+    // const size = Number(web3.utils.fromWei(position.positionSize)) * ((Number(position.leverage))+1)
+    return (Number(web3.utils.fromWei(position.leveragedAmount))) - ((Number(web3.utils.fromWei(await pmm.queryBuyBaseToken(position.positionSize)))) )
+}

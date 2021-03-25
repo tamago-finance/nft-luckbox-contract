@@ -163,6 +163,37 @@ contract Perpetual is Lockable, Whitelist {
     }
 
     // open short position
+    function openShortPosition(uint256 positionSize, uint256 maxCollateralAmount, Leverage leverage)
+        public
+        nonReentrant()
+        pmmRequired()
+    {
+        PositionData storage positionData = positions[msg.sender];
+
+        require(positionSize > 0, "amount must be greater than 0");
+        require(positionData.locked == false , "Position is locked");
+
+        uint256 leveragedSize = positionSize.mul(_resolveLeverage(leverage));
+
+        uint256 amount = pmm.querySellBaseToken(leveragedSize);
+        uint256 currentPrice = amount.wdiv(leveragedSize);
+        uint256 collateralAmount = positionSize.wmul(currentPrice);
+
+        require(maxCollateralAmount >= collateralAmount, "collateralAmount > maxCollateralAmount");
+        require(leveragedSize < totalLiquidity.availableBase, "Not enough liquidity");
+
+        pmm.sellBaseToken(leveragedSize, amount);
+        // Record it
+        _incrementCollateralBalances(positionData, collateralAmount, amount, leveragedSize, Side.SHORT, leverage, currentPrice );
+
+        totalLiquidity.availableBase = totalLiquidity.availableBase.sub(leveragedSize);
+        totalLiquidity.availableQuote = totalLiquidity.availableQuote.add(amount);
+        totalLiquidity.quote = totalLiquidity.quote.add(amount);
+
+        emit PositionCreated(msg.sender, collateralAmount, amount, Side.SHORT, leverage, currentPrice);
+
+        collateralCurrency.transferFrom(msg.sender, address(this), collateralAmount);
+    }
 
     // add liquidity
     function addLiquidity(uint256 collateralAmount) 
