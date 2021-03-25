@@ -62,6 +62,7 @@ contract('Perpetual', accounts => {
             web3.utils.toWei("0.99") // K 
         )
 
+        await colleteralToken.approve(perpetual.address,  web3.utils.toWei("1000000"))
         await perpetual.setupPmm(pmm.address) // mint 1 SYNTH and deposit to PMM
 
     })
@@ -117,11 +118,14 @@ contract('Perpetual', accounts => {
 
         // Risen AAPL from 120 -> 135
 
-        console.log(web3.utils.fromWei(await pmm.querySellBaseToken( web3.utils.toWei("1") ) ))
+        console.log("base --> ", web3.utils.fromWei(await syntheticToken.balanceOf(pmm.address)) )
+        console.log("quote --> ", web3.utils.fromWei(await colleteralToken.balanceOf(pmm.address)))
+
+        console.log(web3.utils.fromWei(await pmm.querySellBaseToken( web3.utils.toWei("2") ) ))
 
         await priceFeed.updateValue(web3.utils.toWei("135"))
 
-        console.log(web3.utils.fromWei(await pmm.querySellBaseToken( web3.utils.toWei("1") ) ))
+        console.log(web3.utils.fromWei(await pmm.querySellBaseToken( web3.utils.toWei("2") ) ))
 
     })
 

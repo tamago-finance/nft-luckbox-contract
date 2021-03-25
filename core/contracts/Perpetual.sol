@@ -113,7 +113,11 @@ contract Perpetual is Lockable, Whitelist {
         // Initial fund PMM with 1 SYNTH
         tokenCurrency.mint(address(this), ONE);
         pmm.depositBase(ONE);
-
+        uint256 initialRate = pmm.getMidPrice();
+        collateralCurrency.transferFrom(msg.sender, address(this), initialRate);
+        // Funding on colleteral side that equivalent to 1 SYNTH
+        pmm.depositQuote(initialRate);
+        // TODO: Find out the suitable amount when initialize the PMM
     }
 
     // Get synthetic token address
