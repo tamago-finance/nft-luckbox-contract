@@ -23,6 +23,7 @@ contract Perpetual is Lockable, Whitelist {
 
     enum Leverage {ONE, TWO, THREE, FOUR}
     enum Side {FLAT, SHORT, LONG} 
+    enum CollateralizationStatus {SAFE, WARNING, DANGER}
 
     struct LiquidityProvider {
         // Raw collateral value
@@ -70,15 +71,19 @@ contract Perpetual is Lockable, Whitelist {
     
     uint256 constant MAX = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
     uint256 constant ONE = 1000000000000000000; // 1
-    uint256 constant liquidationRatio = 1250000000000000000; // 1.25
-    uint256 constant maintenanceRatio = 1500000000000000000; // 1.5
+    // Trader need to top-up when position is below 70%
+    uint256 constant maintenanceRatio = 700000000000000000; // 0.7
+    // Anybody can liquidate when particular trader position belows 40%
+    uint256 constant liquidationRatio = 400000000000000000; // 0.4
+    // Take cut to liquidator 15%
+    uint256 constant liquidationIncentive = 150000000000000000; // 0.15
 
     event CreatedPerpetual();
     event AddLiquidity(address indexed sender, uint256 collateralAmount, uint256 numTokens);
     event RemoveLiquidity(address indexed sender, uint256 collateralAmount, uint256 numTokens);
     event NewLiquidityProvider(address indexed sponsor);
     event PositionCreated(address indexed sender, uint256 collateralAmount, uint256 positionSize, Side side, Leverage leverage, uint256 price);
-
+    event PositionLiquidated(address indexed trader, address indexed liquidator, uint256 tokenAmount, uint256 payBackToTrader, uint256 payToLiquidator);
 
     constructor(
         string memory _name,
@@ -124,6 +129,36 @@ contract Perpetual is Lockable, Whitelist {
     function getTokenCurrency() public view returns (address)
     {
         return address(tokenCurrency);
+    }
+
+    // Get my Profit/Loss
+    function myPnl() 
+        public
+        view
+        returns (int256 pnl) 
+    {
+        PositionData storage positionData = positions[msg.sender];
+        return _pnl(positionData);
+    }
+
+    // Get the current collateralization ratio from the sender
+    function myCollateralizationRatio()
+        public
+        view
+        returns (uint256 ratio)
+    {
+        PositionData storage positionData = positions[msg.sender];
+        return _getCollateralizationRatio(positionData);
+    }
+
+    // Get the current collateralization status from the sender
+    function myCollateralizationStatus()
+        public
+        view
+        returns (CollateralizationStatus status)
+    {
+        PositionData storage positionData = positions[msg.sender];
+        return _getCollateralizationStatus(positionData);
     }
 
     // trade functions
@@ -193,6 +228,64 @@ contract Perpetual is Lockable, Whitelist {
         emit PositionCreated(msg.sender, collateralAmount, amount, Side.SHORT, leverage, currentPrice);
 
         collateralCurrency.transferFrom(msg.sender, address(this), collateralAmount);
+    }
+
+    // liquidation
+    function liquidate(address trader) 
+        external
+        nonReentrant()
+        pmmRequired()
+    {
+        // Retrieve Position data for trader who being liquidated
+        PositionData storage positionData = positions[trader];
+
+        require( positionData.locked == true, "No position on a given address" );
+        require(
+            _getCollateralizationStatus(positionData) == CollateralizationStatus.DANGER,
+            "Position above than liquidation ratio"
+        );
+
+        uint256 currentRatio = _getCollateralizationRatio(positionData);
+        uint256 penaltyFee = 0;
+        uint256 payToTrader = 0;
+
+        if (currentRatio != 0) {
+            // Pay Trader back - Penalty fee 
+            uint256 remainingCollateral = (positionData.rawCollateral).wmul(currentRatio);
+            penaltyFee = remainingCollateral.wmul(liquidationIncentive);
+            payToTrader =  remainingCollateral.sub(penaltyFee);
+
+            collateralCurrency.transfer(trader, payToTrader);
+            // Incentivize the liquidator
+            collateralCurrency.transfer(msg.sender, penaltyFee);
+        }
+
+        if (positionData.side == Side.LONG) {
+            // Sell synthetic assets back to PMM
+            uint256 amount = pmm.querySellBaseToken(positionData.positionSize);
+            pmm.sellBaseToken(positionData.positionSize, amount); 
+
+            totalLiquidity.availableQuote = totalLiquidity.availableQuote.add(amount);
+            require(totalLiquidity.availableBase >= positionData.positionSize, "not enough liquidity");
+            totalLiquidity.availableBase = totalLiquidity.availableBase.sub(positionData.positionSize);
+            totalLiquidity.base = totalLiquidity.base.sub(positionData.positionSize);
+
+        } else {
+            // Sell colleteral assets back to PMM
+            // FIXME: Find the better way to convert collateral -> synthetic
+            uint256 spotPrice = pmm.getMidPrice();
+            uint256 totalSynths = positionData.leveragedAmount.wdiv(spotPrice);
+            uint256 amount = pmm.queryBuyBaseToken(totalSynths);
+            pmm.buyBaseToken(totalSynths, amount);
+
+            totalLiquidity.availableBase = totalLiquidity.availableBase.add(totalSynths);
+            totalLiquidity.availableQuote = totalLiquidity.availableQuote.sub(positionData.leveragedAmount);
+            totalLiquidity.quote = totalLiquidity.quote.sub(positionData.leveragedAmount);
+        }   
+
+        emit PositionLiquidated(trader, msg.sender , positionData.rawCollateral , payToTrader, penaltyFee);
+
+        _deletePosition(trader);
     }
 
     // add liquidity
@@ -297,6 +390,48 @@ contract Perpetual is Lockable, Whitelist {
         positionData.entryTimestamp = block.timestamp;
         positionData.locked = true;
 
+    }
+
+    function _deletePosition(address trader) internal {
+        PositionData storage positionData = positions[trader];
+        require( positionData.locked == true , "No position on the given address" );
+
+        positionData.leveragedAmount = 0;
+        positionData.positionSize = 0;
+        positionData.side = Side.FLAT;
+        positionData.leverage = Leverage.ONE;
+        positionData.entryValue = 0;
+        positionData.entryTimestamp = 0;
+        positionData.locked = false;
+    }
+
+    function _getCollateralizationRatio(PositionData storage positionData) internal view returns (uint256) {
+        int256 pnl = _pnl(positionData);
+        // TODO: Might need to track debt
+        if (positionData.rawCollateral.toInt256().add(pnl) > 0) {
+            return ((positionData.rawCollateral.toInt256().add(pnl)).wdiv(positionData.rawCollateral.toInt256())).toUint256();
+        } else {
+            return 0;
+        }
+    }
+
+    function _getCollateralizationStatus(PositionData storage positionData) internal view returns (CollateralizationStatus) {
+        uint256 currentRatio = _getCollateralizationRatio(positionData);
+        if (currentRatio > maintenanceRatio) {
+            return CollateralizationStatus.SAFE;
+        } else if (currentRatio > liquidationRatio) {
+            return CollateralizationStatus.WARNING;
+        } else {
+            return CollateralizationStatus.DANGER;
+        }
+    }
+
+    function _pnl(PositionData storage positionData) internal view returns (int256) {
+        if (positionData.side == Side.LONG) {
+            return (pmm.querySellBaseToken(positionData.positionSize).toInt256()).sub( (positionData.positionSize.wmul(positionData.entryValue)).toInt256() );
+        } else {
+            return (positionData.leveragedAmount.toInt256()).sub( (pmm.queryBuyBaseToken(positionData.positionSize)).toInt256() );
+        }
     }
 
 }

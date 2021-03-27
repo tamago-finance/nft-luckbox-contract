@@ -27,6 +27,12 @@ const Leverage = {
     FOUR: 3
 }
 
+const PositionStatus = {
+    SAFE : 0,
+    WARNING : 1,
+    DANGER : 2
+}
+
 contract('Perpetual', accounts => {
 
     const admin = accounts[0]
@@ -113,8 +119,8 @@ contract('Perpetual', accounts => {
         assert(web3.utils.fromWei(alicePosition.rawCollateral), "125.8426229508196722")
         assert(web3.utils.fromWei(alicePosition.leveragedAmount), "251.6852459016393444")
         assert(web3.utils.fromWei(alicePosition.positionSize), "2")
-        assert(Number(alicePosition.side), 2)
-        assert(Number(alicePosition.leverage), 1)
+        assert(Number(alicePosition.side), Side.LONG)
+        assert(Number(alicePosition.leverage), Leverage.TWO)
         assert(web3.utils.fromWei(alicePosition.entryValue) , "125.8426229508196722")
         assert(alicePosition.locked, true)
 
@@ -145,8 +151,8 @@ contract('Perpetual', accounts => {
         assert(web3.utils.fromWei(alicePosition.leveragedAmount) , "307.481379310344828")
         assert(web3.utils.fromWei(alicePosition.positionSize) , "2")
 
-        assert(Number(alicePosition.side),1)
-        assert(Number(alicePosition.leverage), 1)
+        assert(Number(alicePosition.side),Side.SHORT)
+        assert(Number(alicePosition.leverage), Leverage.TWO)
 
         assert(web3.utils.fromWei(alicePosition.entryValue) , "153.740689655172414")
         assert(alicePosition.locked, true)
@@ -158,5 +164,67 @@ contract('Perpetual', accounts => {
         assert(pnl, 21.275392617589205)
 
     })
+
+    it('liquidate the long position', async () => {
+        // Adding liquidity first
+        await colleteralToken.approve(perpetual.address, web3.utils.toWei("1000000"), { from: admin })
+        await perpetual.addLiquidity(web3.utils.toWei("5000"), { from: admin })
+        // Open a long position witth 4x leverage
+        await colleteralToken.approve(perpetual.address, web3.utils.toWei("1000000"), { from: alice })
+        await perpetual.openLongPosition(web3.utils.toWei("1"), web3.utils.toWei("150"), Leverage.FOUR, { from: alice })
+
+        // Check if the position is safe
+        assert(await perpetual.myCollateralizationStatus({from : alice }), PositionStatus.SAFE)
+
+        // try to liquidate when the position is safe
+        try {
+            await perpetual.liquidate(alice, { from: bob })
+        } catch (error) {
+            assert.ok(error.message.includes("Position above than liquidation ratio"));
+        }
+        // Decrease the price to 95
+        await priceFeed.updateValue(web3.utils.toWei("95"))
+        assert(await perpetual.myCollateralizationStatus({from : alice }), PositionStatus.DANGER)
+        
+        const bobBalanceBefore = await colleteralToken.balanceOf(bob)
+
+        // Bob liquidates Alice's position
+        await perpetual.liquidate(alice, { from: bob })
+        
+        const bobBalanceAfter = await colleteralToken.balanceOf(bob)
+        assert(Number(web3.utils.fromWei(bobBalanceAfter)) > Number(web3.utils.fromWei(bobBalanceBefore)) , true)
+
+        assert(await perpetual.myCollateralizationStatus({from : alice }) , Side.FLAT)
+    })
+
+    it('liquidate the short position', async () => {
+        // Adding liquidity first and acquire some synthetic tokens into the reserve
+        await colleteralToken.approve(perpetual.address, web3.utils.toWei("1000000"), { from: admin })
+        await perpetual.addLiquidity(web3.utils.toWei("5000"), { from: admin })
+        await perpetual.openLongPosition(web3.utils.toWei("3"), web3.utils.toWei("500"), Leverage.TWO, { from: admin })
+
+        // Open a long position witth 4x leverage
+        await colleteralToken.approve(perpetual.address, web3.utils.toWei("1000000"), { from: alice })
+        await perpetual.openShortPosition(web3.utils.toWei("1"), web3.utils.toWei("150"), Leverage.FOUR, { from: alice })
+
+        // Check if the position is safe
+        assert(await perpetual.myCollateralizationStatus({from : alice }), PositionStatus.SAFE)
+
+        // Decrease the price to 140
+        await priceFeed.updateValue(web3.utils.toWei("140"))
+        assert(await perpetual.myCollateralizationStatus({from : alice }), PositionStatus.DANGER)
+
+        const bobBalanceBefore = await colleteralToken.balanceOf(bob)
+
+        // Bob liquidates Alice's position
+        await perpetual.liquidate(alice, { from: bob })
+
+        const bobBalanceAfter = await colleteralToken.balanceOf(bob)
+        assert(Number(web3.utils.fromWei(bobBalanceAfter)) > Number(web3.utils.fromWei(bobBalanceBefore)) , true)
+
+        assert(await perpetual.myCollateralizationStatus({from : alice }) , Side.FLAT)
+
+    })
+
 
 })
