@@ -163,6 +163,16 @@ contract Perpetual is Lockable, Whitelist {
         return _getCollateralizationStatus(positionData);
     }
 
+    // get mid price
+    function getMidPrice()
+        public
+        view
+        pmmRequired()
+        returns (uint256)
+    {
+        return pmm.getMidPrice();
+    }
+
     // trade functions
     
     // open long position

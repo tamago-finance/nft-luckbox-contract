@@ -3,7 +3,12 @@
   "version": "0.1.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "test": "truffle test",
+    "ganache": "ganache-cli --mnemonic $(grep MNEMONIC .env | cut -d '=' -f2)"
+  },
   "devDependencies": {
-    "@truffle/hdwallet-provider": "^1.2.2"
+    "@truffle/hdwallet-provider": "1.2.2",
+    "ganache-cli": "^6.12.1"
   }
 }

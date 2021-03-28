@@ -18,7 +18,7 @@
  *
  */
 
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
+ const HDWalletProvider = require('@truffle/hdwallet-provider');
 // const infuraKey = "fj4jll3k.....";
 //
 // const fs = require('fs');
@@ -46,6 +46,14 @@ module.exports = {
       host: "127.0.0.1",     // Localhost (default: none)
       port: 8545,            // Standard Ethereum port (default: none)
       network_id: "*",       // Any network (default: none)
+    },
+    kovan: {
+      provider: () => new HDWalletProvider("", `https://kovan.infura.io/v3/c719e84c3f494d3ca05aa0fb5a36a2f8`),
+      network_id: 42,       // Ropsten's id
+      gas: 8500000,
+      gasPrice: 20000000000,        // Ropsten has a lower block limit than mainnet
+      confirmations: 1,    // # of confs to wait between deployments. (default: 0)
+      skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
     },
 
     // Another network with more advanced options...
