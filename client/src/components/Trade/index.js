@@ -24,7 +24,7 @@ const Trade = () => {
 
     return (
         <div>
-            Trade
+            Under construction
         </div>
     )
 }

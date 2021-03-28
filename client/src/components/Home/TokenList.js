@@ -4,12 +4,13 @@ import { Row, Col, Table, Badge } from "reactstrap"
 import { useHistory } from "react-router-dom"
 import { TOKENS } from "../../constants"
 import AssetIcon from "../common/AssetIcon"
-
+import { ContractContext } from "../../hooks/useContract"
 
 const TokenList = styled(
     ({ className, currentNetwork }) => {
 
         let history = useHistory()
+        const { collateralToken, perpetuals } = useContext(ContractContext)
 
         const LIST = useMemo(() => {
 
@@ -24,6 +25,8 @@ const TokenList = styled(
         const toTrading = (address) => {
             history.push(`/trade/${address}`)
         }
+
+        console.log("perpetuals --> ", perpetuals)
 
         return (
             <div className={className}>
@@ -48,19 +51,19 @@ const TokenList = styled(
                                                 <tr>
                                                     <td>Mark Price</td>
                                                     <td>
-                                                        618.71
+                                                        {(perpetuals[item.symbol].markPrice)}
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td>Liquidity</td>
                                                     <td>
-                                                        1100.00
+                                                    {(perpetuals[item.symbol].totalLiquidity)}
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td>Collateral</td>
                                                     <td>
-                                                        USDX
+                                                        {collateralToken.symbol}
                                                     </td>
                                                 </tr>
                                             </tbody>

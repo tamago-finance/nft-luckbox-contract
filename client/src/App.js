@@ -10,6 +10,7 @@ import {
 import Navbar from "./components/Navbar"
 import Routes from "./components/Routes"
 import ToastProvider from "./hooks/useToasts"
+import ContractProvider from "./hooks/useContract"
 
 const getLibrary = (provider) => {
   const library = new ethers.providers.Web3Provider(provider)
@@ -20,12 +21,14 @@ const getLibrary = (provider) => {
 function App() {
   return (
     <Web3ReactProvider getLibrary={getLibrary} >
-      <ToastProvider>
-        <Router>
-          <Navbar />
-          <Routes />
-        </Router>
-      </ToastProvider>
+      <ContractProvider>
+        <ToastProvider>
+          <Router>
+            <Navbar />
+            <Routes />
+          </Router>
+        </ToastProvider>
+      </ContractProvider>
     </Web3ReactProvider>
   );
 }

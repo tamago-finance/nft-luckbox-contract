@@ -187,7 +187,7 @@ const Main = () => {
                             </NavItem> */}
                             <NavItem>
                                 <NavLink>
-                                    <a target="_blank" href="https://github.com/pisuthd/hotpotswap">GitHub</a>
+                                    <a target="_blank" href="https://github.com/tamago-finance/tamago-finance">GitHub</a>
                                 </NavLink>
                             </NavItem>
                             {!account
@@ -219,8 +219,8 @@ const Main = () => {
                                                     deactivate()
                                                 }}
                                             >
-                                                <LogOut size={16} className="mr-1" /> Exit
-                                                    </div>
+                                                <LogOut size={16} className="mr-1" /> Logout
+                                             </div>
                                         </DropdownItem>
                                     </DropdownMenu>
                                 </UncontrolledDropdown>

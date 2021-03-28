@@ -23,9 +23,9 @@ const Headline = styled(
                     </p> */}
                 </div>
                 <div className="button-row">
-                    <Button onClick={() => setNetwork(0)} color={currentNetwork === 0 ? "info" : "secondary"}>
+                    {/* <Button onClick={() => setNetwork(0)} color={currentNetwork === 0 ? "info" : "secondary"}>
                         Development
-                    </Button>
+                    </Button> */}
                     <Button onClick={() => setNetwork(1)} color={currentNetwork === 1 ? "info" : "secondary"}>
                         Ethereum Kovan
                     </Button>
@@ -64,7 +64,7 @@ const Headline = styled(
 
 const Home = () => {
 
-    const [currentNetwork, setNetwork] = useState(0) // 0 - Dev, 1 - Kovan, 2 - Acala
+    const [currentNetwork, setNetwork] = useState(1) // 0 - Dev, 1 - Kovan, 2 - Acala
 
     return (
         <Container>
