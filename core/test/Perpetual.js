@@ -130,6 +130,14 @@ contract('Perpetual', accounts => {
         const pnl = await calculateLongPnl(pmm, alicePosition)
         assert(pnl, 23.26563304047943)
 
+        const aliceBalanceBefore = await colleteralToken.balanceOf(alice)
+
+        await perpetual.closePosition( { from : alice })
+
+        const aliceBalanceAfter = await colleteralToken.balanceOf(alice)
+
+        // rawCollateral + pnl
+        assert(Number(web3.utils.fromWei(aliceBalanceAfter)) - Number(web3.utils.fromWei(aliceBalanceBefore)), 149.1082559912993)
     })
 
     it('open a short position with x2 leverage', async () => {
@@ -163,6 +171,14 @@ contract('Perpetual', accounts => {
         const pnl = await calculateShortPnl(pmm, alicePosition)
         assert(pnl, 21.275392617589205)
 
+        const aliceBalanceBefore = await colleteralToken.balanceOf(alice)
+
+        await perpetual.closePosition( { from : alice })
+
+        const aliceBalanceAfter = await colleteralToken.balanceOf(alice)
+
+        // rawCollateral + pnl
+        assert(Number(web3.utils.fromWei(aliceBalanceAfter)) - Number(web3.utils.fromWei(aliceBalanceBefore)) , 175.0160822727612 )
     })
 
     it('liquidate the long position', async () => {

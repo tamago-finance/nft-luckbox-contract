@@ -83,7 +83,8 @@ contract Perpetual is Lockable, Whitelist {
     event RemoveLiquidity(address indexed sender, uint256 collateralAmount, uint256 numTokens);
     event NewLiquidityProvider(address indexed sponsor);
     event PositionCreated(address indexed sender, uint256 collateralAmount, uint256 positionSize, Side side, Leverage leverage, uint256 price);
-    event PositionLiquidated(address indexed trader, address indexed liquidator, uint256 tokenAmount, uint256 payBackToTrader, uint256 payToLiquidator);
+    event PositionLiquidated(address indexed trader, address indexed liquidator, Side side, uint256 tokenAmount, uint256 payBackToTrader, uint256 payToLiquidator);
+    event PositionClosed(address indexed trader, Side side, uint256 collateralAmount, uint256 positionSize, uint256 entryPrice, uint256 exitPrice);
 
     constructor(
         string memory _name,
@@ -230,6 +231,55 @@ contract Perpetual is Lockable, Whitelist {
         collateralCurrency.transferFrom(msg.sender, address(this), collateralAmount);
     }
 
+    // close the position
+    function closePosition()
+        public
+        nonReentrant()
+        pmmRequired()
+    {
+        PositionData storage positionData = positions[msg.sender];
+
+        require( positionData.locked == true, "No position on a given address" );
+        require(
+            _getCollateralizationStatus(positionData) != CollateralizationStatus.DANGER,
+            "Unable to close unsafe position"
+        );
+
+        int256 remainingCollateral = (positionData.rawCollateral.toInt256()).add(_pnl(positionData));
+        uint256 exitPrice = 0;
+
+        if (positionData.side == Side.LONG) {
+            // Sell synthetic assets back to PMM
+            uint256 amount = pmm.querySellBaseToken(positionData.positionSize);
+            pmm.sellBaseToken(positionData.positionSize, amount); 
+
+            totalLiquidity.availableQuote = totalLiquidity.availableQuote.add(amount);
+            require(totalLiquidity.availableBase >= positionData.positionSize, "not enough liquidity");
+            totalLiquidity.availableBase = totalLiquidity.availableBase.sub(positionData.positionSize);
+            totalLiquidity.base = totalLiquidity.base.sub(positionData.positionSize);
+        } else {
+            // Sell colleteral assets back to PMM
+            // FIXME: Find the better way to convert collateral -> synthetic
+            uint256 spotPrice = pmm.getMidPrice();
+            uint256 totalSynths = positionData.leveragedAmount.wdiv(spotPrice);
+            uint256 amount = pmm.queryBuyBaseToken(totalSynths);
+            pmm.buyBaseToken(totalSynths, amount);
+
+            totalLiquidity.availableBase = totalLiquidity.availableBase.add(totalSynths);
+            require(totalLiquidity.availableQuote >= positionData.leveragedAmount, "not enough liquidity");
+            totalLiquidity.availableQuote = totalLiquidity.availableQuote.sub(positionData.leveragedAmount);
+            totalLiquidity.quote = totalLiquidity.quote.sub(positionData.leveragedAmount);
+        }
+
+        rawTotalPositionCollateral = rawTotalPositionCollateral.sub(positionData.rawCollateral);
+
+        emit PositionClosed(msg.sender, positionData.side, remainingCollateral.toUint256(), positionData.positionSize, positionData.entryValue, exitPrice);
+
+        _deletePosition(msg.sender);
+
+        collateralCurrency.transfer(msg.sender, remainingCollateral.toUint256());
+    }
+
     // liquidation
     function liquidate(address trader) 
         external
@@ -279,11 +329,14 @@ contract Perpetual is Lockable, Whitelist {
             pmm.buyBaseToken(totalSynths, amount);
 
             totalLiquidity.availableBase = totalLiquidity.availableBase.add(totalSynths);
+            require(totalLiquidity.availableQuote >= positionData.leveragedAmount, "not enough liquidity");
             totalLiquidity.availableQuote = totalLiquidity.availableQuote.sub(positionData.leveragedAmount);
             totalLiquidity.quote = totalLiquidity.quote.sub(positionData.leveragedAmount);
         }   
 
-        emit PositionLiquidated(trader, msg.sender , positionData.rawCollateral , payToTrader, penaltyFee);
+        rawTotalPositionCollateral = rawTotalPositionCollateral.sub(positionData.rawCollateral);
+
+        emit PositionLiquidated(trader, msg.sender, positionData.side , positionData.rawCollateral , payToTrader, penaltyFee);
 
         _deletePosition(trader);
     }
