@@ -31,7 +31,7 @@ import {
 // import Trade from "./Trade"
 import Liquidity from "./Liquidity"
 import Home from "./Home"
-
+import Trade from "./Trade"
 
 
 const Wrapper = styled(Container)`
@@ -52,6 +52,9 @@ const Routes = () => {
                 <Route exact path="/">
                     <Home />
                 </Route> 
+                <Route path="/trade">
+                    <Trade/>
+                </Route>
                 <Route exact path="/liquidity">
                     <Liquidity />
                 </Route>

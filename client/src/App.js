@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import Navbar from "./components/Navbar"
 import Routes from "./components/Routes"
+import ToastProvider from "./hooks/useToasts"
 
 const getLibrary = (provider) => {
   const library = new ethers.providers.Web3Provider(provider)
@@ -19,10 +20,12 @@ const getLibrary = (provider) => {
 function App() {
   return (
     <Web3ReactProvider getLibrary={getLibrary} >
-      <Router>
-        <Navbar/> 
-        <Routes/>
-      </Router>
+      <ToastProvider>
+        <Router>
+          <Navbar />
+          <Routes />
+        </Router>
+      </ToastProvider>
     </Web3ReactProvider>
   );
 }

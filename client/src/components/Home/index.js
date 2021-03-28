@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react'
 import { Container, Button } from "reactstrap"
 import styled from "styled-components"
+import TokenList from "./TokenList"
 
 // the first vAMM based perpetual contract protocol built on #Neo.
 
@@ -23,13 +24,13 @@ const Headline = styled(
                 </div>
                 <div className="button-row">
                     <Button onClick={() => setNetwork(0)} color={currentNetwork === 0 ? "info" : "secondary"}>
-                        All Network
+                        Development
                     </Button>
                     <Button onClick={() => setNetwork(1)} color={currentNetwork === 1 ? "info" : "secondary"}>
-                        Kovan
+                        Ethereum Kovan
                     </Button>
-                    <Button onClick={() => setNetwork(2)} color={currentNetwork === 2 ? "info" : "secondary"}>
-                        Acala Mandala
+                    <Button disabled={true} onClick={() => setNetwork(2)} color={currentNetwork === 2 ? "info" : "secondary"}>
+                        Acala Testnet
                     </Button>
                 </div>
             </div>
@@ -63,13 +64,16 @@ const Headline = styled(
 
 const Home = () => {
 
-    const [currentNetwork, setNetwork] = useState(0) // 0 - All, 1 - Kovan, 2 - Acala
+    const [currentNetwork, setNetwork] = useState(0) // 0 - Dev, 1 - Kovan, 2 - Acala
 
     return (
         <Container>
             <Headline
                 currentNetwork={currentNetwork}
                 setNetwork={setNetwork}
+            />
+            <TokenList
+                currentNetwork={currentNetwork}
             />
         </Container>
     )
