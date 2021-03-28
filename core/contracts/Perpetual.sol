@@ -14,6 +14,7 @@ import "./TokenFactory.sol";
 
 /**
  * @title Perpetual contract
+ * @dev this is unaudited code, don't use it on Mainnet
  */
 
 contract Perpetual is Lockable, Whitelist {

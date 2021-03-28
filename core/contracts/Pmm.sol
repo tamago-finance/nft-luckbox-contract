@@ -14,6 +14,7 @@ import "./utility/DODOMath.sol";
 
 /**
  * @title PMM contract (inspired by DODOEx)
+ * @dev this is unaudited code, don't use it on Mainnet
  */
 
 contract Pmm is Lockable, Whitelist, IPmm {
