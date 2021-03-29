@@ -11,6 +11,7 @@ import Navbar from "./components/Navbar"
 import Routes from "./components/Routes"
 import ToastProvider from "./hooks/useToasts"
 import ContractProvider from "./hooks/useContract"
+import NetworkProvider from "./hooks/useNetwork"
 
 const getLibrary = (provider) => {
   const library = new ethers.providers.Web3Provider(provider)
@@ -23,10 +24,12 @@ function App() {
     <Web3ReactProvider getLibrary={getLibrary}>
       <ContractProvider>
         <ToastProvider>
-          <Router>
-            <Navbar />
-            <Routes />
-          </Router>
+          <NetworkProvider>
+            <Router>
+              <Navbar />
+              <Routes />
+            </Router>
+          </NetworkProvider>
         </ToastProvider>
       </ContractProvider>
     </Web3ReactProvider>
