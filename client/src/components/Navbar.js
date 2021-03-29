@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react"
+import React, { useState, useCallback, useEffect, useContext } from "react"
 import styled from "styled-components"
 import {
   Dropdown,
@@ -32,14 +32,8 @@ import {
   useWeb3React,
   UnsupportedChainIdError,
 } from "@web3-react/core"
-import { ApiPromise } from "@polkadot/api"
-import { WsProvider } from "@polkadot/rpc-provider"
-import { options } from "@acala-network/api"
-import {
-  web3Accounts,
-  web3Enable,
-  isWeb3Injected,
-} from "@polkadot/extension-dapp"
+import { NetworkContext } from "../hooks/useNetwork"
+import { Web3AcalaContext } from "../hooks/useWeb3Acala"
 import Logo from "../assets/img/logo-2.png"
 import { useToasts } from "../hooks/useToasts"
 import MetamaskSVG from "../assets/img/metamask.svg"
@@ -134,6 +128,10 @@ const Main = () => {
     active,
     error,
   } = context
+  const { currentNetwork } = useContext(NetworkContext)
+  const { acalaAccount, setAcalaAccount, allAccounts } = useContext(
+    Web3AcalaContext
+  )
   const { add } = useToasts()
   const [loginModal, setLoginModal] = useState(false)
   const [locked, setLocked] = useState(false)
@@ -161,6 +159,7 @@ const Main = () => {
   }, [loginModal])
 
   useEffect(() => {
+    if (currentNetwork !== 1) return
     if (error && error.name === "UnsupportedChainIdError" && !locked) {
       setLocked(true)
       add({
@@ -170,18 +169,6 @@ const Main = () => {
     }
   }, [error, locked])
 
-  useEffect(async () => {
-    const injectWebPolkadot = async () => {
-      await web3Enable("Tamago Finance")
-      const provider = new WsProvider(
-        "wss://testnet-node-1.acala.laminar.one/ws"
-      )
-      const api = new ApiPromise(options({ provider }))
-      await api.isReady
-    }
-    injectWebPolkadot()
-  }, [])
-
   return (
     <>
       <Wrapper color='transparent' light expand='md'>
@@ -190,14 +177,19 @@ const Main = () => {
             <Link to='/'>
               <Brand />
             </Link>
-            {chainId === 42 && (
+            {currentNetwork === 1 && chainId === 42 && (
               <Badge size='sm' color='warning'>
                 Kovan
               </Badge>
             )}
-            {chainId === 1337 && (
+            {currentNetwork === 1 && chainId === 1337 && (
               <Badge size='sm' color='dark'>
                 Dev
+              </Badge>
+            )}
+            {currentNetwork === 2 && (
+              <Badge size='sm' color='info'>
+                Acala
               </Badge>
             )}
           </NavbarBrand>
@@ -224,37 +216,60 @@ const Main = () => {
                   </a>
                 </NavLink>
               </NavItem>
-              {!account ? (
+              {currentNetwork === 0 || currentNetwork === 1 ? (
+                !account ? (
+                  <Button color='info' onClick={toggleModal}>
+                    Connect Wallet
+                  </Button>
+                ) : (
+                  <UncontrolledDropdown className='pr-1'>
+                    <DropdownToggle nav>
+                      {/* <Blockies
+                                              seed={account}
+                                              className="rounded-circle width-35"
+                                          /> */}
+                      {shortAddress(account)}
+                      {` `}
+                      <ChevronDown size={18} />
+                    </DropdownToggle>
+                    <DropdownMenu right>
+                      {/* <DropdownItem disabled>
+                                              <div className="font-small-3">
+                                                  {shortAddress(account)}
+                                              </div>
+                                          </DropdownItem>
+                                          <DropdownItem divider /> */}
+                      <DropdownItem>
+                        <div
+                          onClick={() => {
+                            deactivate()
+                          }}
+                        >
+                          <LogOut size={16} className='mr-1' /> Logout
+                        </div>
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </UncontrolledDropdown>
+                )
+              ) : !acalaAccount ? (
                 <Button color='info' onClick={toggleModal}>
                   Connect Wallet
                 </Button>
               ) : (
                 <UncontrolledDropdown className='pr-1'>
                   <DropdownToggle nav>
-                    {/* <Blockies
-                                            seed={account}
-                                            className="rounded-circle width-35"
-                                        /> */}
-                    {shortAddress(account)}
-                    {` `}
+                    {shortAddress(acalaAccount.address)}
                     <ChevronDown size={18} />
                   </DropdownToggle>
                   <DropdownMenu right>
-                    {/* <DropdownItem disabled>
-                                            <div className="font-small-3">
-                                                {shortAddress(account)}
-                                            </div>
-                                        </DropdownItem>
-                                        <DropdownItem divider /> */}
-                    <DropdownItem>
-                      <div
-                        onClick={() => {
-                          deactivate()
-                        }}
+                    {allAccounts.map((account, index) => (
+                      <DropdownItem
+                        onClick={() => setAcalaAccount(account)}
+                        key={index}
                       >
-                        <LogOut size={16} className='mr-1' /> Logout
-                      </div>
-                    </DropdownItem>
+                        {shortAddress(account.address)}
+                      </DropdownItem>
+                    ))}
                   </DropdownMenu>
                 </UncontrolledDropdown>
               )}

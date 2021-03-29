@@ -12,6 +12,7 @@ import Routes from "./components/Routes"
 import ToastProvider from "./hooks/useToasts"
 import ContractProvider from "./hooks/useContract"
 import NetworkProvider from "./hooks/useNetwork"
+import Web3AcalaProvider from "./hooks/useWeb3Acala"
 
 const getLibrary = (provider) => {
   const library = new ethers.providers.Web3Provider(provider)
@@ -22,16 +23,18 @@ const getLibrary = (provider) => {
 function App() {
   return (
     <Web3ReactProvider getLibrary={getLibrary}>
-      <ContractProvider>
-        <ToastProvider>
-          <NetworkProvider>
-            <Router>
-              <Navbar />
-              <Routes />
-            </Router>
-          </NetworkProvider>
-        </ToastProvider>
-      </ContractProvider>
+      <NetworkProvider>
+        <Web3AcalaProvider>
+          <ContractProvider>
+            <ToastProvider>
+              <Router>
+                <Navbar />
+                <Routes />
+              </Router>
+            </ToastProvider>
+          </ContractProvider>
+        </Web3AcalaProvider>
+      </NetworkProvider>
     </Web3ReactProvider>
   )
 }
