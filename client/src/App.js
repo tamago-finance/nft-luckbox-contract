@@ -1,12 +1,12 @@
-import styled from 'styled-components'
-import { Web3ReactProvider } from '@web3-react/core'
-import { ethers } from "ethers";
+import styled from "styled-components"
+import { Web3ReactProvider } from "@web3-react/core"
+import { ethers } from "ethers"
 import {
   BrowserRouter as Router,
   Switch,
   Redirect,
-  Route
-} from "react-router-dom";
+  Route,
+} from "react-router-dom"
 import Navbar from "./components/Navbar"
 import Routes from "./components/Routes"
 import ToastProvider from "./hooks/useToasts"
@@ -20,7 +20,7 @@ const getLibrary = (provider) => {
 
 function App() {
   return (
-    <Web3ReactProvider getLibrary={getLibrary} >
+    <Web3ReactProvider getLibrary={getLibrary}>
       <ContractProvider>
         <ToastProvider>
           <Router>
@@ -30,7 +30,7 @@ function App() {
         </ToastProvider>
       </ContractProvider>
     </Web3ReactProvider>
-  );
+  )
 }
 
-export default App;
+export default App
