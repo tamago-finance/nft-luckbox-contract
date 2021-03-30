@@ -25,8 +25,7 @@ const TokenList = styled(
         const toTrading = (address) => {
             history.push(`/trade/${address}`)
         }
-
-        console.log("perpetuals --> ", perpetuals)
+ 
 
         return (
             <div className={className}>

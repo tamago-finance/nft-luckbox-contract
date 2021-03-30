@@ -173,6 +173,26 @@ contract Perpetual is Lockable, Whitelist {
         return pmm.getMidPrice();
     }
 
+    // get buy price
+    function getBuyPrice(uint256 amount)
+        public
+        view
+        pmmRequired()
+        returns (uint256)
+    {
+        return pmm.queryBuyBaseToken(amount);
+    }
+
+    // get sell price
+    function getSellPrice(uint256 amount)
+        public
+        view
+        pmmRequired()
+        returns (uint256)
+    {
+        return pmm.querySellBaseToken(amount);
+    }
+
     // trade functions
     
     // open long position
