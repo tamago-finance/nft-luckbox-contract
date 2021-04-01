@@ -92,6 +92,33 @@ export const usePerpetual = (perpetualAddress, account, library, tick) => {
         [perpetualContract, account]
     );
 
+    const getPosition = useCallback(async () => {
+        
+        const position = await perpetualContract.positions(account)
+
+        let pnl = 0
+
+        try {
+            const pnlRaw = await perpetualContract.myPnl()
+            pnl = (Number(ethers.utils.formatEther(pnlRaw))) 
+        } catch (e) {
+
+        }
+
+        return {
+            locked : position.locked,
+            createdDate : new Date(Number(position.entryTimestamp) * 1000),
+            entryValue : (Number(ethers.utils.formatEther(position.entryValue))),
+            leverage : position.leverage + 1,
+            leveragedAmount : (Number(ethers.utils.formatEther(position.leveragedAmount))),
+            positionSize : (Number(ethers.utils.formatEther(position.positionSize))),
+            rawCollateral : (Number(ethers.utils.formatEther(position.rawCollateral))),
+            side : position.side === 2 ? "Long" : "Short",
+            pnl
+        }
+
+    }, [perpetualContract, account])
+
     const getBuyPrice = useCallback(async (amount) => {
         const result = await perpetualContract.getBuyPrice(ethers.utils.parseEther(`${amount}`))
         return ethers.utils.formatEther(result)
@@ -110,6 +137,10 @@ export const usePerpetual = (perpetualAddress, account, library, tick) => {
         return await perpetualContract.openShortPosition(ethers.utils.parseEther(`${amount}`), ethers.utils.parseEther(`${maxColleteral}`), leverage)
     }, [perpetualContract, account])
 
+    const closePosition = useCallback(async () => {
+        return await perpetualContract.closePosition()
+    }, [perpetualContract, account])
+
     useEffect(() => {
 
         perpetualContract && getMarkPrice().then(setMarkPrice)
@@ -126,7 +157,9 @@ export const usePerpetual = (perpetualAddress, account, library, tick) => {
         buy,
         sell,
         getBuyPrice,
-        getSellPrice
+        getSellPrice,
+        getPosition,
+        closePosition
     }
 
 }

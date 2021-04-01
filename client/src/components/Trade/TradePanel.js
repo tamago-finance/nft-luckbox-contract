@@ -40,6 +40,9 @@ const Container = styled.div`
     padding: 6px 12px;
     border: 1px solid #ddd; 
     background: white;
+
+    opacity: ${props => props.locked ? "0.6" : "1.0"};
+
     p {
         font-size: 12px;
     }
@@ -64,7 +67,7 @@ const Error = ({ errorMessage }) => {
 }
 
 
-const TradePanel = ({ perpetual, collateralToken, symbol }) => {
+const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
 
     const { chainId, account } = useWeb3React()
     const { increaseTick } = useContext(ContractContext)
@@ -107,7 +110,7 @@ const TradePanel = ({ perpetual, collateralToken, symbol }) => {
                     setBuyPrice(Number(buyPrice))
                 } catch (e) {
                     errorCount += 1
-                    setErrorMessage("Price Error - Please reduce collateral size")
+                    setErrorMessage("Price Calculation Error")
                 }
 
                 try {
@@ -115,7 +118,7 @@ const TradePanel = ({ perpetual, collateralToken, symbol }) => {
                     setSellPrice(Number(sellPrice))
                 } catch (e) {
                     errorCount += 1
-                    setErrorMessage("Price Error - Please reduce collateral size")
+                    setErrorMessage("Price Calculation Error")
                 }
 
                 if (errorCount === 0) {
@@ -183,7 +186,7 @@ const TradePanel = ({ perpetual, collateralToken, symbol }) => {
     }, [perpetual, amount, sellPrice, leverage])
 
     return (
-        <Container>
+        <Container locked={locked}>
             {/* <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam</p> */}
             <Alert color="info">Lorem ipsum dolor sit amet</Alert>
             <Nav tabs>
@@ -225,7 +228,7 @@ const TradePanel = ({ perpetual, collateralToken, symbol }) => {
                             <FormGroup>
                                 <Label for="buyAmount">Amount</Label>
                                 <InputGroup>
-                                    <Input step="0.1" value={amount} onChange={handleChange} type="number" name="buyAmount" id="buyAmount" />
+                                    <Input disabled={locked} step="0.1" value={amount} onChange={handleChange} type="number" name="buyAmount" id="buyAmount" />
                                     <InputGroupAddon addonType="append">
                                         {symbol}
                                     </InputGroupAddon>
@@ -239,16 +242,17 @@ const TradePanel = ({ perpetual, collateralToken, symbol }) => {
                                 <Label for="leverage">Leverage</Label>
                                 <div>
                                     <ButtonGroup>
-                                        <Button onClick={() => setLeverage(1)} color={leverage === 1 ? "primary" : "secondary"}>1x</Button>
-                                        <Button onClick={() => setLeverage(2)} color={leverage === 2 ? "primary" : "secondary"}>2x</Button>
-                                        <Button onClick={() => setLeverage(3)} color={leverage === 3 ? "primary" : "secondary"}>3x</Button>
-                                        <Button onClick={() => setLeverage(4)} color={leverage === 4 ? "primary" : "secondary"}>4x</Button>
+                                        <Button disabled={locked} onClick={() => setLeverage(1)} color={leverage === 1 ? "primary" : "secondary"}>1x</Button>
+                                        <Button disabled={locked} onClick={() => setLeverage(2)} color={leverage === 2 ? "primary" : "secondary"}>2x</Button>
+                                        <Button disabled={locked} onClick={() => setLeverage(3)} color={leverage === 3 ? "primary" : "secondary"}>3x</Button>
+                                        <Button disabled={locked} onClick={() => setLeverage(4)} color={leverage === 4 ? "primary" : "secondary"}>4x</Button>
                                     </ButtonGroup>
                                 </div>
                             </FormGroup>
                         </Col>
                     </Row>
                     <Summary
+                        locked={locked}
                         collateralToken={collateralToken}
                         onFaucet={onFaucet}
                         amount={amount}
@@ -258,8 +262,8 @@ const TradePanel = ({ perpetual, collateralToken, symbol }) => {
                         availableMargin={Number(perpetual?.liquidity?.availableQuote)}
                     />
                     <Error errorMessage={errorMessage} />
-                    <Button disabled={approved} onClick={onApprove} color="info" block>Approve</Button>
-                    <Button onClick={onBuy} disabled={Number(collateralToken.balance) === 0 || !approved} style={{ marginBottom: 20 }} color="primary" block>Long</Button>
+                    <Button disabled={approved || locked} onClick={onApprove} color="info" block>Approve</Button>
+                    <Button onClick={onBuy} disabled={Number(collateralToken.balance) === 0 || !approved || locked} style={{ marginBottom: 20 }} color="primary" block>Long</Button>
                 </TabPane>
                 <TabPane tabId="1">
                     {/* Short */}
@@ -282,7 +286,7 @@ const TradePanel = ({ perpetual, collateralToken, symbol }) => {
                             <FormGroup>
                                 <Label for="shortAmount">Amount</Label>
                                 <InputGroup>
-                                    <Input step="0.0001" value={amount} onChange={handleChange} type="number" name="shortAmount" id="shortAmount" />
+                                    <Input disabled={locked} step="0.0001" value={amount} onChange={handleChange} type="number" name="shortAmount" id="shortAmount" />
                                     <InputGroupAddon addonType="append">
                                         {symbol}
                                     </InputGroupAddon>
@@ -296,16 +300,17 @@ const TradePanel = ({ perpetual, collateralToken, symbol }) => {
                                 <Label for="leverage">Leverage</Label>
                                 <div>
                                     <ButtonGroup>
-                                        <Button onClick={() => setLeverage(1)} color={leverage === 1 ? "primary" : "secondary"}>1x</Button>
-                                        <Button onClick={() => setLeverage(2)} color={leverage === 2 ? "primary" : "secondary"}>2x</Button>
-                                        <Button onClick={() => setLeverage(3)} color={leverage === 3 ? "primary" : "secondary"}>3x</Button>
-                                        <Button onClick={() => setLeverage(4)} color={leverage === 4 ? "primary" : "secondary"}>4x</Button>
+                                        <Button disabled={locked} onClick={() => setLeverage(1)} color={leverage === 1 ? "primary" : "secondary"}>1x</Button>
+                                        <Button disabled={locked} onClick={() => setLeverage(2)} color={leverage === 2 ? "primary" : "secondary"}>2x</Button>
+                                        <Button disabled={locked} onClick={() => setLeverage(3)} color={leverage === 3 ? "primary" : "secondary"}>3x</Button>
+                                        <Button disabled={locked} onClick={() => setLeverage(4)} color={leverage === 4 ? "primary" : "secondary"}>4x</Button>
                                     </ButtonGroup>
                                 </div>
                             </FormGroup>
                         </Col>
                     </Row>
                     <Summary
+                        locked={locked}
                         collateralToken={collateralToken}
                         onFaucet={onFaucet}
                         amount={amount}
@@ -315,8 +320,8 @@ const TradePanel = ({ perpetual, collateralToken, symbol }) => {
                         availableMargin={Number(perpetual?.liquidity?.availableBase) * Number(sellPrice)}
                     />
                     <Error errorMessage={errorMessage} />
-                    <Button disabled={approved} onClick={onApprove} color="info" block>Approve</Button>
-                    <Button onClick={onSell} disabled={Number(collateralToken.balance) === 0 || !approved} style={{ marginBottom: 20 }} color="primary" block>Short</Button>
+                    <Button disabled={approved || locked} onClick={onApprove} color="info" block>Approve</Button>
+                    <Button onClick={onSell} disabled={Number(collateralToken.balance) === 0 || !approved || locked} style={{ marginBottom: 20 }} color="primary" block>Short</Button>
                 </TabPane>
             </TabContent>
         </Container>
@@ -324,7 +329,7 @@ const TradePanel = ({ perpetual, collateralToken, symbol }) => {
 }
 
 
-const Summary = ({ collateralToken, onFaucet, amount, leverage, price, availableMargin, symbol }) => {
+const Summary = ({ locked, collateralToken, onFaucet, amount, leverage, price, availableMargin, symbol }) => {
  
     return (
         <div>
@@ -336,7 +341,7 @@ const Summary = ({ collateralToken, onFaucet, amount, leverage, price, available
                         </th>
                         <td style={{ display: "flex", flexDirection: "row" }}>
                             <div style={{ marginTop: 3 }}>{collateralToken.balance}{` `}{collateralToken.symbol}</div>
-                            <Button onClick={onFaucet} style={{ marginLeft: 5 }} color="info" size="sm">
+                            <Button disabled={locked} onClick={onFaucet} style={{ marginLeft: 5 }} color="info" size="sm">
                                 <Plus size={16} />
                             </Button>
                         </td>

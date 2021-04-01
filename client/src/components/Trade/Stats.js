@@ -18,8 +18,6 @@ const Item = styled(Col).attrs(props => ({
 const Stats = styled(
     ({ className, perpetual, collateralToken, symbol }) => {
 
-        console.log("perpetual --> ", perpetual)
-
         return (
             <div className={className}>
                 <Row>
@@ -37,15 +35,22 @@ const Stats = styled(
                     </Item>
                     <Item>
                         <h4>
+                            Index Price
+                        </h4>
+                        <p>{0}{` `}{collateralToken.symbol}</p>
+                    </Item>
+                    <Item>
+                        <h4>
                             Mark Price
                         </h4>
                         <p>{perpetual?.markPrice}{` `}{collateralToken.symbol}</p>
                     </Item>
-                    <Item>
+                    <Item xs="4">
                         <h4>
                             Total Liquidity
                         </h4>
-                        <p>{perpetual?.totalLiquidity}{` `}{collateralToken.symbol}</p>
+                        {/* <p>{perpetual?.totalLiquidity}{` `}{collateralToken.symbol}</p> */}
+                        <p>{Number(perpetual?.liquidity?.availableQuote).toLocaleString()}{` `}{collateralToken.symbol} / {Number(perpetual?.liquidity?.availableBase).toLocaleString()}{` `}{symbol}</p>
                     </Item>
                     {/* <Item>
                         <h4>

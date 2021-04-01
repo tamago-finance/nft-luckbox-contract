@@ -9,6 +9,7 @@ import { ContractContext } from "../../hooks/useContract"
 import Header from "./Header"
 import Stats from "./Stats"
 import TradePanel from "./TradePanel"
+import Position from "./Position"
 
 const Wrapper = styled.div`
 
@@ -31,7 +32,8 @@ const Trade = () => {
     const location = useLocation()
     const { chainId, account, active, error, library } = useWeb3React()
     const { perpetuals, collateralToken } = useContext(ContractContext)
-    const [currentToken, setToken] = useState()
+    const [ currentToken, setToken] = useState()
+    const [ locked , setLocked ] = useState(false)
 
     useEffect(() => {
 
@@ -47,7 +49,7 @@ const Trade = () => {
         }
 
     }, [chainId, location.pathname])
- 
+
 
     if (!currentToken) {
         return <div> Your're not login </div>
@@ -70,13 +72,17 @@ const Trade = () => {
                         perpetual={perpetuals[currentToken?.symbol]}
                         collateralToken={collateralToken}
                         symbol={currentToken?.symbol}
+                        locked={locked}
                     />
                 </StyledCol>
                 <StyledCol xs="8">
                     <TradingViewContainer>
                         <TradingViewWidget symbol={currentToken?.symbol} autosize />
                     </TradingViewContainer>
-                    {/* <Position /> */}
+                    <Position 
+                        currentToken={currentToken}
+                        setLocked={setLocked}
+                    />
                 </StyledCol>
             </StyledRow>
         </Wrapper>
