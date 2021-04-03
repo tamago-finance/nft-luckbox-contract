@@ -37,7 +37,7 @@ const Stats = styled(
                         <h4>
                             Index Price
                         </h4>
-                        <p>{0}{` `}{collateralToken.symbol}</p>
+                        <p>{perpetual?.indexPrice}{` `}{collateralToken.symbol}</p>
                     </Item>
                     <Item>
                         <h4>

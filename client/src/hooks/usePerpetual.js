@@ -33,6 +33,7 @@ export const usePerpetual = (perpetualAddress, account, library, tick) => {
     }, [account, perpetualAddress, library])
 
     const [markPrice, setMarkPrice] = useState("--")
+    const [indexPrice, setIndexPrice] = useState("--")
     const [totalLiquidity, setTotalLiquidity] = useState("--")
     const [liquidity, setLiquidity] = useState()
 
@@ -129,6 +130,11 @@ export const usePerpetual = (perpetualAddress, account, library, tick) => {
         return ethers.utils.formatEther(result)
     }, [perpetualContract, account])
 
+    const getIndexPrice = useCallback(async () => {
+        const result = await perpetualContract.getIndexPrice()
+        return ethers.utils.formatEther(result)
+    }, [perpetualContract, account])
+
     const buy = useCallback(async (amount, maxColleteral, leverage) => {
         return await perpetualContract.openLongPosition(ethers.utils.parseEther(`${amount}`), ethers.utils.parseEther(`${maxColleteral}`), leverage)
     }, [perpetualContract, account])
@@ -144,6 +150,7 @@ export const usePerpetual = (perpetualAddress, account, library, tick) => {
     useEffect(() => {
 
         perpetualContract && getMarkPrice().then(setMarkPrice)
+        perpetualContract && getIndexPrice().then(setIndexPrice)
         perpetualContract && getTotalLiquidity().then(setTotalLiquidity)
         perpetualContract && getAvailableLiquidity().then(setLiquidity)
 
@@ -152,6 +159,7 @@ export const usePerpetual = (perpetualAddress, account, library, tick) => {
     return {
         perpetualAddress,
         markPrice,
+        indexPrice,
         totalLiquidity,
         liquidity,
         buy,
