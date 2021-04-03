@@ -9,7 +9,7 @@ const HDWalletProvider = require('@truffle/hdwallet-provider')
 
 const privateKey = ""
 const kovanRpcUrl = ""
-const oracles = ["0xe474820BC9D9FB599432944fFc6f3f7927dAb8D7" , "0xF43BFd791f831741b0Be0aDCe2F18b4dfdc923e8"]
+const oracles = ["0x758Bd19A7627bcd9043360307658bafD557CC1D0" , "0x4eE82Da2E06c6465182d9C1FCB582F8866eB816B"]
 
 // For KOVAN only
 const requestPrice = async (event) => {
