@@ -1,6 +1,7 @@
 const Pmm = artifacts.require('Pmm')
 const MockToken = artifacts.require('MockToken')
 const PriceFeeder = artifacts.require('PriceFeeder')
+const PriceFeederTiingo = artifacts.require('PriceFeederTiingo')
 const TokenFactory = artifacts.require('TokenFactory')
 const Perpetual = artifacts.require('Perpetual')
 const SyntheticToken = artifacts.require('SyntheticToken')
@@ -9,29 +10,43 @@ const fs = require("fs")
 
 module.exports = async (deployer, network, accounts) => {
 
-    const deployToken = async (collateralTokenAddress, feederName, feederInitialValue , tokenFactoryAddress, tokenName, tokenSymbol, initialFund) => {
+    const deployToken = async (collateralTokenAddress, feederName, feederInitialValue, tokenFactoryAddress, tokenName, tokenSymbol, initialFund, network = "development") => {
 
         const colleteralToken = await MockToken.at(collateralTokenAddress)
 
+        let priceFeederInstance
+
         // Setup Price Feeder
-        await deployer.deploy(
-            PriceFeeder,
-            feederName,
-            {
-                from: accounts[0]
-            })
-        
-        const priceFeederInstance = await PriceFeeder.at(PriceFeeder.address)
-        
-        await priceFeederInstance.updateValue(web3.utils.toWei(`${feederInitialValue}`), { from : accounts[0]})
-        
+        if (network === "kovan") {
+            await deployer.deploy(
+                PriceFeederTiingo,
+                feederName,
+                tokenSymbol,
+                web3.utils.toWei(`${feederInitialValue}`),
+                {
+                    from: accounts[0]
+                })
+            
+            priceFeederInstance = await PriceFeederTiingo.at(PriceFeederTiingo.address)
+        } else {
+            await deployer.deploy(
+                PriceFeeder,
+                feederName,
+                {
+                    from: accounts[0]
+                })
+
+            priceFeederInstance = await PriceFeeder.at(PriceFeeder.address)
+            await priceFeederInstance.updateValue(web3.utils.toWei(`${feederInitialValue}`), { from: accounts[0] })
+        }
+
         // Setup a perpetual contract
         await deployer.deploy(
             Perpetual,
             tokenName,
             tokenSymbol,
             tokenFactoryAddress,
-            PriceFeeder.address,
+            priceFeederInstance.address,
             collateralTokenAddress,
             {
                 from: accounts[0]
@@ -47,17 +62,17 @@ module.exports = async (deployer, network, accounts) => {
             Perpetual.address,
             syntheticTokenAddress,
             collateralTokenAddress,
-            PriceFeeder.address,
+            priceFeederInstance.address,
             web3.utils.toWei("0.99"),
             {
                 from: accounts[0]
             })
- 
-        await colleteralToken.approve( Perpetual.address, web3.utils.toWei("1000000") , { from : accounts[0]})
+
+        await colleteralToken.approve(Perpetual.address, web3.utils.toWei("1000000"), { from: accounts[0] })
         await perpetualInstance.setupPmm(Pmm.address)
         // Add liquidity
-        await perpetualInstance.addLiquidity( web3.utils.toWei(`${initialFund}`) , { from : accounts[0]})
-        
+        await perpetualInstance.addLiquidity(web3.utils.toWei(`${initialFund}`), { from: accounts[0] })
+
         return Perpetual.address
     }
 
@@ -77,13 +92,13 @@ module.exports = async (deployer, network, accounts) => {
             {
                 from: admin
             })
-        
-        const applePerpetualAddress = await deployToken(MockToken.address, "AAPL/USD", 120, TokenFactory.address, "Apple Stock", "AAPL", 5000)
-        const teslaPerpetualAddress = await deployToken(MockToken.address, "TSLA/USD", 600, TokenFactory.address, "Tesla Stock", "TSLA", 7000)
-        
+
+        const applePerpetualAddress = await deployToken(MockToken.address, "AAPL/USD", 120, TokenFactory.address, "Apple Stock", "AAPL", 50000, network)
+        const teslaPerpetualAddress = await deployToken(MockToken.address, "TSLA/USD", 660, TokenFactory.address, "Tesla Stock", "TSLA", 70000, network)
+
         await fs.writeFileSync(
             "../client/.env",
-`
+            `
 REACT_APP_APPLE_PERPETUAL_ADDRESS=${applePerpetualAddress}
 REACT_APP_TESLA_PERPETUAL_ADDRESS=${teslaPerpetualAddress}
 REACT_APP_COLLATERAL_ADDRESS=${MockToken.address}

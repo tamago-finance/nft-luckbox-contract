@@ -173,6 +173,15 @@ contract Perpetual is Lockable, Whitelist {
         return pmm.getMidPrice();
     }
 
+    // get index price
+    function getIndexPrice()
+        public
+        view
+        returns (uint256)
+    {
+        return priceFeeder.getValue();
+    }
+
     // get buy price
     function getBuyPrice(uint256 amount)
         public
