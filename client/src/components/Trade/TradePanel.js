@@ -167,7 +167,7 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
         setApproved(true)
         update({
             id,
-            ...processingToast("Approved", "Your transaction is completed", false, tx.hash, chainId)
+            ...processingToast("Buy Done", "Your transaction is completed", false, tx.hash, chainId)
         })
 
         increaseTick()
@@ -182,7 +182,7 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
         setApproved(true)
         update({
             id,
-            ...processingToast("Approved", "Your transaction is completed", false, tx.hash, chainId)
+            ...processingToast("Sell Done", "Your transaction is completed", false, tx.hash, chainId)
         })
 
         increaseTick()
@@ -321,7 +321,7 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
                         leverage={leverage}
                         symbol={symbol}
                         price={sellPrice}
-                        availableMargin={Number(perpetual?.liquidity?.availableBase) * Number(sellPrice)}
+                        availableMargin={Number(perpetual?.liquidity?.availableBase) * (Number(sellPrice)/Number(amount))}
                     />
                     <Error errorMessage={errorMessage} />
                     <Button disabled={approved || locked} onClick={onApprove} color="info" block>Approve</Button>
