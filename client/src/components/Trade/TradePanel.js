@@ -162,20 +162,22 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
     const onBuy = useCallback(async () => {
 
         const tx = await perpetual.buy(amount, (Number(leverage) * Number(amount) * Number(buyPrice) * 1.1), leverage - 1)
-        const id = add(processingToast("Approving", "Your transaction is being processed", true, tx.hash, chainId))
+        const id = add(processingToast("Buying", "Your transaction is being processed", true, tx.hash, chainId))
         await tx.wait()
         setApproved(true)
         update({
             id,
             ...processingToast("Approved", "Your transaction is completed", false, tx.hash, chainId)
         })
+
+        increaseTick()
         
     }, [perpetual, amount, buyPrice, leverage])
 
     const onSell = useCallback(async () => {
 
         const tx = await perpetual.sell(amount, (Number(leverage) * Number(amount) * Number(sellPrice) * 1.1), leverage - 1)
-        const id = add(processingToast("Approving", "Your transaction is being processed", true, tx.hash, chainId))
+        const id = add(processingToast("Selling", "Your transaction is being processed", true, tx.hash, chainId))
         await tx.wait()
         setApproved(true)
         update({
@@ -183,12 +185,14 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
             ...processingToast("Approved", "Your transaction is completed", false, tx.hash, chainId)
         })
 
+        increaseTick()
+
     }, [perpetual, amount, sellPrice, leverage])
 
     return (
         <Container locked={locked}>
             {/* <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam</p> */}
-            <Alert color="info">Lorem ipsum dolor sit amet</Alert>
+            {/* <Alert color="info">Lorem ipsum dolor sit amet</Alert> */}
             <Nav tabs>
                 <NavItem>
                     <NavLink
@@ -384,7 +388,7 @@ const Summary = ({ locked, collateralToken, onFaucet, amount, leverage, price, a
                             <div>Collateral Need</div>
                         </th>
                         <td>
-                            {(amount * price).toLocaleString()}{` `}{collateralToken.symbol}
+                            {(price).toLocaleString()}{` `}{collateralToken.symbol}
                         </td>
                     </tr>
                 </tbody>
