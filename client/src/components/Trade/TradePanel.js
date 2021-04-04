@@ -219,7 +219,7 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
                             <FormGroup>
                                 <Label for="buyPrice">Price</Label>
                                 <InputGroup>
-                                    <Input value={buyPrice.toLocaleString()} type="text" disabled name="buyPrice" id="buyPrice" />
+                                    <Input value={(buyPrice/amount).toLocaleString()} type="text" disabled name="buyPrice" id="buyPrice" />
                                     <InputGroupAddon addonType="append">
                                         {collateralToken?.symbol}
                                     </InputGroupAddon>
@@ -276,7 +276,7 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
                             <FormGroup>
                                 <Label for="shortPrice">Price</Label>
                                 <InputGroup>
-                                    <Input value={sellPrice.toLocaleString()} type="text" disabled name="shortPrice" id="shortPrice" />
+                                    <Input value={(sellPrice/amount).toLocaleString()} type="text" disabled name="shortPrice" id="shortPrice" />
                                     <InputGroupAddon addonType="append">
                                         {collateralToken?.symbol}
                                     </InputGroupAddon>
