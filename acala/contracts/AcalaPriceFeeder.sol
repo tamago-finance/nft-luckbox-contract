@@ -122,7 +122,7 @@ contract AcalaPriceFeeder is IPriceFeeder, ADDRESS {
             value = oracle.getPrice(token);
             timestamp = now;
             remainingCount--;
-            scheduler.scheduleCall(address(this), 0, 100000, 100, period, abi.encodeWithSignature("pay()"));
+            scheduler.scheduleCall(address(this), 0, 100000, 100, period, abi.encodeWithSignature("requestPrice()"));
         } 
 
     } 
