@@ -1,0 +1,10 @@
+{
+  "name": "acala",
+  "version": "0.1.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@openzeppelin/contracts": "3.3.0",
+    "ethereum-waffle": "3.2.1"
+  }
+}
