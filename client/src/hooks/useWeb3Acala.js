@@ -28,7 +28,7 @@ const Provider = ({ children }) => {
 
   const injectWebPolkadot = async () => {
     await web3Enable("Tamago Finance")
-    const provider = new WsProvider("wss://testnet-node-1.acala.laminar.one/ws")
+    const provider = new WsProvider("wss://mandala6.laminar.codes/ws")
     const api = new ApiPromise(options({ provider }))
     await api.isReady
   }
@@ -58,6 +58,7 @@ const Provider = ({ children }) => {
 
   const web3AcalaContext = useMemo(
     () => ({
+      acalaEvmProvider,
       acalaAccount,
       allAccounts,
       setAcalaAccount,
