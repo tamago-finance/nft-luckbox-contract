@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react"
+import React, { useState, useCallback, useContext } from "react"
 import { Container, Button, Alert, Row, Col } from "reactstrap"
 import styled from "styled-components"
 import TokenList from "./TokenList"
@@ -42,7 +42,7 @@ const Headline = styled(({ className, currentNetwork, setNetwork }) => {
           Ethereum Kovan
         </Button>
         <Button
-          disabled={true}
+          //   disabled={true}
           onClick={() => setNetwork(2)}
           color={currentNetwork === 2 ? "info" : "secondary"}
         >
@@ -146,7 +146,7 @@ const Footer = styled(({ className }) => (
 const Home = () => {
   const { currentNetwork, setNetwork } = useContext(NetworkContext)
 
-  const [currentNetwork, setNetwork] = useState(1) // 0 - Dev, 1 - Kovan, 2 - Acala
+  //   const [currentNetwork, setNetwork] = useState(1) // 0 - Dev, 1 - Kovan, 2 - Acala
 
   return (
     <Container>
