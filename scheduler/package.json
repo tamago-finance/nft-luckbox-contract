@@ -1,0 +1,12 @@
+{
+    "name": "scheduler",
+    "main": "index.js",
+    "dependencies": {
+        "@pulumi/aws": "^3.25.1",
+        "@pulumi/awsx": "^0.24.0",
+        "@pulumi/pulumi": "^2.0.0",
+        "@truffle/hdwallet-provider": "^1.2.6",
+        "axios": "^0.21.1",
+        "ethers": "^5.1.0"
+    }
+}

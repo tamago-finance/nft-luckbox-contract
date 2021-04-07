@@ -48,7 +48,7 @@ module.exports = {
       network_id: "*",       // Any network (default: none)
     },
     kovan: {
-      provider: () => new HDWalletProvider("", `https://kovan.infura.io/v3/c719e84c3f494d3ca05aa0fb5a36a2f8`),
+      provider: () => new HDWalletProvider("36221d1f2534028359f2acda31e3dbc3f2554bb5cd73ae846bdcf62e09ac468c", `https://kovan.infura.io/v3/c719e84c3f494d3ca05aa0fb5a36a2f8`),
       network_id: 42,       // Ropsten's id
       gas: 8500000,
       gasPrice: 20000000000,        // Ropsten has a lower block limit than mainnet

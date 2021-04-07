@@ -26,7 +26,6 @@ const TokenList = styled(
             history.push(`/trade/${address}`)
         }
 
-        console.log("perpetuals --> ", perpetuals)
 
         return (
             <div className={className}>
@@ -49,6 +48,12 @@ const TokenList = styled(
                                         <Table>
                                             <tbody>
                                                 <tr>
+                                                    <td>Index Price</td>
+                                                    <td>
+                                                        {(perpetuals[item.symbol].indexPrice)}
+                                                    </td>
+                                                </tr>
+                                                <tr>
                                                     <td>Mark Price</td>
                                                     <td>
                                                         {(perpetuals[item.symbol].markPrice)}
@@ -57,7 +62,7 @@ const TokenList = styled(
                                                 <tr>
                                                     <td>Liquidity</td>
                                                     <td>
-                                                    {(perpetuals[item.symbol].totalLiquidity)}
+                                                        {(perpetuals[item.symbol].totalLiquidity)}
                                                     </td>
                                                 </tr>
                                                 <tr>

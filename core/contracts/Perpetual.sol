@@ -173,6 +173,35 @@ contract Perpetual is Lockable, Whitelist {
         return pmm.getMidPrice();
     }
 
+    // get index price
+    function getIndexPrice()
+        public
+        view
+        returns (uint256)
+    {
+        return priceFeeder.getValue();
+    }
+
+    // get buy price
+    function getBuyPrice(uint256 amount)
+        public
+        view
+        pmmRequired()
+        returns (uint256)
+    {
+        return pmm.queryBuyBaseToken(amount);
+    }
+
+    // get sell price
+    function getSellPrice(uint256 amount)
+        public
+        view
+        pmmRequired()
+        returns (uint256)
+    {
+        return pmm.querySellBaseToken(amount);
+    }
+
     // trade functions
     
     // open long position
@@ -352,7 +381,7 @@ contract Perpetual is Lockable, Whitelist {
         _deletePosition(trader);
     }
 
-    // add liquidity
+    // add liquidity (50% to the pool / 50% to the PMM)
     function addLiquidity(uint256 collateralAmount) 
         public
         nonReentrant()
@@ -372,15 +401,18 @@ contract Perpetual is Lockable, Whitelist {
         liquidityData.rawCollateral = liquidityData.rawCollateral.add(collateralAmount);
 
         totalLiquidity.quote = totalLiquidity.quote.add(collateralAmount);
-        totalLiquidity.availableQuote = totalLiquidity.availableQuote.add(collateralAmount);
+        totalLiquidity.availableQuote = totalLiquidity.availableQuote.add(collateralAmount.div(2));
+        totalLiquidity.base = totalLiquidity.base.add(numTokens);
+        totalLiquidity.availableBase = totalLiquidity.availableBase.add(numTokens.div(2));
 
         require(tokenCurrency.mint(address(this), numTokens), "Minting synthetic tokens failed");
-
-        pmm.depositBase(numTokens);
 
         emit AddLiquidity(msg.sender, collateralAmount, numTokens);
         // Transfer tokens into this contract
         collateralCurrency.transferFrom(msg.sender, address(this), collateralAmount);
+
+        pmm.depositBase(numTokens.div(2));
+        pmm.depositQuote(collateralAmount.div(2));
     }
 
     // remove liquidity (ex. 100% = 1e18)
@@ -403,10 +435,13 @@ contract Perpetual is Lockable, Whitelist {
         liquidityData.rawCollateral = liquidityData.rawCollateral.sub(collateral);
 
         totalLiquidity.quote = totalLiquidity.quote.sub(collateral);
-        totalLiquidity.availableQuote = totalLiquidity.availableQuote.sub(collateral);
+        totalLiquidity.availableQuote = totalLiquidity.availableQuote.sub(collateral.div(2));
+        totalLiquidity.base = totalLiquidity.base.sub(numTokens);
+        totalLiquidity.availableBase = totalLiquidity.availableBase.sub(numTokens.div(2));
 
         // Withdraw synthetics from PMM and burn
-        pmm.withdrawBase(numTokens);
+        pmm.withdrawBase(numTokens.div(2));
+        pmm.withdrawQuote(collateral.div(2));
         tokenCurrency.burn(numTokens);
 
         emit RemoveLiquidity(msg.sender, collateral, numTokens);

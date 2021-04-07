@@ -5,12 +5,12 @@ export const TOKENS = {
         {
             name: "Apple",
             symbol: "AAPL",
-            address : "0xD72C75b795254dEdf463fe06072A30517e8b18B5"
+            address : "0x8ebf1287C448cB96E7A2C3438CBf29194BF98499"
         },
         {
             name: "Tesla Inc.",
             symbol: "TSLA",
-            address : "0x12fa74832cCbB7FC4E7160d65533709E0A00C2D6"
+            address : "0x75dc396f15E2d0fFFe7CFF1b7869C789895416fe"
         }
     ],
     LOCAL: [
@@ -29,7 +29,7 @@ export const TOKENS = {
 
 export const CONTRACTS = {
     KOVAN : {
-        collateralToken : "0xB5d2c96E6CbE262C890aEd469C574290bd051E8D"
+        collateralToken : "0x443A24CDb74C14e23AdE804C247A92ee1b5Dc4Cb"
     },
     LOCAL : {
         collateralToken : process.env.REACT_APP_COLLATERAL_ADDRESS
