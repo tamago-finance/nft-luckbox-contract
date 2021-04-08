@@ -38,6 +38,9 @@ export const TOKENS = {
 }
 
 export const CONTRACTS = {
+  ACALA: {
+    collateralToken: "0x867af5013cD0E54cb9B67035fDcc717488Cfcb6C",
+  },
   KOVAN: {
     collateralToken: "0x443A24CDb74C14e23AdE804C247A92ee1b5Dc4Cb",
   },

@@ -27,11 +27,11 @@ export const usePerpetual = (perpetualAddress, account, library, tick) => {
     if (!account || !perpetualAddress || !library) {
       return
     }
-
     return new ethers.Contract(
       perpetualAddress,
       Perpetual.abi,
-      library.getSigner()
+      library
+      // library.getSigner()
     )
   }, [account, perpetualAddress, library])
 

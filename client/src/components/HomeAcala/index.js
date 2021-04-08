@@ -2,7 +2,7 @@ import React, { useState, useCallback, useContext } from "react"
 import { Container, Button, Alert, Row, Col } from "reactstrap"
 import { useHistory } from "react-router-dom"
 import styled from "styled-components"
-// import TokenList from "./TokenList"
+import TokenList from "./TokenList"
 import { NetworkContext } from "../../hooks/useNetwork"
 import IllustrationPNG from "../../assets/img/illustration-1.png"
 import IllustrationPNG2 from "../../assets/img/illustration-2.png"
@@ -166,7 +166,7 @@ const Home = () => {
         Please note that the project is under heavy development and available
         only on Testnet
       </Alert>
-      {/* <TokenList currentNetwork={currentNetwork} /> */}
+      <TokenList currentNetwork={currentNetwork} />
       <About />
       <Footer />
     </Container>

@@ -6,16 +6,18 @@ import React, {
   useContext,
   useCallback,
 } from "react"
+import { ethers } from "ethers"
 import { ApiPromise, WsProvider } from "@polkadot/api"
-import { Provider as AcalaProvider, Signer } from "@acala-network/bodhi"
+import { Provider as AcalaProvider, Wallet } from "@acala-network/bodhi"
 import { options } from "@acala-network/api"
 import {
   web3Accounts,
   web3Enable,
   isWeb3Injected,
 } from "@polkadot/extension-dapp"
+import Perpetual from "../../abi/Perpetual.json"
 
-import { NetworkContext } from "../hooks/useNetwork"
+import { NetworkContext } from "../useNetwork"
 
 export const Web3AcalaContext = createContext({})
 
@@ -23,6 +25,7 @@ const Provider = ({ children }) => {
   const { currentNetwork } = useContext(NetworkContext)
   const [acalaAccount, setAcalaAccount] = useState("")
   const [allAccounts, setAllAccounts] = useState([])
+  const [acalaChainId, setAcalaChainId] = useState(0)
   const [acalaEvmProvider, setAcalaEvmProvider] = useState()
 
   const injectWebPolkadot = async () => {
@@ -33,13 +36,15 @@ const Provider = ({ children }) => {
   }
 
   const getAcalaEvmProvider = useCallback(async () => {
-    const acalaEvmProvider = new AcalaProvider(
+    const provider = new AcalaProvider(
       options({
         provider: new WsProvider("wss://mandala6.laminar.codes"),
       })
     )
-    await acalaEvmProvider.isReady
-    return acalaEvmProvider
+    await provider.init()
+    const { chainId } = await provider.getNetwork()
+    setAcalaChainId(chainId)
+    return provider
   })
 
   const getAllAccounts = useCallback(async () => {
@@ -50,7 +55,6 @@ const Provider = ({ children }) => {
 
   useEffect(async () => {
     if (currentNetwork !== 2) return
-
     injectWebPolkadot()
     getAllAccounts().then(setAllAccounts)
     getAcalaEvmProvider().then(setAcalaEvmProvider)
@@ -59,12 +63,18 @@ const Provider = ({ children }) => {
   const web3AcalaContext = useMemo(
     () => ({
       acalaEvmProvider,
+      acalaChainId,
       acalaAccount,
       allAccounts,
       setAcalaAccount,
-      isWeb3Injected,
     }),
-    [acalaAccount, setAcalaAccount, allAccounts, isWeb3Injected]
+    [
+      acalaAccount,
+      setAcalaAccount,
+      allAccounts,
+      currentNetwork,
+      acalaEvmProvider,
+    ]
   )
 
   return (

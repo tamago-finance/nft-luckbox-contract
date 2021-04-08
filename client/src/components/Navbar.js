@@ -33,7 +33,7 @@ import {
   UnsupportedChainIdError,
 } from "@web3-react/core"
 import { NetworkContext } from "../hooks/useNetwork"
-import { Web3AcalaContext } from "../hooks/useWeb3Acala"
+import { Web3AcalaContext } from "../hooks/Acala/useWeb3Acala"
 import Logo from "../assets/img/logo-2.png"
 import { useToasts } from "../hooks/useToasts"
 import MetamaskSVG from "../assets/img/metamask.svg"

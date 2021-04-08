@@ -12,7 +12,7 @@ import Routes from "./components/Routes"
 import ToastProvider from "./hooks/useToasts"
 import ContractProvider from "./hooks/useContract"
 import NetworkProvider from "./hooks/useNetwork"
-import Web3AcalaProvider from "./hooks/useWeb3Acala"
+import Web3AcalaProvider from "./hooks/Acala/useWeb3Acala"
 
 const getLibrary = (provider) => {
   const library = new ethers.providers.Web3Provider(provider)
