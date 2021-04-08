@@ -25,7 +25,7 @@ import {
   Nav,
 } from "reactstrap"
 import { ChevronDown, LogOut } from "react-feather"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import Blockies from "react-blockies"
 import {
   Web3ReactProvider,
@@ -128,10 +128,14 @@ const Main = () => {
     active,
     error,
   } = context
-  const { currentNetwork } = useContext(NetworkContext)
-  const { acalaAccount, setAcalaAccount, allAccounts } = useContext(
-    Web3AcalaContext
-  )
+  const { currentNetwork, setNetwork } = useContext(NetworkContext)
+  const {
+    acalaAccount,
+    setAcalaAccount,
+    allAccounts,
+    isWeb3Injected,
+  } = useContext(Web3AcalaContext)
+  const { pathname } = useLocation()
   const { add } = useToasts()
   const [loginModal, setLoginModal] = useState(false)
   const [locked, setLocked] = useState(false)
@@ -168,6 +172,11 @@ const Main = () => {
       })
     }
   }, [error, locked])
+
+  useEffect(() => {
+    if (pathname === "/acala") setNetwork(2)
+    if (currentNetwork !== 2) return
+  }, [currentNetwork])
 
   return (
     <>
@@ -252,8 +261,13 @@ const Main = () => {
                   </UncontrolledDropdown>
                 )
               ) : !acalaAccount ? (
-                <Button color='info' onClick={toggleModal}>
-                  Connect Wallet
+                <Button
+                  color='info'
+                  onClick={() =>
+                    window.open("https://polkadot.js.org/", "_blank")
+                  }
+                >
+                  Please Donwload Polkadot.js
                 </Button>
               ) : (
                 <UncontrolledDropdown className='pr-1'>

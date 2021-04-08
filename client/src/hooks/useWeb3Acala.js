@@ -7,8 +7,7 @@ import React, {
   useCallback,
 } from "react"
 import { ApiPromise, WsProvider } from "@polkadot/api"
-// import { WsProvider } from "@polkadot/rpc-provider"
-import { Provider as AcalaProvider } from "@acala-network/bodhi"
+import { Provider as AcalaProvider, Signer } from "@acala-network/bodhi"
 import { options } from "@acala-network/api"
 import {
   web3Accounts,
@@ -36,9 +35,10 @@ const Provider = ({ children }) => {
   const getAcalaEvmProvider = useCallback(async () => {
     const acalaEvmProvider = new AcalaProvider(
       options({
-        provider: new WsProvider("ws://localhost:9944"),
+        provider: new WsProvider("wss://mandala6.laminar.codes"),
       })
     )
+    await acalaEvmProvider.isReady
     return acalaEvmProvider
   })
 
@@ -62,8 +62,9 @@ const Provider = ({ children }) => {
       acalaAccount,
       allAccounts,
       setAcalaAccount,
+      isWeb3Injected,
     }),
-    [acalaAccount, setAcalaAccount, allAccounts]
+    [acalaAccount, setAcalaAccount, allAccounts, isWeb3Injected]
   )
 
   return (
