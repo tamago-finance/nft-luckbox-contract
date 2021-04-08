@@ -1,0 +1,18 @@
+{
+    "Mandala TC6": {
+        "TokenFactory": "0xdDf6E46f6efbCC96A493aB962D236E4C96bd9440",
+        "MockToken": "0x867af5013cD0E54cb9B67035fDcc717488Cfcb6C",
+        "DOT" : {
+            "PriceFeeder" : "0xB920Ad3C45E8A4E540042a6F13D266d62366E30f",
+            "Perpetual" : "0xBBE267F15e1b991dA988A5c04d840e50c8d6D72A",
+            "Synthetics" : "0x32c1620b222C4C87776AFd20C0A40cc182f355F2",
+            "Pmm" : "0xE5003C555d063f4f12BabC03d7E7803E158763eD"
+        },
+        "RENBTC" : {
+            "PriceFeeder" : "0x41851Be5fC0c07f3111fd843402129C4c5e287C0",
+            "Perpetual" : "0xfE3a0EC3b62B8a8bCC7f8333856c0F64c1cF5223",
+            "Synthetics" : "0x9462BbCd34055Ae051bC0BB7D912276214054273",
+            "Pmm" : "0x32542022D518C6DDC4F56165Fe798B8d1BC1d57f"
+        }
+    }
+}
