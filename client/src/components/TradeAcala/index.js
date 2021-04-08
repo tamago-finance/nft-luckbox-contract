@@ -6,6 +6,8 @@ import { Row, Col } from "reactstrap"
 import TradingViewWidget from "react-tradingview-widget"
 import { CONTRACTS, TOKENS } from "../../constants"
 import { ContractContext } from "../../hooks/useContract"
+import { Web3AcalaContext } from "../../hooks/Acala/useWeb3Acala"
+import { NetworkContext } from "../../hooks/useNetwork"
 import Header from "./Header"
 import Stats from "./Stats"
 import TradePanel from "./TradePanel"
@@ -23,10 +25,11 @@ const TradingViewContainer = styled.div`
   height: 400px;
 `
 
-const Trade = () => {
+const TradeAcala = () => {
   const location = useLocation()
   const { chainId, account, active, error, library } = useWeb3React()
   const { perpetuals, collateralToken } = useContext(ContractContext)
+  const { currentNetwork } = useContext(NetworkContext)
   const [currentToken, setToken] = useState()
   const [locked, setLocked] = useState(false)
 
@@ -34,14 +37,19 @@ const Trade = () => {
     if (location && location.pathname && chainId) {
       const contractAddress = location.pathname.split("/trade/")[1]
       let token
-      if (chainId === 1337) {
+      if (chainId === 1337 && currentNetwork !== 2) {
         token = TOKENS.LOCAL.find(
           (item) => item.address.toLowerCase() === contractAddress.toLowerCase()
         )
-      } else if (chainId === 42) {
+      } else if (chainId === 42 && currentNetwork !== 2) {
         token = TOKENS.KOVAN.find(
           (item) => item.address.toLowerCase() === contractAddress.toLowerCase()
         )
+      } else if (currentNetwork === 2) {
+        token = TOKENS.ACALA.find(
+          (item) => item.address.toLowerCase() === contractAddress.toLowerCase()
+        )
+        console.log(token)
       }
       setToken(token)
     }
@@ -70,7 +78,14 @@ const Trade = () => {
         </StyledCol>
         <StyledCol xs='8'>
           <TradingViewContainer>
-            <TradingViewWidget symbol={currentToken?.symbol} autosize />
+            <TradingViewWidget
+              symbol={
+                currentToken?.symbol === "renBTC"
+                  ? `BTCUSD`
+                  : `${currentToken?.symbol}USD`
+              }
+              autosize
+            />
           </TradingViewContainer>
           <Position currentToken={currentToken} setLocked={setLocked} />
         </StyledCol>
@@ -79,4 +94,4 @@ const Trade = () => {
   )
 }
 
-export default Trade
+export default TradeAcala

@@ -21,7 +21,7 @@ const TokenList = styled(({ className, currentNetwork }) => {
   }, [currentNetwork])
 
   const toTrading = (address) => {
-    history.push(`/trade/${address}`)
+    history.push(`/acala/trade/${address}`)
   }
 
   return (

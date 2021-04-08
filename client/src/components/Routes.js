@@ -37,6 +37,7 @@ import Liquidity from "./Liquidity"
 import Home from "./Home"
 import HomeAcala from "./HomeAcala"
 import Trade from "./Trade"
+import TradeAcala from "./TradeAcala"
 
 const Wrapper = styled(Container)`
   margin-top: 20px;
@@ -64,6 +65,9 @@ const Routes = () => {
         </Route>
         <Route exact path='/acala'>
           <HomeAcala />
+        </Route>
+        <Route path='/acala/trade'>
+          <TradeAcala />
         </Route>
         <Route path='/trade'>
           <Trade />
