@@ -36,7 +36,13 @@ const Provider = ({ children }) => {
     useLibrary = library
   }
 
-  const collateralToken = useERC20(useChainId, account, useLibrary, tick)
+  const collateralToken = useERC20(
+    useChainId,
+    account,
+    useLibrary,
+    tick,
+    currentNetwork
+  )
 
   let appleAddress
   let teslaAddress
@@ -51,10 +57,22 @@ const Provider = ({ children }) => {
   }
 
   const perpetuals = {
-    AAPL: usePerpetual(appleAddress, account, library, tick),
-    TSLA: usePerpetual(teslaAddress, account, library, tick),
-    renBTC: usePerpetual(renBTCAddress, account, acalaEvmProvider, tick),
-    DOT: usePerpetual(dotAddress, account, acalaEvmProvider, tick),
+    AAPL: usePerpetual(appleAddress, account, library, tick, currentNetwork),
+    TSLA: usePerpetual(teslaAddress, account, library, tick, currentNetwork),
+    renBTC: usePerpetual(
+      renBTCAddress,
+      account,
+      acalaEvmProvider,
+      tick,
+      currentNetwork
+    ),
+    DOT: usePerpetual(
+      dotAddress,
+      account,
+      acalaEvmProvider,
+      tick,
+      currentNetwork
+    ),
   }
 
   const increaseTick = useCallback(() => {

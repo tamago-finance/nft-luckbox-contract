@@ -22,16 +22,24 @@ const PositionStatus = {
   DANGER: 2,
 }
 
-export const usePerpetual = (perpetualAddress, account, library, tick) => {
+export const usePerpetual = (
+  perpetualAddress,
+  account,
+  library,
+  tick,
+  currentNetwork
+) => {
   const perpetualContract = useMemo(() => {
     if (!account || !perpetualAddress || !library) {
       return
     }
+    if (currentNetwork === 2) {
+      return new ethers.Contract(perpetualAddress, Perpetual.abi, library)
+    }
     return new ethers.Contract(
       perpetualAddress,
       Perpetual.abi,
-      library
-      // library.getSigner()
+      library.getSigner()
     )
   }, [account, perpetualAddress, library])
 

@@ -3,9 +3,8 @@ import { ethers } from "ethers"
 import Token from "../abi/ERC20.json"
 import { CONTRACTS } from "../constants"
 
-export const useERC20 = (chainId, account, library, tick) => {
+export const useERC20 = (chainId, account, library, tick, currentNetwork) => {
   let address
-  console.log(chainId)
   switch (chainId) {
     case 1337:
       address = CONTRACTS.LOCAL.collateralToken
@@ -24,8 +23,10 @@ export const useERC20 = (chainId, account, library, tick) => {
     if (!account || !address || !library) {
       return
     }
-
-    return new ethers.Contract(address, Token.abi, library)
+    if (currentNetwork === 2) {
+      return new ethers.Contract(address, Token.abi, library)
+    }
+    return new ethers.Contract(address, Token.abi, library.getSigner())
   }, [account, address, library])
 
   const [balance, setBalance] = useState("0")
