@@ -34,7 +34,7 @@ const TradeAcala = () => {
   const [locked, setLocked] = useState(false)
 
   useEffect(() => {
-    if (location && location.pathname && chainId) {
+    if (location && location.pathname) {
       const contractAddress = location.pathname.split("/trade/")[1]
       let token
       if (chainId === 1337 && currentNetwork !== 2) {

@@ -59,6 +59,7 @@ const Provider = ({ children }) => {
 
   const getAllAccounts = async () => {
     const allAccounts = await web3Accounts()
+    allAccounts.reverse()
     setAcalaAccount(allAccounts[0])
     setAllAccounts(allAccounts)
   }
