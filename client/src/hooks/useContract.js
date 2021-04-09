@@ -23,17 +23,21 @@ export const ContractContext = createContext({})
 
 const Provider = ({ children }) => {
   const context = useWeb3React()
-  const { acalaEvmProvider, acalaChainId } = useContext(Web3AcalaContext)
+  const { acalaEvmProvider, acalaChainId, blindEthAddress } = useContext(
+    Web3AcalaContext
+  )
   const { currentNetwork } = useContext(NetworkContext)
-  const { chainId, account, active, error, library } = context
+  const { chainId, account: ethAccount, active, error, library } = context
   const [tick, setTick] = useState(0)
-  let useChainId, useLibrary
+  let useChainId, useLibrary, account
   if (currentNetwork === 2) {
     useChainId = acalaChainId
     useLibrary = acalaEvmProvider
+    account = blindEthAddress
   } else {
     useChainId = chainId
     useLibrary = library
+    account = ethAccount
   }
 
   const collateralToken = useERC20(
@@ -85,7 +89,7 @@ const Provider = ({ children }) => {
       increaseTick,
       perpetuals,
     }),
-    [collateralToken, increaseTick, perpetuals]
+    [collateralToken, increaseTick, perpetuals, account]
   )
 
   return (

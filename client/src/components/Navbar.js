@@ -278,7 +278,7 @@ const Main = () => {
                   <DropdownMenu right>
                     {allAccounts.map((account, index) => (
                       <DropdownItem
-                        onClick={() => setAcalaAccount(account)}
+                        onClick={() => setAcalaAccount(() => account)}
                         key={index}
                       >
                         {shortAddress(account.address)}

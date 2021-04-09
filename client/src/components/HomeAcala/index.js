@@ -1,9 +1,13 @@
 import React, { useState, useCallback, useContext } from "react"
 import { Container, Button, Alert, Row, Col } from "reactstrap"
 import { useHistory } from "react-router-dom"
+import { web3FromAddress } from "@polkadot/extension-dapp"
 import styled from "styled-components"
 import TokenList from "./TokenList"
 import { NetworkContext } from "../../hooks/useNetwork"
+import { Web3AcalaContext } from "../../hooks/Acala/useWeb3Acala"
+import { useToasts } from "../../hooks/useToasts"
+import { processingToast } from "../../utils"
 import IllustrationPNG from "../../assets/img/illustration-1.png"
 import IllustrationPNG2 from "../../assets/img/illustration-2.png"
 
@@ -156,8 +160,46 @@ const Footer = styled(({ className }) => (
 
 const Home = () => {
   const { currentNetwork, setNetwork } = useContext(NetworkContext)
+  const { blindEthAddress, acalaApi, acalaAccount, increaseTick } = useContext(
+    Web3AcalaContext
+  )
+  const { add, update } = useToasts()
 
   //   const [currentNetwork, setNetwork] = useState(1) // 0 - Dev, 1 - Kovan, 2 - Acala
+
+  const claimEvmAddress = async () => {
+    const injector = await web3FromAddress(acalaAccount.address)
+    acalaApi.setSigner(injector.signer)
+    await acalaApi.tx.evmAccounts
+      .claimDefaultAccount()
+      .signAndSend(acalaAccount.address, async (status) => {
+        const { status: newStatus } = status.toHuman()
+        let id
+        if (Object.keys(newStatus)[0] === "Finalized") {
+          update({
+            id,
+            ...processingToast(
+              "Complete",
+              "Your transaction is completed",
+              false,
+              "",
+              0
+            ),
+          })
+          increaseTick()
+        } else if (Object.keys(newStatus)[0] === "InBlock") {
+          id = add(
+            processingToast(
+              "Processing",
+              "Claims your Acala EVM address",
+              true,
+              "",
+              0
+            )
+          )
+        }
+      })
+  }
 
   return (
     <Container>
@@ -166,6 +208,19 @@ const Home = () => {
         Please note that the project is under heavy development and available
         only on Testnet
       </Alert>
+      {!blindEthAddress ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: 12,
+          }}
+        >
+          <Button color='danger' onClick={claimEvmAddress}>
+            Please Claim your Acala EVM address
+          </Button>
+        </div>
+      ) : null}
       <TokenList currentNetwork={currentNetwork} />
       <About />
       <Footer />

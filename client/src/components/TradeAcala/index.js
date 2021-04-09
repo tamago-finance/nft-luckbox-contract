@@ -49,7 +49,6 @@ const TradeAcala = () => {
         token = TOKENS.ACALA.find(
           (item) => item.address.toLowerCase() === contractAddress.toLowerCase()
         )
-        console.log(token)
       }
       setToken(token)
     }

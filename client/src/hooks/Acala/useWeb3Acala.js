@@ -6,7 +6,6 @@ import React, {
   useContext,
   useCallback,
 } from "react"
-import { ethers } from "ethers"
 import { ApiPromise, WsProvider } from "@polkadot/api"
 import { Provider as AcalaProvider, Wallet } from "@acala-network/bodhi"
 import { options } from "@acala-network/api"
@@ -27,12 +26,16 @@ const Provider = ({ children }) => {
   const [allAccounts, setAllAccounts] = useState([])
   const [acalaChainId, setAcalaChainId] = useState(0)
   const [acalaEvmProvider, setAcalaEvmProvider] = useState()
+  const [acalaApi, setAcalaApi] = useState()
+  const [blindEthAddress, setBlindEthAddress] = useState()
+  const [tick, setTick] = useState(0)
 
   const injectWebPolkadot = async () => {
     await web3Enable("Tamago Finance")
-    const provider = new WsProvider("wss://mandala6.laminar.codes/ws")
+    const provider = new WsProvider("wss://mandala6.laminar.codes")
     const api = new ApiPromise(options({ provider }))
     await api.isReady
+    setAcalaApi(api)
   }
 
   const getAcalaEvmProvider = useCallback(async () => {
@@ -45,28 +48,48 @@ const Provider = ({ children }) => {
     const { chainId } = await provider.getNetwork()
     setAcalaChainId(chainId)
     return provider
-  })
+  }, [currentNetwork, acalaAccount])
 
-  const getAllAccounts = useCallback(async () => {
+  const getBlindEthAddress = useCallback(async () => {
+    const isClaim = await acalaApi.query.evmAccounts.evmAddresses(
+      acalaAccount.address
+    )
+    return isClaim.toHuman()
+  }, [currentNetwork, acalaAccount])
+
+  const getAllAccounts = async () => {
     const allAccounts = await web3Accounts()
     setAcalaAccount(allAccounts[0])
-    return allAccounts
-  })
+    setAllAccounts(allAccounts)
+  }
+
+  const increaseTick = useCallback(() => {
+    setTick(tick + 1)
+  }, [tick])
 
   useEffect(async () => {
     if (currentNetwork !== 2) return
-    injectWebPolkadot()
-    getAllAccounts().then(setAllAccounts)
+    await injectWebPolkadot()
+    await getAllAccounts()
     getAcalaEvmProvider().then(setAcalaEvmProvider)
+    acalaApi && getBlindEthAddress().then(setBlindEthAddress)
   }, [currentNetwork])
+
+  useEffect(async () => {
+    if (!acalaApi && !acalaEvmProvider) return
+    getBlindEthAddress().then(setBlindEthAddress)
+  }, [currentNetwork, acalaAccount, blindEthAddress, tick])
 
   const web3AcalaContext = useMemo(
     () => ({
       acalaEvmProvider,
+      acalaApi,
       acalaChainId,
       acalaAccount,
       allAccounts,
       setAcalaAccount,
+      blindEthAddress,
+      increaseTick,
     }),
     [
       acalaAccount,
@@ -74,6 +97,8 @@ const Provider = ({ children }) => {
       allAccounts,
       currentNetwork,
       acalaEvmProvider,
+      blindEthAddress,
+      increaseTick,
     ]
   )
 

@@ -5,6 +5,7 @@ import { useHistory } from "react-router-dom"
 import { TOKENS } from "../../constants"
 import AssetIcon from "../common/AssetIcon"
 import { ContractContext } from "../../hooks/useContract"
+import { Web3AcalaContext } from "../../hooks/Acala/useWeb3Acala"
 
 const TokenList = styled(({ className, currentNetwork }) => {
   let history = useHistory()
