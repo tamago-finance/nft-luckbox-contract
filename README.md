@@ -34,7 +34,7 @@ Trader opens a long position by paying 1/4 and get 4x money on margin account to
 
 If synthetic tokens drop value at a 60% rate then the position can be liquidated by anyone with the 10% penalty.
 
-### Price steams
+### Price streams
 
 Asset prices are observed depending on the network.
 
