@@ -22,7 +22,7 @@ The magic behinds is the DODO's Proactive Market Making model that applied into 
 
 ![slide](illustration-1.png)
 
-**There are 3 groups of people participating in the protocol, including:** 
+**There are 2 groups of people participating in the protocol, including:** 
 
 ### A. Liquidity Provider
 
