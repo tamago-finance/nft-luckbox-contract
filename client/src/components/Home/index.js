@@ -1,11 +1,24 @@
 import React, { useState, useCallback } from 'react'
-import { Container, Button, Alert, Row, Col } from "reactstrap"
+import {
+    Container,
+    Button,
+    Alert,
+    Row,
+    Col,
+    InputGroup,
+    InputGroupAddon,
+    InputGroupButtonDropdown,
+    Input,
+    DropdownToggle,
+    DropdownMenu,
+    DropdownItem
+} from "reactstrap"
 import styled from "styled-components"
+import MailchimpSubscribe from "react-mailchimp-subscribe"
 import TokenList from "./TokenList"
 import IllustrationPNG from "../../assets/img/illustration-1.png"
 import IllustrationPNG2 from "../../assets/img/illustration-2.png"
-
-// Join Our Community
+import SocialIcon from "../common/SocialIcon"
 
 // Roadmap
 
@@ -21,7 +34,7 @@ const Illustration2 = styled.img.attrs(props => ({
     width: 100%; 
 `
 
-
+const MAILCHIMP_URL = "https://elliptix.us2.list-manage.com/subscribe/post?u=99c7dd209da5d13372fa9eea4&amp;id=ff5ba55ce5"
 
 const Headline = styled(
     ({ className, currentNetwork, setNetwork }) => {
@@ -86,7 +99,7 @@ const About = styled(
                 </Col>
                 <Col lg="6">
                     <div style={{ textAlign: "center" }}>
-                        <Illustration2/>
+                        <Illustration2 />
                     </div>
                 </Col>
                 <Col lg="6">
@@ -125,7 +138,8 @@ const Footer = styled(
             </div>
         </div>
     ))`
-    margin-top: 20px;
+    margin-top: 60px;
+    margin-bottom: 10px;
     display: flex;
     flex-direction: row;
     font-size: 12px;
@@ -136,6 +150,170 @@ const Footer = styled(
         }
     }
     `
+
+
+const Subscribe = styled(
+    ({ className }) => {
+
+        const [email, setEmail] = useState()
+
+        const handleChange = (e) => {
+            setEmail(e.target.value)
+        }
+
+        return (
+            <div className={className}>
+                <div className="box">
+                    <div className="content">
+                        <h2>
+                            Let's keep in touch
+                        </h2>
+                        <p>
+                            Subscribe to get the latest blog posts, news and platform annoucements straight to your inbox.
+                        </p>
+                        <MailchimpSubscribe
+                            url={MAILCHIMP_URL}
+                            render={({ subscribe, status, message }) => {
+
+                                const submit = () => {
+                                    if (!email || email === "") {
+                                        return
+                                    }
+                                    subscribe({
+                                        EMAIL: email
+                                    })
+                                }
+
+                                return (
+                                    <Row style={{ maxWidth: 500, marginLeft: "auto", marginRight: "auto" }}>
+                                        {/* <Col span={16}>
+                                            <Form.Item name="email">
+                                                <Input placeholder="Enter email for newsletter" value={email} onChange={handleChange} />
+                                                <p className="error">
+                                                   
+                                                    {status === "error" && (
+                                                        <div
+                                                            style={{ color: "red" }}
+                                                            dangerouslySetInnerHTML={{ __html: message }}
+                                                        />
+                                                    )}
+                                                    {status === "success" && (
+                                                        <div
+                                                            style={{ color: "green" }}
+                                                            dangerouslySetInnerHTML={{ __html: message }}
+                                                        />
+                                                    )}
+                                                </p>
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={8} style={{ display: "flex" }}>
+                                            <div style={{ marginLeft: "auto", marginRight: "auto", marginTop: 4, paddingLeft: 4 }}>
+                                                <Button loading={status === "sending"} disabled={(email && email.indexOf("@") == -1) || status === "sending" || status === "success"} size="large" type="primary" onClick={submit} >
+                                                    {status === "success"
+                                                        ?
+                                                        <>Subscribed</>
+                                                        :
+                                                        <>Subscribe</>
+                                                    }
+                                                </Button>
+                                            </div>
+                                        </Col> */}
+                                        <InputGroup>
+
+                                            <Input value={email} onChange={handleChange} placeholder="Enter your email address " />
+                                            <InputGroupAddon addonType="append">
+                                                <Button disabled={(email && email.indexOf("@") == -1) || status === "sending" || status === "success"} color="warning" onClick={submit}>
+                                                    {status === "success"
+                                                        ?
+                                                        <>OK</>
+                                                        :
+                                                        <>Signup</>
+                                                    }
+                                                </Button>
+                                            </InputGroupAddon>
+                                        </InputGroup>
+                                        <p className="error">
+                                            {status === "error" && (
+                                                <div
+                                                    style={{ color: "red" }}
+                                                    dangerouslySetInnerHTML={{ __html: message }}
+                                                />
+                                            )}
+                                            {status === "success" && (
+                                                <div
+                                                    style={{ color: "green" }}
+                                                    dangerouslySetInnerHTML={{ __html: message }}
+                                                />
+                                            )}
+                                        </p>
+                                    </Row>
+                                )
+                            }} />
+
+                        <div className="icons">
+                            <SocialIcon name={"github"} url={"https://github.com/tamago-finance/tamago-finance"} />
+                            <SocialIcon name={"twitter"} url={"https://twitter.com/tamagofinance"}  />
+                            <SocialIcon name={"medium"} url={"https://medium.com/tamago-finance"}  />
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+        )
+    })`
+    margin-top: 20px;
+    margin-bottom: 40px;
+    text-align: center;
+
+    .box {
+        display: flex;
+        background: rgb(255,255,255);
+        background: linear-gradient(0deg, #bdc3c7 0%, #2c3e50 100%);
+        min-height: 400px;
+        border-radius: 12px;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .content {
+        h2 {
+            letter-spacing: -2px;
+            color: white;
+            @media screen and (max-width: 992px) {
+                font-size: 24px;    
+            }
+
+        }
+        p {
+            color: white;
+            opacity: 0.8;
+        }
+        .error {
+            margin-top: 10px;
+            font-size: 14px;
+            letter-spacing: -1px;
+        }
+        .icons {
+            margin-top: 20px;
+            
+            img {
+                margin-left: 20px;
+                margin-right: 20px; 
+            }
+        }
+    }
+
+
+
+
+    `
+
 
 const Home = () => {
 
@@ -154,6 +332,7 @@ const Home = () => {
                 currentNetwork={currentNetwork}
             />
             <About />
+            <Subscribe />
             <Footer />
         </Container>
     )
