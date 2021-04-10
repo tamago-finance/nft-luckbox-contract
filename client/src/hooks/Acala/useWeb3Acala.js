@@ -14,7 +14,6 @@ import {
   web3Enable,
   isWeb3Injected,
 } from "@polkadot/extension-dapp"
-import Perpetual from "../../abi/Perpetual.json"
 
 import { NetworkContext } from "../useNetwork"
 

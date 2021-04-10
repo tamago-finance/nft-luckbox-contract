@@ -28,6 +28,8 @@ import {
   ModalFooter,
 } from "reactstrap"
 import classnames from "classnames"
+import Web3 from "web3"
+import { ethers } from "ethers"
 import { useWeb3React } from "@web3-react/core"
 import { web3FromAddress } from "@polkadot/extension-dapp"
 import { DollarSign, Plus } from "react-feather"
@@ -36,6 +38,9 @@ import { useToasts } from "../../hooks/useToasts"
 import { processingToast } from "../../utils"
 import useInterval from "../../hooks/useInterval"
 import { Web3AcalaContext } from "../../hooks/Acala/useWeb3Acala"
+import Token from "../../abi/ERC20.json"
+import Perpetual from "../../abi/Perpetual.json"
+import { CONTRACTS, TOKENS } from "../../constants"
 
 const Container = styled.div`
   padding: 6px 12px;
@@ -78,7 +83,9 @@ const Error = ({ errorMessage }) => {
 const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
   const { chainId, account } = useWeb3React()
   const { increaseTick } = useContext(ContractContext)
-  const { acalaApi, acalaAccount } = useContext(Web3AcalaContext)
+  const { acalaApi, acalaAccount, blindEthAddress } = useContext(
+    Web3AcalaContext
+  )
   const { add, update } = useToasts()
   const [side, setSide] = useState(0) // 0 - long, 1 - short
   const [amount, setAmount] = useState(1)
@@ -87,12 +94,23 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
   const [leverage, setLeverage] = useState(1)
   const [approved, setApproved] = useState(false)
   const [errorMessage, setErrorMessage] = useState()
+  const web3 = new Web3("wss://mandala6.laminar.codes")
+  const mockTokenAddress = new web3.eth.Contract(
+    Token.abi,
+    CONTRACTS.ACALA.collateralToken
+  )
+  const perpetualAddress = new web3.eth.Contract(
+    Perpetual.abi,
+    perpetual.perpetualAddress
+  )
 
   useEffect(() => {
     if (perpetual && collateralToken && perpetual.perpetualAddress) {
       collateralToken.allowance(perpetual.perpetualAddress).then((result) => {
         if (Number(result) > 0) {
           setApproved(true)
+        } else {
+          setApproved(false)
         }
       })
     }
@@ -131,10 +149,11 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
   const onFaucet = useCallback(async () => {
     const injector = await web3FromAddress(acalaAccount.address)
     acalaApi.setSigner(injector.signer)
+    const inputData = mockTokenAddress.methods.faucet().encodeABI()
     await acalaApi.tx.evm
       .call(
-        "0x867af5013cd0e54cb9b67035fdcc717488cfcb6c",
-        "0xde5f72fd",
+        CONTRACTS.ACALA.collateralToken,
+        inputData,
         "0",
         "300000000",
         "4294967295"
@@ -171,10 +190,13 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
   const onApprove = useCallback(async () => {
     const injector = await web3FromAddress(acalaAccount.address)
     acalaApi.setSigner(injector.signer)
+    const inputData = mockTokenAddress.methods
+      .approve(perpetual.perpetualAddress, "9999999999999999999999999999")
+      .encodeABI()
     await acalaApi.tx.evm
       .call(
-        perpetual.perpetualAddress,
-        "0x095ea7b3000000000000000000000000bbe267f15e1b991da988a5c04d840e50c8d6d72a0000000000000000000000000000000000000000204fce5e3e2502610fffffff",
+        CONTRACTS.ACALA.collateralToken,
+        inputData,
         "0",
         "300000000",
         "4294967295"
@@ -213,65 +235,120 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
   }
 
   const onBuy = useCallback(async () => {
-    const tx = await perpetual.buy(
-      amount,
-      Number(leverage) * Number(amount) * Number(buyPrice) * 1.1,
-      leverage - 1
-    )
-    const id = add(
-      processingToast(
-        "Buying",
-        "Your transaction is being processed",
-        true,
-        tx.hash,
-        chainId
+    const injector = await web3FromAddress(acalaAccount.address)
+    acalaApi.setSigner(injector.signer)
+    const inputData = perpetualAddress.methods
+      .openLongPosition(
+        ethers.utils.parseEther(amount.toString()),
+        ethers.utils.parseEther(
+          (
+            Number(leverage) *
+            Number(amount) *
+            Number(buyPrice) *
+            1.1
+          ).toString()
+        ),
+        leverage - 1
       )
-    )
-    await tx.wait()
-    setApproved(true)
-    update({
-      id,
-      ...processingToast(
-        "Buy Done",
-        "Your transaction is completed",
-        false,
-        tx.hash,
-        chainId
-      ),
-    })
-
-    increaseTick()
+      .encodeABI()
+    await acalaApi.tx.evm
+      .call(
+        perpetual.perpetualAddress,
+        inputData,
+        "0",
+        "300000000",
+        "4294967295"
+      )
+      .signAndSend(acalaAccount.address, async (status) => {
+        const { status: newStatus } = status.toHuman()
+        let id
+        if (Object.keys(newStatus)[0] === "Finalized") {
+          setApproved(true)
+          update({
+            id,
+            ...processingToast(
+              "Buy Done",
+              "Your transaction is completed",
+              false,
+              "",
+              0
+            ),
+          })
+          increaseTick()
+        } else if (Object.keys(newStatus)[0] === "InBlock") {
+          id = add(
+            processingToast(
+              "Buying",
+              "Your transaction is being processed",
+              true,
+              "",
+              0
+            )
+          )
+        }
+      })
   }, [perpetual, amount, buyPrice, leverage])
 
   const onSell = useCallback(async () => {
-    const tx = await perpetual.sell(
-      amount,
-      Number(leverage) * Number(amount) * Number(sellPrice) * 1.1,
-      leverage - 1
-    )
-    const id = add(
-      processingToast(
-        "Selling",
-        "Your transaction is being processed",
-        true,
-        tx.hash,
-        chainId
+    const injector = await web3FromAddress(acalaAccount.address)
+    acalaApi.setSigner(injector.signer)
+    const inputData = perpetualAddress.methods
+      .openShortPosition(
+        ethers.utils.parseEther(amount.toString()),
+        ethers.utils.parseEther(
+          (
+            Number(leverage) *
+            Number(amount) *
+            Number(buyPrice) *
+            1.1
+          ).toString()
+        ),
+        leverage - 1
       )
+      .encodeABI()
+    await acalaApi.tx.evm.call(
+      perpetual.perpetualAddress,
+      inputData,
+      "0",
+      "300000000",
+      "4294967295"
     )
-    await tx.wait()
-    setApproved(true)
-    update({
-      id,
-      ...processingToast(
-        "Sell Done",
-        "Your transaction is completed",
-        false,
-        tx.hash,
-        chainId
-      ),
-    })
-
-    increaseTick()
+    await acalaApi.tx.evm
+      .call(
+        perpetual.perpetualAddress,
+        inputData,
+        "0",
+        "300000000",
+        "4294967295"
+      )
+      .signAndSend(acalaAccount.address, async (status) => {
+        const { status: newStatus } = status.toHuman()
+        let id
+        if (Object.keys(newStatus)[0] === "Finalized") {
+          setApproved(true)
+          update({
+            id,
+            ...processingToast(
+              "Sell Done",
+              "Your transaction is completed",
+              false,
+              "",
+              0
+            ),
+          })
+          increaseTick()
+        } else if (Object.keys(newStatus)[0] === "InBlock") {
+          id = add(
+            processingToast(
+              "Selling",
+              "Your transaction is being processed",
+              true,
+              "",
+              0
+            )
+          )
+        }
+      })
   }, [perpetual, amount, sellPrice, leverage])
 
   return (
