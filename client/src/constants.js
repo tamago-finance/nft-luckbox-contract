@@ -3,12 +3,12 @@ export const TOKENS = {
     {
       name: "Ren Bitcoin",
       symbol: "renBTC",
-      address: "0xfE3a0EC3b62B8a8bCC7f8333856c0F64c1cF5223",
+      address: "0x6D4D49F8016B604673939f51de116E7f7fD01446",
     },
     {
       name: "Polkadot",
       symbol: "DOT",
-      address: "0xBBE267F15e1b991dA988A5c04d840e50c8d6D72A",
+      address: "0xAFDC5f616cCDE1495f5977292C09eAd8059007C5",
     },
   ],
   KOVAN: [
