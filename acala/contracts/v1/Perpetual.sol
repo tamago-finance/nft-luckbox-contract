@@ -311,7 +311,7 @@ contract Perpetual is Lockable, Whitelist {
             totalLiquidity.quote = totalLiquidity.quote.sub(positionData.leveragedAmount);
         }
 
-        rawTotalPositionCollateral = rawTotalPositionCollateral.sub(positionData.rawCollateral);
+        // rawTotalPositionCollateral = rawTotalPositionCollateral.sub(positionData.rawCollateral);
 
         emit PositionClosed(msg.sender, positionData.side, remainingCollateral.toUint256(), positionData.positionSize, positionData.entryValue, exitPrice);
 
