@@ -335,7 +335,7 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
           (
             Number(leverage) *
             Number(amount) *
-            Number(buyPrice) *
+            Number(sellPrice) *
             1.1
           ).toString()
         ),
