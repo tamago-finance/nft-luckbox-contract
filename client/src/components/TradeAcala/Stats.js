@@ -25,13 +25,13 @@ const Stats = styled(
                         <h4>
                             Source
                         </h4>
-                        <p>Tiingo</p>
+                        <p>Generic Oracle</p>
                     </Item>
                     <Item>
                         <h4>
                             Period
                         </h4>
-                        <p>EOD</p>
+                        <p>Every 15 minutes</p>
                     </Item>
                     <Item>
                         <h4>
