@@ -170,35 +170,47 @@ const Home = () => {
   const claimEvmAddress = async () => {
     const injector = await web3FromAddress(acalaAccount.address)
     acalaApi.setSigner(injector.signer)
-    await acalaApi.tx.evmAccounts
-      .claimDefaultAccount()
-      .signAndSend(acalaAccount.address, async (status) => {
-        const { status: newStatus } = status.toHuman()
-        let id
-        if (Object.keys(newStatus)[0] === "Finalized") {
-          update({
-            id,
-            ...processingToast(
-              "Complete",
-              "Your transaction is completed",
-              false,
-              "",
-              0
-            ),
-          })
-          increaseTick()
-        } else if (Object.keys(newStatus)[0] === "InBlock") {
-          id = add(
-            processingToast(
-              "Processing",
-              "Claims your Acala EVM address",
-              true,
-              "",
-              0
+    try {
+      await acalaApi.tx.evmAccounts
+        .claimDefaultAccount()
+        .signAndSend(acalaAccount.address, async (status) => {
+          const { status: newStatus } = status.toHuman()
+          let id
+          if (Object.keys(newStatus)[0] === "Finalized") {
+            update({
+              id,
+              ...processingToast(
+                "Complete",
+                "Your transaction is completed",
+                false,
+                "",
+                0
+              ),
+            })
+            increaseTick()
+          } else if (Object.keys(newStatus)[0] === "InBlock") {
+            id = add(
+              processingToast(
+                "Processing",
+                "Claims your Acala EVM address",
+                true,
+                "",
+                0
+              )
             )
-          )
-        }
-      })
+          }
+        })
+    } catch (e) {
+      add(
+        processingToast(
+          "Error",
+          "Insufficient balances on Acala token",
+          false,
+          "",
+          0
+        )
+      )
+    }
   }
 
   return (

@@ -60,41 +60,53 @@ const Position = ({ currentToken, setLocked }) => {
     const injector = await web3FromAddress(acalaAccount.address)
     acalaApi.setSigner(injector.signer)
     const inputData = perpetualAddress.methods.closePosition().encodeABI()
-    await acalaApi.tx.evm
-      .call(
-        perpetual.perpetualAddress,
-        inputData,
-        "0",
-        "300000000",
-        "4294967295"
-      )
-      .signAndSend(acalaAccount.address, async (status) => {
-        const { status: newStatus } = status.toHuman()
-        let id
-        if (Object.keys(newStatus)[0] === "InBlock") {
-          update({
-            id,
-            ...processingToast(
-              "Closed",
-              "Your transaction is completed",
-              false,
-              "",
-              0
-            ),
-          })
-          increaseTick()
-        } else if (Object.keys(newStatus)[0] === "Broadcast") {
-          id = add(
-            processingToast(
-              "Closing",
-              "Your transaction is being processed",
-              true,
-              "",
-              0
+    try {
+      await acalaApi.tx.evm
+        .call(
+          perpetual.perpetualAddress,
+          inputData,
+          "0",
+          "300000000",
+          "4294967295"
+        )
+        .signAndSend(acalaAccount.address, async (status) => {
+          const { status: newStatus } = status.toHuman()
+          let id
+          if (Object.keys(newStatus)[0] === "InBlock") {
+            update({
+              id,
+              ...processingToast(
+                "Closed",
+                "Your transaction is completed",
+                false,
+                "",
+                0
+              ),
+            })
+            increaseTick()
+          } else if (Object.keys(newStatus)[0] === "Broadcast") {
+            id = add(
+              processingToast(
+                "Closing",
+                "Your transaction is being processed",
+                true,
+                "",
+                0
+              )
             )
-          )
-        }
-      })
+          }
+        })
+    } catch (e) {
+      add(
+        processingToast(
+          "Error",
+          "Insufficient balances on Acala token",
+          false,
+          "",
+          0
+        )
+      )
+    }
   }, [perpetual, chainId])
 
   return (

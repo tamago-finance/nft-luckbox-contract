@@ -150,41 +150,53 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
     const injector = await web3FromAddress(acalaAccount.address)
     acalaApi.setSigner(injector.signer)
     const inputData = mockTokenAddress.methods.faucet().encodeABI()
-    await acalaApi.tx.evm
-      .call(
-        CONTRACTS.ACALA.collateralToken,
-        inputData,
-        "0",
-        "300000000",
-        "4294967295"
-      )
-      .signAndSend(acalaAccount.address, async (status) => {
-        const { status: newStatus } = status.toHuman()
-        let id
-        if (Object.keys(newStatus)[0] === "InBlock") {
-          update({
-            id,
-            ...processingToast(
-              "Received",
-              "Your transaction is completed",
-              false,
-              "",
-              0
-            ),
-          })
-          increaseTick()
-        } else if (Object.keys(newStatus)[0] === "Broadcast") {
-          id = add(
-            processingToast(
-              "Requesting tokens",
-              "Your transaction is being processed",
-              true,
-              "",
-              0
+    try {
+      await acalaApi.tx.evm
+        .call(
+          CONTRACTS.ACALA.collateralToken,
+          inputData,
+          "0",
+          "300000000",
+          "4294967295"
+        )
+        .signAndSend(acalaAccount.address, async (status) => {
+          const { status: newStatus } = status.toHuman()
+          let id
+          if (Object.keys(newStatus)[0] === "InBlock") {
+            update({
+              id,
+              ...processingToast(
+                "Received",
+                "Your transaction is completed",
+                false,
+                "",
+                0
+              ),
+            })
+            increaseTick()
+          } else if (Object.keys(newStatus)[0] === "Broadcast") {
+            id = add(
+              processingToast(
+                "Requesting tokens",
+                "Your transaction is being processed",
+                true,
+                "",
+                0
+              )
             )
-          )
-        }
-      })
+          }
+        })
+    } catch (e) {
+      add(
+        processingToast(
+          "Error",
+          "Insufficient balances on Acala token",
+          false,
+          "",
+          0
+        )
+      )
+    }
   }, [collateralToken, chainId])
 
   const onApprove = useCallback(async () => {
@@ -193,41 +205,53 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
     const inputData = mockTokenAddress.methods
       .approve(perpetual.perpetualAddress, "9999999999999999999999999999")
       .encodeABI()
-    await acalaApi.tx.evm
-      .call(
-        CONTRACTS.ACALA.collateralToken,
-        inputData,
-        "0",
-        "300000000",
-        "4294967295"
-      )
-      .signAndSend(acalaAccount.address, async (status) => {
-        const { status: newStatus } = status.toHuman()
-        let id
-        if (Object.keys(newStatus)[0] === "InBlock") {
-          setApproved(true)
-          update({
-            id,
-            ...processingToast(
-              "Approved",
-              "Your transaction is completed",
-              false,
-              "",
-              0
-            ),
-          })
-        } else if (Object.keys(newStatus)[0] === "Broadcast") {
-          id = add(
-            processingToast(
-              "Approving",
-              "Your transaction is being processed",
-              true,
-              "",
-              0
+    try {
+      await acalaApi.tx.evm
+        .call(
+          CONTRACTS.ACALA.collateralToken,
+          inputData,
+          "0",
+          "300000000",
+          "4294967295"
+        )
+        .signAndSend(acalaAccount.address, async (status) => {
+          const { status: newStatus } = status.toHuman()
+          let id
+          if (Object.keys(newStatus)[0] === "InBlock") {
+            setApproved(true)
+            update({
+              id,
+              ...processingToast(
+                "Approved",
+                "Your transaction is completed",
+                false,
+                "",
+                0
+              ),
+            })
+          } else if (Object.keys(newStatus)[0] === "Broadcast") {
+            id = add(
+              processingToast(
+                "Approving",
+                "Your transaction is being processed",
+                true,
+                "",
+                0
+              )
             )
-          )
-        }
-      })
+          }
+        })
+    } catch (e) {
+      add(
+        processingToast(
+          "Error",
+          "Insufficient balances on Acala token",
+          false,
+          "",
+          0
+        )
+      )
+    }
   }, [collateralToken, perpetual, chainId])
 
   const handleChange = (e) => {
@@ -251,42 +275,54 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
         leverage - 1
       )
       .encodeABI()
-    await acalaApi.tx.evm
-      .call(
-        perpetual.perpetualAddress,
-        inputData,
-        "0",
-        "300000000",
-        "4294967295"
-      )
-      .signAndSend(acalaAccount.address, async (status) => {
-        const { status: newStatus } = status.toHuman()
-        let id
-        if (Object.keys(newStatus)[0] === "InBlock") {
-          setApproved(true)
-          update({
-            id,
-            ...processingToast(
-              "Buy Done",
-              "Your transaction is completed",
-              false,
-              "",
-              0
-            ),
-          })
-          increaseTick()
-        } else if (Object.keys(newStatus)[0] === "Broadcast") {
-          id = add(
-            processingToast(
-              "Buying",
-              "Your transaction is being processed",
-              true,
-              "",
-              0
+    try {
+      await acalaApi.tx.evm
+        .call(
+          perpetual.perpetualAddress,
+          inputData,
+          "0",
+          "300000000",
+          "4294967295"
+        )
+        .signAndSend(acalaAccount.address, async (status) => {
+          const { status: newStatus } = status.toHuman()
+          let id
+          if (Object.keys(newStatus)[0] === "InBlock") {
+            setApproved(true)
+            update({
+              id,
+              ...processingToast(
+                "Buy Done",
+                "Your transaction is completed",
+                false,
+                "",
+                0
+              ),
+            })
+            increaseTick()
+          } else if (Object.keys(newStatus)[0] === "Broadcast") {
+            id = add(
+              processingToast(
+                "Buying",
+                "Your transaction is being processed",
+                true,
+                "",
+                0
+              )
             )
-          )
-        }
-      })
+          }
+        })
+    } catch (e) {
+      add(
+        processingToast(
+          "Error",
+          "Insufficient balances on Acala token",
+          false,
+          "",
+          0
+        )
+      )
+    }
   }, [perpetual, amount, buyPrice, leverage])
 
   const onSell = useCallback(async () => {
@@ -306,49 +342,54 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
         leverage - 1
       )
       .encodeABI()
-    await acalaApi.tx.evm.call(
-      perpetual.perpetualAddress,
-      inputData,
-      "0",
-      "300000000",
-      "4294967295"
-    )
-    await acalaApi.tx.evm
-      .call(
-        perpetual.perpetualAddress,
-        inputData,
-        "0",
-        "300000000",
-        "4294967295"
-      )
-      .signAndSend(acalaAccount.address, async (status) => {
-        const { status: newStatus } = status.toHuman()
-        let id
-        if (Object.keys(newStatus)[0] === "InBlock") {
-          setApproved(true)
-          update({
-            id,
-            ...processingToast(
-              "Sell Done",
-              "Your transaction is completed",
-              false,
-              "",
-              0
-            ),
-          })
-          increaseTick()
-        } else if (Object.keys(newStatus)[0] === "Broadcast") {
-          id = add(
-            processingToast(
-              "Selling",
-              "Your transaction is being processed",
-              true,
-              "",
-              0
+    try {
+      await acalaApi.tx.evm
+        .call(
+          perpetual.perpetualAddress,
+          inputData,
+          "0",
+          "300000000",
+          "4294967295"
+        )
+        .signAndSend(acalaAccount.address, async (status) => {
+          const { status: newStatus } = status.toHuman()
+          let id
+          if (Object.keys(newStatus)[0] === "InBlock") {
+            setApproved(true)
+            update({
+              id,
+              ...processingToast(
+                "Sell Done",
+                "Your transaction is completed",
+                false,
+                "",
+                0
+              ),
+            })
+            increaseTick()
+          } else if (Object.keys(newStatus)[0] === "Broadcast") {
+            id = add(
+              processingToast(
+                "Selling",
+                "Your transaction is being processed",
+                true,
+                "",
+                0
+              )
             )
-          )
-        }
-      })
+          }
+        })
+    } catch (e) {
+      add(
+        processingToast(
+          "Error",
+          "Insufficient balances on Acala token",
+          false,
+          "",
+          0
+        )
+      )
+    }
   }, [perpetual, amount, sellPrice, leverage])
 
   return (
