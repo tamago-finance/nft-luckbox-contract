@@ -377,7 +377,7 @@ const Summary = ({ locked, collateralToken, onFaucet, amount, leverage, price, a
                     </tr>
                     <tr>
                         <th scope="row">
-                            <div>Panelty Fee</div>
+                            <div>Penalty Fee</div>
                         </th>
                         <td>
                             10%
