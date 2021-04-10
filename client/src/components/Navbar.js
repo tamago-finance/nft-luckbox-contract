@@ -267,7 +267,7 @@ const Main = () => {
                     window.open("https://polkadot.js.org/", "_blank")
                   }
                 >
-                  Please Donwload Polkadot.js
+                  Install Polkadot JS extension
                 </Button>
               ) : (
                 <UncontrolledDropdown className='pr-1'>
