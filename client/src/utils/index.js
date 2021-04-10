@@ -11,7 +11,7 @@ export const shortAddress = (address, first = 6, last = -4) => {
 
 export const processingToast = (title = "Processing", subtitle = "Transaction is being processed" , loading = false, txId = "", chainId) => {
 
-    let suffix = "bscscan.com"
+    let suffix = ""
 
     if (chainId === 42) {
         suffix = "kovan.etherscan.io"

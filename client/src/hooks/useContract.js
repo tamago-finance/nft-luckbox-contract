@@ -1,55 +1,102 @@
-import React, { useEffect, useMemo, useReducer, createContext, useState, useCallback } from 'react';
-import { Web3ReactProvider, useWeb3React, UnsupportedChainIdError } from '@web3-react/core'
+import React, {
+  useEffect,
+  useMemo,
+  useReducer,
+  createContext,
+  useState,
+  useContext,
+  useCallback,
+} from "react"
+import {
+  Web3ReactProvider,
+  useWeb3React,
+  UnsupportedChainIdError,
+} from "@web3-react/core"
 import { ethers } from "ethers"
 import { useERC20 } from "./useERC20"
 import { usePerpetual } from "./usePerpetual"
-import { CONTRACTS , TOKENS } from "../constants"
+import { CONTRACTS, TOKENS } from "../constants"
+import { Web3AcalaContext } from "./Acala/useWeb3Acala"
+import { NetworkContext } from "./useNetwork"
 
-export const ContractContext = createContext({});
+export const ContractContext = createContext({})
 
 const Provider = ({ children }) => {
+  const context = useWeb3React()
+  const { acalaEvmProvider, acalaChainId, blindEthAddress } = useContext(
+    Web3AcalaContext
+  )
+  const { currentNetwork } = useContext(NetworkContext)
+  const { chainId, account: ethAccount, active, error, library } = context
+  const [tick, setTick] = useState(0)
+  let useChainId, useLibrary, account
+  if (currentNetwork === 2) {
+    useChainId = acalaChainId
+    useLibrary = acalaEvmProvider
+    account = blindEthAddress
+  } else {
+    useChainId = chainId
+    useLibrary = library
+    account = ethAccount
+  }
 
-    const context = useWeb3React()
-    const { chainId, account, active, error, library } = context
+  const collateralToken = useERC20(
+    useChainId,
+    account,
+    useLibrary,
+    tick,
+    currentNetwork
+  )
 
-    const [tick, setTick] = useState(0)
+  let appleAddress
+  let teslaAddress
+  const renBTCAddress = TOKENS.ACALA[0].address
+  const dotAddress = TOKENS.ACALA[1].address
+  if (chainId === 1337) {
+    appleAddress = TOKENS.LOCAL[0].address
+    teslaAddress = TOKENS.LOCAL[1].address
+  } else if (chainId === 42) {
+    appleAddress = TOKENS.KOVAN[0].address
+    teslaAddress = TOKENS.KOVAN[1].address
+  }
 
-    const collateralToken = useERC20(chainId, account, library, tick)
+  const perpetuals = {
+    AAPL: usePerpetual(appleAddress, account, library, tick, currentNetwork),
+    TSLA: usePerpetual(teslaAddress, account, library, tick, currentNetwork),
+    renBTC: usePerpetual(
+      renBTCAddress,
+      account,
+      acalaEvmProvider,
+      tick,
+      currentNetwork
+    ),
+    DOT: usePerpetual(
+      dotAddress,
+      account,
+      acalaEvmProvider,
+      tick,
+      currentNetwork
+    ),
+  }
 
-    let appleAddress
-    let teslaAddress
-    if (chainId === 1337) {
-        appleAddress = TOKENS.LOCAL[0].address
-        teslaAddress = TOKENS.LOCAL[1].address
-    } else if (chainId === 42) {
-        appleAddress = TOKENS.KOVAN[0].address
-        teslaAddress = TOKENS.KOVAN[1].address
-    }
+  const increaseTick = useCallback(() => {
+    setTick(tick + 1)
+  }, [tick])
 
+  const contractContext = useMemo(
+    () => ({
+      collateralToken,
+      increaseTick,
+      perpetuals,
+    }),
+    [collateralToken, increaseTick, perpetuals, account]
+  )
 
-    const perpetuals = {
-        AAPL : usePerpetual(appleAddress, account, library, tick),
-        TSLA : usePerpetual(teslaAddress, account, library, tick)
-    }
-
-    const increaseTick = useCallback(() => {
-        setTick(tick+1)
-    }, [tick])
-
-    const contractContext = useMemo(
-        () => ({
-            collateralToken,
-            increaseTick,
-            perpetuals
-        }),
-        [collateralToken, increaseTick, perpetuals]
-    )
-
-    return (
-        <ContractContext.Provider value={contractContext}>
-            {children}
-        </ContractContext.Provider>
-    )
+  return (
+    <ContractContext.Provider value={contractContext}>
+      {children}
+    </ContractContext.Provider>
+  )
 }
 
 export default Provider
