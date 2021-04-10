@@ -36,11 +36,15 @@ export const usePerpetual = (
     if (currentNetwork === 2) {
       return new ethers.Contract(perpetualAddress, Perpetual.abi, library)
     }
-    return new ethers.Contract(
-      perpetualAddress,
-      Perpetual.abi,
-      library.getSigner()
-    )
+    try {
+      return new ethers.Contract(
+        perpetualAddress,
+        Perpetual.abi,
+        library.getSigner()
+      )
+    } catch (e) {
+      return
+    }
   }, [account, perpetualAddress, library])
 
   const [markPrice, setMarkPrice] = useState("--")
