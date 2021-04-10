@@ -161,7 +161,7 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
       .signAndSend(acalaAccount.address, async (status) => {
         const { status: newStatus } = status.toHuman()
         let id
-        if (Object.keys(newStatus)[0] === "Finalized") {
+        if (Object.keys(newStatus)[0] === "InBlock") {
           update({
             id,
             ...processingToast(
@@ -173,7 +173,7 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
             ),
           })
           increaseTick()
-        } else if (Object.keys(newStatus)[0] === "InBlock") {
+        } else if (Object.keys(newStatus)[0] === "Broadcast") {
           id = add(
             processingToast(
               "Requesting tokens",
@@ -204,7 +204,7 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
       .signAndSend(acalaAccount.address, async (status) => {
         const { status: newStatus } = status.toHuman()
         let id
-        if (Object.keys(newStatus)[0] === "Finalized") {
+        if (Object.keys(newStatus)[0] === "InBlock") {
           setApproved(true)
           update({
             id,
@@ -216,7 +216,7 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
               0
             ),
           })
-        } else if (Object.keys(newStatus)[0] === "InBlock") {
+        } else if (Object.keys(newStatus)[0] === "Broadcast") {
           id = add(
             processingToast(
               "Approving",
@@ -262,7 +262,7 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
       .signAndSend(acalaAccount.address, async (status) => {
         const { status: newStatus } = status.toHuman()
         let id
-        if (Object.keys(newStatus)[0] === "Finalized") {
+        if (Object.keys(newStatus)[0] === "InBlock") {
           setApproved(true)
           update({
             id,
@@ -275,7 +275,7 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
             ),
           })
           increaseTick()
-        } else if (Object.keys(newStatus)[0] === "InBlock") {
+        } else if (Object.keys(newStatus)[0] === "Broadcast") {
           id = add(
             processingToast(
               "Buying",
@@ -324,7 +324,7 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
       .signAndSend(acalaAccount.address, async (status) => {
         const { status: newStatus } = status.toHuman()
         let id
-        if (Object.keys(newStatus)[0] === "Finalized") {
+        if (Object.keys(newStatus)[0] === "InBlock") {
           setApproved(true)
           update({
             id,
@@ -337,7 +337,7 @@ const TradePanel = ({ perpetual, collateralToken, symbol, locked }) => {
             ),
           })
           increaseTick()
-        } else if (Object.keys(newStatus)[0] === "InBlock") {
+        } else if (Object.keys(newStatus)[0] === "Broadcast") {
           id = add(
             processingToast(
               "Selling",
