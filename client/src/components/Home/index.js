@@ -125,7 +125,7 @@ const About = styled(({ className }) => (
         <Button style={{ cursor: "default" }} color='warning' />
         <h2>Trade all asset classes up to 4x leverage</h2>
         <p>
-          Tamago Finance is a derivatives DEX where any asset classes are
+          Tamago Finance is a derivatives DEX where any asset classes is
           possible to be listed through our unique price discovery mechanism
         </p>
       </Col>
