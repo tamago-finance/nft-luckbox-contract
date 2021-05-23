@@ -4,6 +4,7 @@
         "client",
         "core",
         "scheduler",
-        "acala"
+        "acala",
+        "contractV1"
     ]
 }
