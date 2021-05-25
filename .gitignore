@@ -2,5 +2,6 @@ node_modules/
 core-old
 contractV1-old
 contractV1-old-2
-core
+core/
+core-old-2/
 client
