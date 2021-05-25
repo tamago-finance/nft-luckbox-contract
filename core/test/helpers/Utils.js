@@ -1,28 +1,117 @@
-const MockToken = artifacts.require("MockToken")
+const abiDecoder = require('abi-decoder')
 
-module.exports.setupSystem = async (accounts) => {
+const loanCreatedEvent = [
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "collateral",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "bytes32",
+                "name": "currency",
+                "type": "bytes32"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "issuanceFee",
+                "type": "uint256"
+            }
+        ],
+        "name": "LoanCreated",
+        "type": "event",
+        "signature": "0x604952b18be5fed608cbdd28101dc57bd667055c9678ec6d44fb1d8e4c7c172a"
+    }
+]
 
-    const admin = accounts[0]
-    const alice = accounts[1]
-    const bob = accounts[2]
+abiDecoder.addABI(loanCreatedEvent)
 
-    const quoteToken = await MockToken.new("USD Stablecoin", "USD", { from: admin })
-
-    await quoteToken.transfer(alice, web3.utils.toWei("10000"))
-    await quoteToken.transfer(bob, web3.utils.toWei("10000"))
-
+module.exports.getContracts = () => {
     return {
-        quoteTokenAddress: quoteToken.address
+        "SynthUsdAddress": "0x57Ab1ec28D129707052df4dF418D58a2D46d5f51",
+        "SynthBtcAddress" : "0xDB91E4B3b6E19bF22E810C43273eae48C9037e74",
+        "ResolverAddress": "0x823bE81bbF96BEc0e25CA13170F5AaCb5B79ba83",
+        "CollateralManagerStateAddress": "0x573E5105c4B92416D1544A188F1bf77d442Bb52d",
+        "CollateralManagerAddress": "0x067e398605E84F2D0aEEC1806e62768C5110DCc6",
+        "CollateralErc20Address": "0xaa03aB31b55DceEeF845C8d17890CC61cD98eD04",
+        "CollateralEthAddress": "0x5c8344bcdC38F1aB5EB5C1d4a35DdEeA522B5DfA",
+        "CollateralStateEthAddress": "0xbe5B5a7c198bC156474ed5c33CBf2F3F604F8fF8",
+        "DebtCacheAddress": "0x12c815b0c404D66Dd0491f4EC62839904cec25e7",
+        "SynthetixAddress" : "0x97767D7D04Fd0dB0A1a2478DCd4BA85290556B48"
+    }
+}
+
+module.exports.getLoanId = async (tx) => {
+
+    const receipt = await web3.eth.getTransactionReceipt(tx.tx)
+    const decodedLogs = abiDecoder.decodeLogs(receipt.logs);
+
+    if (decodedLogs[0]) {
+        const { value } = decodedLogs[0].events.find(item => item.name === "id")
+        return Number(value)
+    } else {
+        return 0
     }
 
 }
 
 
-module.exports.calculateLongPnl = async (pmm, position) => {
-    return (Number(web3.utils.fromWei(await pmm.querySellBaseToken(position.positionSize))))-(Number(web3.utils.fromWei(position.positionSize)) * Number(web3.utils.fromWei(position.entryValue)))
+const advanceTime = (time) => {
+    return new Promise((resolve, reject) => {
+        web3.currentProvider.send({
+            jsonrpc: "2.0",
+            method: "evm_increaseTime",
+            params: [time],
+            id: new Date().getTime()
+        }, (err, result) => {
+            if (err) { return reject(err); }
+            return resolve(result);
+        });
+    });
 }
 
-module.exports.calculateShortPnl = async (pmm, position) => {
-    // const size = Number(web3.utils.fromWei(position.positionSize)) * ((Number(position.leverage))+1)
-    return (Number(web3.utils.fromWei(position.leveragedAmount))) - ((Number(web3.utils.fromWei(await pmm.queryBuyBaseToken(position.positionSize)))) )
+const advanceBlock = () => {
+    return new Promise((resolve, reject) => {
+        web3.currentProvider.send({
+            jsonrpc: "2.0",
+            method: "evm_mine",
+            id: new Date().getTime()
+        }, (err, result) => {
+            if (err) { return reject(err); }
+            const newBlockHash = web3.eth.getBlock('latest').hash;
+
+            return resolve(newBlockHash)
+        });
+    });
+}
+
+
+module.exports.advanceTimeAndBlock = async (time) => {
+    await advanceTime(time);
+    await advanceBlock();
+
+    return Promise.resolve(web3.eth.getBlock('latest'));
 }

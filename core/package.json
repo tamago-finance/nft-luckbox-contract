@@ -5,10 +5,13 @@
   "license": "MIT",
   "scripts": {
     "test": "truffle test",
-    "ganache": "ganache-cli --mnemonic $(grep MNEMONIC .env | cut -d '=' -f2)"
+    "forked-mainnet": "ganache-cli --fork $(grep FORKED_MAINNET_URL .env | cut -d '=' -f2) --mnemonic $(grep MNEMONIC .env | cut -d '=' -f2)"
   },
   "devDependencies": {
     "@truffle/hdwallet-provider": "1.2.2",
     "ganache-cli": "^6.12.1"
+  },
+  "dependencies": {
+    "abi-decoder": "^2.4.0"
   }
 }

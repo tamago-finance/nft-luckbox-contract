@@ -37,7 +37,7 @@ contract Pmm is Lockable, Whitelist, IPmm {
     address perpetual;
     // Variables for PMM Algorithm
     uint256 public k;
-    RStatus public rStatus; // reverse status of K
+    RStatus public rStatus;
     uint256 public targetBaseTokenAmount;
     uint256 public targetQuoteTokenAmount;
     uint256 public baseBalance;
