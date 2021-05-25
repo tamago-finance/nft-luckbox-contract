@@ -16,7 +16,7 @@ import "../utility/DODOMath.sol";
  * @title DODO v1 PMM contract
  */
 
-contract PMM is Lockable, Whitelist, IPmm {
+contract Pmm is Lockable, Whitelist, IPmm {
     using LibMathSigned for int256;
     using LibMathUnsigned for uint256;
     using SafeERC20 for IERC20;

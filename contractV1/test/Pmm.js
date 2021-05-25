@@ -1,4 +1,4 @@
-const PMM = artifacts.require('PMM')
+const Pmm = artifacts.require('Pmm')
 const PriceFeeder = artifacts.require('PriceFeeder')
 const TokenFactory = artifacts.require('TokenFactory')
 const MockToken = artifacts.require('MockToken')
@@ -11,7 +11,7 @@ let quoteToken
 let baseCapitalToken
 let quoteCapitalToken
 
-// contract('PMM', accounts => {
+// contract('Pmm', accounts => {
 
 //     const admin = accounts[0]
 //     const alice = accounts[1]
@@ -32,7 +32,7 @@ let quoteCapitalToken
 
 //         const tokenFactory = await TokenFactory.new()
 
-//         pmm = await PMM.new(
+//         pmm = await Pmm.new(
 //             tokenFactory.address,
 //             "0x0000000000000000000000000000000000000001",
 //             baseToken.address,

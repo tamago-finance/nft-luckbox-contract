@@ -34,6 +34,4 @@ let instance
 //         assert(isWhitelisted, true) 
 //     })
 
-    
-
 // })
