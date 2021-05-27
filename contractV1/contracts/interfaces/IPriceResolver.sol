@@ -12,6 +12,10 @@ interface IPriceResolver is ISide {
 
     function getPriceFeederShort() external view returns (address);
 
+    function getStartingPrice() external view returns (uint256);
+
     function getAdjustedPrice() external view returns (uint256, uint256);
+
+    function currentCoefficient() external view returns (int256, int256);
 
 }

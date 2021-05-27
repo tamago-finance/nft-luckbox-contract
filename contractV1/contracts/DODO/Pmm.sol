@@ -299,7 +299,10 @@ contract Pmm is Lockable, Whitelist, IPmm {
     function sellBaseToken(
         uint256 amount,
         uint256 minReceiveQuote
-    ) external override nonReentrant() onlyWhitelisted() returns (uint256) {
+    ) external override 
+        nonReentrant() 
+        onlyWhitelisted() 
+    returns (uint256) {
         // query price
         (
             uint256 receiveQuote,

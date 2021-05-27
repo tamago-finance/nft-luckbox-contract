@@ -113,9 +113,13 @@ contract PriceResolver is Lockable, Whitelist, ISide, IPriceResolver {
         return (startingPrice.wmul(longCoeff.toUint256()),startingPrice.wmul(shortCoeff.toUint256()));
     }
 
-    function currentCoefficient() external view returns (int256, int256) {
+    function currentCoefficient() override external view returns (int256, int256) {
         return _coefficient();
-    }   
+    }
+
+    function getStartingPrice() override external view returns (uint256) {
+        return startingPrice;
+    }
 
     function _coefficient() internal view returns (int256, int256) {
         int256 currentValue = (priceFeeder.getValue()).toInt256();

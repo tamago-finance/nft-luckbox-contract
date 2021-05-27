@@ -5,6 +5,6 @@ pragma solidity 0.6.9;
 
 interface ISide {
     
-    enum Side {FLAT, SHORT, LONG} 
+    enum Side {FLAT, LONG, SHORT} 
 
 }

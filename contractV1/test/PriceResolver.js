@@ -1,9 +1,6 @@
 const PriceFeeder = artifacts.require('PriceFeeder')
-const IPriceFeeder = artifacts.require('IPriceFeeder')
 const PriceResolver = artifacts.require('PriceResolver') 
 const ProxyFeeder = artifacts.require('ProxyFeeder') 
-
-const { advanceTimeAndBlock } = require("./helpers/Utils")
 
 let priceFeed
 let priceResolver
