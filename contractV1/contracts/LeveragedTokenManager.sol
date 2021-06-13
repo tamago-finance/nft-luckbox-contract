@@ -10,18 +10,11 @@ import "./utility/SafeERC20.sol";
 import "./interfaces/IExpandedIERC20.sol";
 import "./interfaces/ISide.sol";
 import "./interfaces/IPriceResolver.sol";
-import "./utility/synthetix/interfaces/IAddressResolver.sol";
-import "./utility/synthetix/interfaces/IDepot.sol";
-import "./utility/synthetix/interfaces/ISynthetix.sol";
-import "./utility/synthetix/interfaces/ICollateralLoan.sol";
-import "./interfaces/IReserves.sol";
-import "./utility/synthetix/CollateralEth.sol";
-import "./utility/synthetix/CollateralState.sol";
 import "./interfaces/IPriceFeeder.sol";
 import "./interfaces/IPmm.sol";
 import "./TokenFactory.sol";
 
-contract PerpetualManager is Lockable, Whitelist, ICollateralLoan, ISide {
+contract LeveragedTokenManager is Lockable, Whitelist, ISide {
     using LibMathSigned for int256;
     using LibMathUnsigned for uint256;
     using SafeERC20 for IERC20;
@@ -29,8 +22,6 @@ contract PerpetualManager is Lockable, Whitelist, ICollateralLoan, ISide {
     struct TokenOutstanding {
         int256 totalLongToken;
         int256 totalShortToken;
-        uint256 collectedBaseToken;
-        uint256 collectedQuoteToken;
     }
 
     enum State {INITIAL, NORMAL, EMERGENCY, EXPIRED}
@@ -38,8 +29,6 @@ contract PerpetualManager is Lockable, Whitelist, ICollateralLoan, ISide {
 
     // Contract state
     State public contractState;
-    // Reserves contract
-    IReserves public reserves;
     // PMM contract.
     IPmm public pmmLong;
     IPmm public pmmShort;
@@ -49,16 +38,12 @@ contract PerpetualManager is Lockable, Whitelist, ICollateralLoan, ISide {
     IExpandedIERC20 public longToken;
     IExpandedIERC20 public shortToken;
     Leverage public leverage;
-
-    // Synthetix
-    IAddressResolver public synthetixResolver;
-    ISynthetix public synthetix;
-    IERC20 public baseToken;
-    bytes32 public baseCurrency;
     // Quote Stablecoin
     IERC20 public quoteToken;
     // Keep track of short/long tokens that been issued
     TokenOutstanding public tokenOutstanding;
+    // Total quote token that locked in this contract
+    uint256 public totalRawCollateral;
 
     // Helpers
     uint256 constant MAX =
@@ -76,37 +61,27 @@ contract PerpetualManager is Lockable, Whitelist, ICollateralLoan, ISide {
         string memory _symbol,
         Leverage _leverage,
         address _tokenFactoryAddress,
-        address _reservesAddress,
         address _priceResolverAddress,
-        address _synthetixResolverAddress,
-        address _baseTokenAddress,
-        bytes32 _baseCurrency
+        address _quoteTokenAddress
     ) public nonReentrant() {
         require( _tokenFactoryAddress != address(0), "Invalid TokenFactory address" );
         require( _priceResolverAddress != address(0), "Invalid PriceResolver address" );
-        require( _synthetixResolverAddress != address(0), "Invalid SynthetixResolver address" );
-
+        require( _quoteTokenAddress != address(0), "Invalid QuoteToken address" );
+        
         // Setup long/short tokens
         TokenFactory tf = TokenFactory(_tokenFactoryAddress);
         longToken = tf.createToken( string(abi.encodePacked(_name, " Long")), string(abi.encodePacked(_symbol, "-LONG")), 18);
         shortToken = tf.createToken( string(abi.encodePacked(_name, " Short")), string(abi.encodePacked(_symbol, "-SHORT")), 18);
  
-
         priceResolver = IPriceResolver(_priceResolverAddress);
-        reserves = IReserves(_reservesAddress);
-        synthetixResolver = IAddressResolver(_synthetixResolverAddress);
-        // Alway use sUSD as a collateral
-        quoteToken = IERC20(synthetixResolver.getAddress("ProxyERC20sUSD"));
-        synthetix = ISynthetix(synthetixResolver.getAddress("Synthetix"));
-        baseToken = IERC20(_baseTokenAddress);
-        
-        baseCurrency = _baseCurrency;
+        // FIXME : allow only DAI, USDT, USDC
+        quoteToken = IERC20(_quoteTokenAddress);
         leverage = _leverage;
 
         addAddress(msg.sender);
 
         emit CreatedLeverageTokens();
-    }
+    } 
 
     // Get synthetic long token address
     function getLongToken() public view returns (address)
@@ -126,31 +101,34 @@ contract PerpetualManager is Lockable, Whitelist, ICollateralLoan, ISide {
         return address(quoteToken);
     }
 
-    // Get quote token address
-    function getBaseToken() public view returns (address)
+    function getCurrentPrice() public view returns (uint256)
     {
-        return address(baseToken);
+        return priceResolver.getCurrentPrice();
     }
 
-    function estimateTokenOut(uint256 tokenIn) public view returns (uint256, uint256) {
-        require( tokenIn > 0 , "Amount must be greater than 0" );
+    function estimateTokenOut(uint256 buyingAmount) public view returns (uint256, uint256) {
+        require( buyingAmount > 0 , "Amount must be greater than 0" );
         (uint256 longPrice, uint256 shortPrice) = _estimateTokenOut();
-        return (longPrice.wmul(tokenIn), shortPrice.wmul(tokenIn));
+        uint256 currentPrice = priceResolver.getCurrentPrice();
+        return (longPrice.wmul(buyingAmount.wdiv(currentPrice)), shortPrice.wmul(buyingAmount.wdiv(currentPrice)));
     }
 
-    function mint(uint256 tokenIn) public nonReentrant() {
-        require( tokenIn > 0 , "Amount must be greater than 0" );
+    function mint(uint256 buyingAmount) public nonReentrant() {
+        require( buyingAmount > 0 , "Amount must be greater than 0" );
+
+        uint256 currentPrice = priceResolver.getCurrentPrice();
+        uint256 tokenIn = buyingAmount.wdiv(currentPrice);
 
         (uint256 totalLong, uint256 totalShort) = _estimateTokenOut();
         totalLong = totalLong.wmul(tokenIn);
         totalShort = totalShort.wmul(tokenIn);
 
-        tokenOutstanding.collectedBaseToken = tokenOutstanding.collectedBaseToken.add(tokenIn);
+        totalRawCollateral = totalRawCollateral.add(buyingAmount);
         tokenOutstanding.totalLongToken = tokenOutstanding.totalLongToken.add(totalLong.toInt256());
         tokenOutstanding.totalShortToken = tokenOutstanding.totalShortToken.add(totalShort.toInt256());
 
         // Collecting synthetic assets from the user
-        baseToken.safeTransferFrom(msg.sender, address(this), tokenIn);
+        quoteToken.safeTransferFrom(msg.sender, address(this), tokenIn);
 
         require(longToken.mint(msg.sender, totalLong), "Minting long tokens failed");
         require(shortToken.mint(msg.sender, totalShort), "Minting short tokens failed");
@@ -247,12 +225,6 @@ contract PerpetualManager is Lockable, Whitelist, ICollateralLoan, ISide {
         shortToken.approve( pmmShortAddress, MAX);
     }
 
-    // just in case
-    function syncSynthetixContracts() external onlyWhitelisted() {
-        quoteToken = IERC20(synthetixResolver.getAddress("ProxyERC20sUSD"));
-        synthetix = ISynthetix(synthetixResolver.getAddress("Synthetix"));
-    }
-
     // INTERNAL FUNCTIONS
     // Check if amm address is set.
     modifier pmmRequired() {
@@ -272,6 +244,6 @@ contract PerpetualManager is Lockable, Whitelist, ICollateralLoan, ISide {
         return (halfCurrentPrice.wdiv(longPrice).toUint256(), halfCurrentPrice.wdiv(shortPrice).toUint256());
     }
 
-
+    
 
 }
