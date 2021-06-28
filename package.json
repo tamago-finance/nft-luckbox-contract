@@ -1,9 +1,8 @@
 {
     "private": true,
-    "workspaces": [
-        "client",
-        "core",
+    "workspaces": [ 
         "scheduler",
-        "acala"
+        "acala",
+        "contractV1"
     ]
 }
