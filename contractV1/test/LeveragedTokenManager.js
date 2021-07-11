@@ -46,7 +46,8 @@ contract('Leveraged Token Manager', accounts => {
                 2,
                 priceFeed.address,
                 web3.utils.toWei("330"), // Reference Price
-                web3.utils.toWei("100") // Index Starting Price
+                web3.utils.toWei("100"), // Index Starting Price
+                admin
             )
 
             await priceResolver.init()
