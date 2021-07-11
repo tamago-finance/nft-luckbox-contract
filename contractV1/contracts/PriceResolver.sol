@@ -60,16 +60,22 @@ contract PriceResolver is Lockable, Whitelist, ISide, IPriceResolver {
     ProxyFeeder public priceFeederLong;
     ProxyFeeder public priceFeederShort;
 
+    // Day from 1970 => Price
+    mapping(uint => uint256) public historicalPrices;
+
     uint256 public referencePrice;
     uint256 public startingPrice;
     State public state;
     Leverage public leverage;
 
+    uint8 constant MAX_DATA_POINTS = 120; // Total data points to be observed
+
     constructor(
         Leverage _leverage,
         address _priceFeederAddress,
         uint256 _referencePrice,
-        uint256 _startingPrice
+        uint256 _startingPrice,
+        address _devAddress
     ) public nonReentrant() {
         require( _priceFeederAddress != address(0), "Invalid Price Feeder address" );
         require( _referencePrice != 0, "Reference price can't be zero" );
@@ -83,6 +89,8 @@ contract PriceResolver is Lockable, Whitelist, ISide, IPriceResolver {
         startingPrice = _startingPrice;
 
         state = State.INITIAL;
+
+        addAddress(_devAddress);
     }
 
     function init() public nonReentrant() onlyWhitelisted() {
@@ -92,7 +100,45 @@ contract PriceResolver is Lockable, Whitelist, ISide, IPriceResolver {
         priceFeederShort.init(address(this));
 
         state = State.NORMAL;
+    }
 
+    // invoke it daily
+    function dump() public nonReentrant() onlyWhitelisted() {
+        uint256 value = priceFeeder.getValue();
+        uint day = _getUnixDay();
+
+        historicalPrices[day] = value;
+    }
+
+    function forceDump(uint day, uint256 value) public nonReentrant() onlyWhitelisted() {
+        historicalPrices[day] = value;
+    }
+
+    // dangerous
+    function updateReferencePrice() public nonReentrant() onlyWhitelisted() {
+        referencePrice = getAvgPrice();
+    }
+
+    function getAvgPrice() public view returns (uint256) {
+        uint day = _getUnixDay();
+
+        uint count = 0;
+        uint256 sum = 0;
+        uint256 totalSample = 0;
+
+        while (MAX_DATA_POINTS >= count) {
+
+            uint256 value = historicalPrices[day.sub(count)];
+
+            if (value != 0) {
+                sum = sum.add(value);
+                totalSample++;
+            }
+
+            count++;
+        }
+        
+        return sum.div(totalSample);
     }
 
     function getCurrentPrice() override external view returns (uint256) {
@@ -121,6 +167,10 @@ contract PriceResolver is Lockable, Whitelist, ISide, IPriceResolver {
         return startingPrice;
     }
 
+    function currentUnixDay() public view returns (uint) {
+        return _getUnixDay();
+    }
+
     function _coefficient() internal view returns (int256, int256) {
         int256 currentValue = (priceFeeder.getValue()).toInt256();
         int256 long = currentValue.wdiv(referencePrice.toInt256());
@@ -138,6 +188,10 @@ contract PriceResolver is Lockable, Whitelist, ISide, IPriceResolver {
         }
 
         return (long, short);
+    }
+
+    function _getUnixDay() internal view returns (uint) {
+        return now.div(86400);
     }
 
 }
