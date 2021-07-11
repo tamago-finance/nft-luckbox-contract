@@ -116,7 +116,9 @@ contract PriceResolver is Lockable, Whitelist, ISide, IPriceResolver {
 
     // dangerous
     function updateReferencePrice() public nonReentrant() onlyWhitelisted() {
-        referencePrice = getAvgPrice();
+        uint256 price = getAvgPrice();
+        require(price!=0, "Avg Price error");
+        referencePrice = price;
     }
 
     function getAvgPrice() public view returns (uint256) {
