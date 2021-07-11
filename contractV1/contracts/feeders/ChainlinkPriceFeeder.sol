@@ -34,7 +34,6 @@ contract ChainlinkPriceFeeder is IPriceFeeder {
         decimals = _decimals;
         side = Side.FLAT;
         chainlinkPriceFeed = AggregatorV3Interface(_chainlinkPriceFeedAddress);
-        decimals = _decimals;
     }
 
     function getValue() public override view returns (uint256) {
@@ -55,6 +54,15 @@ contract ChainlinkPriceFeeder is IPriceFeeder {
     }
 
     function getTimestamp() public override view returns (uint256) {
+        return _getTimestamp();
+    }
+
+    // not used
+    function getSide() public override view returns (Side) {
+        return side;
+    }
+
+    function _getTimestamp() internal view returns (uint256) {
         (
             , 
             ,
@@ -65,9 +73,5 @@ contract ChainlinkPriceFeeder is IPriceFeeder {
         return uint256(timeStamp);
     }
 
-    // not used
-    function getSide() public override view returns (Side) {
-        return side;
-    }
 
 }
