@@ -60,7 +60,8 @@ contract('Leveraged Token Manager', accounts => {
                 2,
                 tokenFactory.address,
                 priceResolver.address,
-                usToken.address
+                usToken.address,
+                admin
             )
 
             longToken = await SyntheticToken.at(await leveragedTokenManager.getLongToken())
@@ -89,7 +90,7 @@ contract('Leveraged Token Manager', accounts => {
                 web3.utils.toWei("0.99") // K 
             )
 
-            await quoteToken.transfer(alice, web3.utils.toWei("10000") )
+            await quoteToken.transfer(alice, web3.utils.toWei("10000"))
 
             await quoteToken.approve(
                 leveragedTokenManager.address,
@@ -103,6 +104,8 @@ contract('Leveraged Token Manager', accounts => {
                 pmmLong.address,
                 pmmShort.address
             )
+
+            await quoteToken.transfer(bob, web3.utils.toWei("1000"))
 
             isMainnet = true
         } catch (e) {
@@ -133,14 +136,14 @@ contract('Leveraged Token Manager', accounts => {
             assert(currentPrice !== 0, true)
 
             const output = await leveragedTokenManager.estimateTokenOut(currentBalance)
-            assert( web3.utils.fromWei(output[0]) !== web3.utils.fromWei(output[1]), true ) 
+            assert(web3.utils.fromWei(output[0]) !== web3.utils.fromWei(output[1]), true)
 
-            await leveragedTokenManager.mint(currentBalance , { from : alice })
+            await leveragedTokenManager.mint(currentBalance, { from: alice })
             const totalLongToken = await longToken.balanceOf(alice)
-            assert( Number(web3.utils.fromWei(totalLongToken)) > 0, true)
+            assert(Number(web3.utils.fromWei(totalLongToken)) > 0, true)
 
             const totalShortToken = await shortToken.balanceOf(alice)
-            assert( Number(web3.utils.fromWei(totalShortToken)) > 0, true)
+            assert(Number(web3.utils.fromWei(totalShortToken)) > 0, true)
 
         }
     })
@@ -153,32 +156,62 @@ contract('Leveraged Token Manager', accounts => {
             const shortTokenBalance = await shortToken.balanceOf(alice)
             const longTokenBalance = await longToken.balanceOf(alice)
 
-            await longToken.approve(leveragedTokenManager.address, web3.utils.toWei("10000") , { from : alice })
-            await shortToken.approve(leveragedTokenManager.address, web3.utils.toWei("10000"), { from : alice })
+            await longToken.approve(leveragedTokenManager.address, web3.utils.toWei("10000"), { from: alice })
+            await shortToken.approve(leveragedTokenManager.address, web3.utils.toWei("10000"), { from: alice })
 
             // PMM-long
-            await leveragedTokenManager.addLiquidity(1, longTokenBalance , web3.utils.toWei(`${halfAmount}`) ,{ from : alice })
+            await leveragedTokenManager.addLiquidity(1, longTokenBalance, web3.utils.toWei(`${halfAmount}`), { from: alice })
 
             // PMM-short
-            await leveragedTokenManager.addLiquidity(2, shortTokenBalance , await quoteToken.balanceOf(alice) ,{ from : alice })
+            await leveragedTokenManager.addLiquidity(2, shortTokenBalance, await quoteToken.balanceOf(alice), { from: alice })
         }
     })
 
     it('buy and sell short token', async () => {
         if (isMainnet) {
-            
-            await quoteToken.transfer(alice, web3.utils.toWei("10000") )
 
-            const buyPrice = await leveragedTokenManager.queryBuyLeveragedToken( 2,  web3.utils.toWei("1") )
-            await leveragedTokenManager.buyLeveragedToken( 2, web3.utils.toWei("1") , buyPrice , { from: alice })
+            await quoteToken.transfer(alice, web3.utils.toWei("10000"))
+
+            const buyPrice = await leveragedTokenManager.queryBuyLeveragedToken(2, web3.utils.toWei("1"))
+            await leveragedTokenManager.buyLeveragedToken(2, web3.utils.toWei("1"), buyPrice, { from: alice })
 
             let currentBalance = await shortToken.balanceOf(alice)
-            assert("1" , web3.utils.fromWei(currentBalance))
+            assert("1", web3.utils.fromWei(currentBalance))
 
-            const sellPrice = await leveragedTokenManager.querySellLeveragedToken( 2, web3.utils.toWei("1") ) 
+            const sellPrice = await leveragedTokenManager.querySellLeveragedToken(2, web3.utils.toWei("1"))
 
-            await leveragedTokenManager.sellLeveragedToken( 2, web3.utils.toWei("1") , sellPrice , { from: alice })
-            
+            await leveragedTokenManager.sellLeveragedToken(2, web3.utils.toWei("1"), sellPrice, { from: alice })
+
+        }
+    })
+
+    it('redeem quote tokens back', async () => {
+        if (isMainnet) {
+            let bobBalance = await quoteToken.balanceOf(bob)
+
+            await quoteToken.approve(leveragedTokenManager.address, web3.utils.toWei("10000"), { from: bob })
+
+            await leveragedTokenManager.mint(bobBalance, { from: bob })
+
+            const totalLongToken = await longToken.balanceOf(bob)
+            assert(Number(web3.utils.fromWei(totalLongToken)) > 0, true)
+
+            const totalShortToken = await shortToken.balanceOf(bob)
+            assert(Number(web3.utils.fromWei(totalShortToken)) > 0, true)
+
+            await longToken.approve(leveragedTokenManager.address, web3.utils.toWei("10000"), { from: bob })
+            await shortToken.approve(leveragedTokenManager.address, web3.utils.toWei("10000"), { from: bob })
+
+            const redeemAmount = Number(web3.utils.fromWei(bobBalance)) * 0.5
+
+            bobBalance = await quoteToken.balanceOf(bob)
+            assert(bobBalance.toString(), "0")
+
+            await leveragedTokenManager.redeem( web3.utils.toWei(`${redeemAmount}`) , { from: bob })
+
+            bobBalance = await quoteToken.balanceOf(bob)
+            assert(`${redeemAmount}`, web3.utils.fromWei(bobBalance))
+
         }
     })
 

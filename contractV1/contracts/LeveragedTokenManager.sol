@@ -18,6 +18,7 @@ contract LeveragedTokenManager is Lockable, Whitelist, ISide {
     using LibMathSigned for int256;
     using LibMathUnsigned for uint256;
     using SafeERC20 for IERC20;
+    using SafeERC20 for IExpandedIERC20;
 
     struct TokenOutstanding {
         int256 totalLongToken;
@@ -52,6 +53,7 @@ contract LeveragedTokenManager is Lockable, Whitelist, ISide {
 
     event CreatedLeverageTokens();
     event Minted(address indexed account, uint256 tokenInAmount, uint256 longTokenOutAmount, uint256 shortTokenOutAmount);
+    event Redeemed(address indexed account, uint256 tokenOutAmount, uint256 longTokenInAmount, uint256 shortTokenInAmount);
     event AddedLiquidity(address indexed account, Side side, uint256 leverageTokenAmount, uint256 quoteTokenAmount);
     event BuyLeveragedToken(address indexed account, Side side, uint256 leverageTokenAmount);
     event SellLeveragedToken(address indexed account, Side side, uint256 leverageTokenAmount);
@@ -62,7 +64,8 @@ contract LeveragedTokenManager is Lockable, Whitelist, ISide {
         Leverage _leverage,
         address _tokenFactoryAddress,
         address _priceResolverAddress,
-        address _quoteTokenAddress
+        address _quoteTokenAddress,
+        address _devAddress // admin
     ) public nonReentrant() {
         require( _tokenFactoryAddress != address(0), "Invalid TokenFactory address" );
         require( _priceResolverAddress != address(0), "Invalid PriceResolver address" );
@@ -78,7 +81,7 @@ contract LeveragedTokenManager is Lockable, Whitelist, ISide {
         quoteToken = IERC20(_quoteTokenAddress);
         leverage = _leverage;
 
-        addAddress(msg.sender);
+        addAddress(_devAddress);
 
         emit CreatedLeverageTokens();
     } 
@@ -128,12 +131,36 @@ contract LeveragedTokenManager is Lockable, Whitelist, ISide {
         tokenOutstanding.totalShortToken = tokenOutstanding.totalShortToken.add(totalShort.toInt256());
 
         // Collecting synthetic assets from the user
-        quoteToken.safeTransferFrom(msg.sender, address(this), tokenIn);
+        quoteToken.safeTransferFrom(msg.sender, address(this), buyingAmount);
 
         require(longToken.mint(msg.sender, totalLong), "Minting long tokens failed");
         require(shortToken.mint(msg.sender, totalShort), "Minting short tokens failed");
 
         emit Minted(msg.sender, tokenIn, totalLong, totalShort);
+    }
+
+    function redeem(uint256 redeemingAmount) public nonReentrant() {
+        require( redeemingAmount > 0 , "Amount must be greater than 0" );
+
+        uint256 currentPrice = priceResolver.getCurrentPrice();
+        uint256 tokenOut = redeemingAmount.wdiv(currentPrice);
+
+        (uint256 totalLong, uint256 totalShort) = _estimateTokenOut();
+        totalLong = totalLong.wmul(tokenOut);
+        totalShort = totalShort.wmul(tokenOut);
+
+        totalRawCollateral = totalRawCollateral.sub(redeemingAmount);
+        tokenOutstanding.totalLongToken = tokenOutstanding.totalLongToken.sub(totalLong.toInt256());
+        tokenOutstanding.totalShortToken = tokenOutstanding.totalShortToken.sub(totalShort.toInt256());
+
+        longToken.safeTransferFrom(msg.sender, address(this), totalLong);
+        shortToken.safeTransferFrom(msg.sender, address(this), totalShort);
+
+        longToken.burn(totalLong);
+        shortToken.burn(totalShort);
+
+        quoteToken.safeTransfer(msg.sender, redeemingAmount);
+        emit Redeemed(msg.sender, tokenOut, totalLong, totalShort);
     }
 
     function addLiquidity(Side side, uint256 leverageTokenAmount, uint256 quoteTokenAmount) public nonReentrant() {
