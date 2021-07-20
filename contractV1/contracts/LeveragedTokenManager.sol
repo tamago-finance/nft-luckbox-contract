@@ -163,24 +163,24 @@ contract LeveragedTokenManager is Lockable, Whitelist, ISide {
         emit Redeemed(msg.sender, tokenOut, totalLong, totalShort);
     }
 
-    function addLiquidity(Side side, uint256 leverageTokenAmount, uint256 quoteTokenAmount) public nonReentrant() {
-        require( side != Side.FLAT , "Side must be long or short" );
+    // function addLiquidity(Side side, uint256 leverageTokenAmount, uint256 quoteTokenAmount) public nonReentrant() {
+    //     require( side != Side.FLAT , "Side must be long or short" );
 
-        quoteToken.safeTransferFrom(msg.sender, address(this), quoteTokenAmount);
+    //     quoteToken.safeTransferFrom(msg.sender, address(this), quoteTokenAmount);
 
-        // TODO: track the LP tokens received
-        if (side == Side.LONG) {
-            longToken.transferFrom(msg.sender, address(this), leverageTokenAmount);
-            pmmLong.depositBase(leverageTokenAmount);
-            pmmLong.depositQuote(quoteTokenAmount);
-        } else {
-            shortToken.transferFrom(msg.sender, address(this), leverageTokenAmount);
-            pmmShort.depositBase(leverageTokenAmount);
-            pmmShort.depositQuote(quoteTokenAmount);
-        }
+    //     // TODO: track the LP tokens received
+    //     if (side == Side.LONG) {
+    //         longToken.transferFrom(msg.sender, address(this), leverageTokenAmount);
+    //         pmmLong.depositBase(leverageTokenAmount);
+    //         pmmLong.depositQuote(quoteTokenAmount);
+    //     } else {
+    //         shortToken.transferFrom(msg.sender, address(this), leverageTokenAmount);
+    //         pmmShort.depositBase(leverageTokenAmount);
+    //         pmmShort.depositQuote(quoteTokenAmount);
+    //     }
 
-        emit AddedLiquidity(msg.sender, side, leverageTokenAmount, quoteTokenAmount);
-    }
+    //     emit AddedLiquidity(msg.sender, side, leverageTokenAmount, quoteTokenAmount);
+    // }
 
     function queryBuyLeveragedToken(Side side, uint256 amount) public view returns (uint256) {
         if (side == Side.LONG) {
