@@ -84,7 +84,7 @@ contract ExchangePair is Lockable, Whitelist, IExchangePair {
     // Deposit base token
     function depositBase(uint256 amount) public override {
         require(amount > 0 , "Invalid amount");
-        baseToken.transferFrom(msg.sender, address(this), amount);
+        baseToken.safeTransferFrom(msg.sender, address(this), amount);
 
         providers[msg.sender].base = providers[msg.sender].base.add(amount);
 
@@ -97,7 +97,7 @@ contract ExchangePair is Lockable, Whitelist, IExchangePair {
     function depositQuote(uint256 amount) external override {
         require(amount > 0 , "Invalid amount");
         // quoteToken.transferFrom(msg.sender, address(this), amount);
-        quoteToken.transferFrom(msg.sender, address(exchangeCore) , amount);
+        quoteToken.safeTransferFrom(msg.sender, address(exchangeCore) , amount);
         exchangeCore.deposit(amount);
 
         providers[msg.sender].quote = providers[msg.sender].quote.add(amount);
@@ -110,7 +110,7 @@ contract ExchangePair is Lockable, Whitelist, IExchangePair {
         require(amount > 0 , "Invalid amount");
         require(providers[msg.sender].base >= amount , "You have insufficient balance");
 
-        baseToken.transfer(msg.sender, amount);
+        baseToken.safeTransfer(msg.sender, amount);
 
         providers[msg.sender].base = providers[msg.sender].base.sub(amount);
 
@@ -148,15 +148,15 @@ contract ExchangePair is Lockable, Whitelist, IExchangePair {
 
         require(maxPayQuote >= tokenIn , "Exceeding your maxPayQuote");
 
-        quoteToken.transferFrom(msg.sender, address(exchangeCore), tokenIn);
+        quoteToken.safeTransferFrom(msg.sender, address(exchangeCore), tokenIn);
         exchangeCore.deposit(tokenIn);
 
         // deducting fees
         uint256 totalFee = amount.wmul(exchangeCore.fee());
         amount = amount.sub(totalFee);
 
-        baseToken.transfer( msg.sender , amount);
-        baseToken.transfer(exchangeCore.devAddress(), totalFee);
+        baseToken.safeTransfer( msg.sender , amount);
+        baseToken.safeTransfer(exchangeCore.devAddress(), totalFee);
         _baseBalance = _baseBalance.sub(amount);
 
         emit BuyBaseToken(msg.sender, amount, tokenIn);
@@ -171,7 +171,7 @@ contract ExchangePair is Lockable, Whitelist, IExchangePair {
         require(tokenOut >= minReceiveQuote , "Not exceeding your minReceiveQuote");
         require(totalQuote >= tokenOut , "Not enough supply on quote tokens");
 
-        baseToken.transferFrom(msg.sender, address(this), amount);
+        baseToken.safeTransferFrom(msg.sender, address(this), amount);
         _baseBalance = _baseBalance.add(amount);
 
         // deducting fees

@@ -198,6 +198,7 @@ contract LeveragedTokenManager is Lockable, Whitelist, ISide {
         }
     }
 
+    // not used
     function buyLeveragedToken(Side side, uint256 amount, uint256 max) public nonReentrant() {
         require( side != Side.FLAT , "Side must be long or short" );
 
@@ -216,6 +217,7 @@ contract LeveragedTokenManager is Lockable, Whitelist, ISide {
         emit BuyLeveragedToken(msg.sender, side, amount);
     }
 
+     // not used
     function sellLeveragedToken(Side side, uint256 amount, uint256 min) public nonReentrant() {
         require( side != Side.FLAT , "Side must be long or short" );
 
