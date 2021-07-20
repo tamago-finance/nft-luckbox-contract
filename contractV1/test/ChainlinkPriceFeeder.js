@@ -21,7 +21,7 @@ contract('Chainlink Price Feeder', accounts => {
             }
 
         } catch (e) {
-            console.log(e)
+            // console.log(e)
         }
     })
 
