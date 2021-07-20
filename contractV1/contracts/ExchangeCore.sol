@@ -131,7 +131,7 @@ contract ExchangeCore is Lockable, Whitelist, ILeverageSize, IExchangeCore {
     function withdraw(uint256 amount, address recipient) external override nonReentrant() isValidPair(msg.sender) {
         require(amount > 0 , "Invalid amount");
 
-        quoteToken.transfer(recipient , amount);
+        quoteToken.safeTransfer(recipient , amount);
         quoteBalance = quoteBalance.sub(amount);
         emit Withdraw(recipient , address(quoteToken), amount);
     }
