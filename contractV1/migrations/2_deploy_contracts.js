@@ -1,52 +1,46 @@
-const MockToken = artifacts.require('MockToken')
-const ChainlinkPriceFeeder = artifacts.require('ChainlinkPriceFeeder')
-const PriceResolver = artifacts.require('PriceResolver')
-const TokenFactory = artifacts.require('TokenFactory')
 const LeveragedTokenManager = artifacts.require('LeveragedTokenManager')
+const ChainlinkPriceFeeder = artifacts.require('ChainlinkPriceFeeder')
 const SyntheticToken = artifacts.require('SyntheticToken')
-const Pmm = artifacts.require('Pmm')
-
+const MockToken = artifacts.require('MockToken')
+const PriceResolver = artifacts.require('PriceResolver')
+const ExchangeCore = artifacts.require('ExchangeCore')
+const ExchangePair = artifacts.require('ExchangePair')
+const TokenFactory = artifacts.require('TokenFactory')
 
 const fs = require("fs")
 
 module.exports = async (deployer, network, accounts) => {
 
-    let quoteTokenInstance
-    let priceFeedInstance
-    let priceResolverInstance
-    let leveragedTokenInstance
-    let pmmLongInstance
-    let pmmShortInstance
+    let quoteToken
+    let priceFeed
+    let priceResolver
+    let leveragedToken
+    let exchangeCore
+    let exchangePairLong
+    let exchangePairShort
+    let tokenFactoryAddress
+    let longToken
+    let shortToken
 
-    if (network === "kovan") {
+    if (network === "kovan" || network === "kovan-fork") {
 
         const admin = accounts[0]
+        const dev = "0x2D4208d1a5B2573476cf1d0f96CB03D15E709E58"
 
-        // await deployer.deploy(
-        //     MockToken,
-        //     "Tamago USD",
-        //     "TUSD",
-        //     {
-        //         from: admin
-        //     })
+        await deployer.deploy(
+            MockToken,
+            "Tamago USD",
+            "TUSD",
+            {
+                from: admin
+            })
 
-        // quoteTokenInstance = await MockToken.at(MockToken.address)
-
-        quoteTokenInstance = await MockToken.at("0x5De36B1c96fEf717C5EAD1AA9a68a35b791Ca418")
-
-        // await deployer.deploy(
-        //     ChainlinkPriceFeeder,
-        //     "Tesla Stock",
-        //     "0xb31357d152638fd1ae0853d24b9Ea81dF29E3EF2",
-        //     8,
-        //     {
-        //         from: admin
-        //     })
+        quoteToken = await MockToken.at(MockToken.address)
 
         await deployer.deploy(
             ChainlinkPriceFeeder,
-            "Gold",
-            "0xc8fb5684f2707C82f28595dEaC017Bfdf44EE9c5",
+            "Tesla Stock",
+            "0xb31357d152638fd1ae0853d24b9Ea81dF29E3EF2",
             8,
             {
                 from: admin
@@ -59,102 +53,118 @@ module.exports = async (deployer, network, accounts) => {
             }
         )
 
-        priceFeedInstance = await ChainlinkPriceFeeder.at(ChainlinkPriceFeeder.address)
+        tokenFactoryAddress = TokenFactory.address
+
+        priceFeed = await ChainlinkPriceFeeder.at(ChainlinkPriceFeeder.address)
 
         await deployer.deploy(
             PriceResolver,
             2,
-            priceFeedInstance.address,
-            web3.utils.toWei("1700"),
-            web3.utils.toWei("100"),
+            priceFeed.address,
+            web3.utils.toWei("650"),
+            web3.utils.toWei("600"),
+            dev,
             {
                 from: admin
             })
 
-        priceResolverInstance = await PriceResolver.at(PriceResolver.address)
+        priceResolver = await PriceResolver.at(PriceResolver.address)
 
-        await priceResolverInstance.init()
+        await priceResolver.init({ from: admin })
 
         await deployer.deploy(
             LeveragedTokenManager,
-            "Gold 2x Leveraged",
-            "xau-2x",
+            "Tesla 2x Leveraged",
+            "tsla-2x",
             2,
-            TokenFactory.address,
-            priceResolverInstance.address,
-            quoteTokenInstance.address,
+            tokenFactoryAddress,
+            priceResolver.address,
+            quoteToken.address,
+            dev,
             {
                 from: admin
             })
 
-        leveragedTokenInstance = await LeveragedTokenManager.at(LeveragedTokenManager.address)
+        leveragedToken = await LeveragedTokenManager.at(LeveragedTokenManager.address)
 
-        const longTokenInstance = await SyntheticToken.at(await leveragedTokenInstance.getLongToken())
-        const shortTokenInstance = await SyntheticToken.at(await leveragedTokenInstance.getShortToken())
+        longToken = await SyntheticToken.at(await leveragedToken.getLongToken())
+        shortToken = await SyntheticToken.at(await leveragedToken.getShortToken())
 
-        const priceFeederLongAddress = await priceResolverInstance.getPriceFeederLong()
-        const priceFeederShortAddress = await priceResolverInstance.getPriceFeederShort()
+        const priceFeederLongAddress = await priceResolver.getPriceFeederLong()
+        const priceFeederShortAddress = await priceResolver.getPriceFeederShort()
 
         await deployer.deploy(
-            Pmm,
-            TokenFactory.address,
-            leveragedTokenInstance.address,
-            longTokenInstance.address,
-            quoteTokenInstance.address,
-            priceFeederLongAddress,
-            web3.utils.toWei("0.99"),
+            ExchangeCore,
+            quoteToken.address,
+            dev,
             {
                 from: admin
             }
         )
 
-        const pmmLongInstance = await Pmm.at(Pmm.address)
+        exchangeCore = await ExchangeCore.at(ExchangeCore.address)
 
         await deployer.deploy(
-            Pmm,
-            TokenFactory.address,
-            leveragedTokenInstance.address,
-            shortTokenInstance.address,
-            quoteTokenInstance.address,
-            priceFeederShortAddress,
-            web3.utils.toWei("0.99"),
+            ExchangePair,
+            ExchangeCore.address,
+            longToken.address,
+            priceFeederLongAddress,
             {
                 from: admin
-            })
-
-        const pmmShortInstance = await Pmm.at(Pmm.address)
-
-        await leveragedTokenInstance.setupPmm(
-            pmmLongInstance.address,
-            pmmShortInstance.address
+            }
         )
 
-        await quoteTokenInstance.approve( leveragedTokenInstance.address , web3.utils.toWei("30000") , { from : admin })
-        await leveragedTokenInstance.mint(web3.utils.toWei("10000") , { from : admin })
+        exchangePairLong = await ExchangePair.at(ExchangePair.address)
 
-        const totalLongToken = await longTokenInstance.balanceOf(admin)
-        const totalShortToken = await shortTokenInstance.balanceOf(admin)
+        await deployer.deploy(
+            ExchangePair,
+            ExchangeCore.address,
+            shortToken.address,
+            priceFeederShortAddress,
+            {
+                from: admin
+            }
+        )
 
-        await longTokenInstance.approve(leveragedTokenInstance.address, web3.utils.toWei("100000") , { from : admin })
-        await shortTokenInstance.approve(leveragedTokenInstance.address, web3.utils.toWei("100000"), { from : admin })
+        exchangePairShort = await ExchangePair.at(ExchangePair.address)
 
-        // PMM-long
-        await leveragedTokenInstance.addLiquidity(1, totalLongToken , web3.utils.toWei("10000") ,{ from : admin })
+        await leveragedToken.setupPmm(
+            exchangePairLong.address,
+            exchangePairShort.address
+        )
 
-        // PMM-short
-        await leveragedTokenInstance.addLiquidity(2, totalShortToken , web3.utils.toWei("10000") ,{ from : admin })
+        await exchangeCore.enable()
 
+        await exchangeCore.addPair("Tesla Stock")
+        await exchangeCore.setLeveragedTokenAddress(0, 2, exchangePairLong.address, exchangePairShort.address)
+
+        // mint long & short tokens
+        await quoteToken.approve(exchangePairLong.address, web3.utils.toWei("100000"), { from: admin })
+        await quoteToken.approve(leveragedToken.address, web3.utils.toWei("100000"), { from: admin })
+        await longToken.approve(exchangePairLong.address, web3.utils.toWei("100000"), { from: admin })
+        await shortToken.approve(exchangePairShort.address, web3.utils.toWei("100000"), { from: admin })
+
+        await leveragedToken.mint(web3.utils.toWei("10000"), { from: admin })
+
+        const totalLongToken = await longToken.balanceOf(admin)
+        const totalShortToken = await shortToken.balanceOf(admin)
+
+        // deposit long & short tokens
+        await exchangePairLong.depositBase(totalLongToken, { from: admin })
+        await exchangePairLong.depositQuote(web3.utils.toWei("10000"), { from: admin })
+
+        await exchangePairShort.depositBase( totalShortToken , { from: admin })
 
         await fs.writeFileSync(
-        "../client/.env",
-        `
-REACT_APP_QUOTE_TOKEN=${quoteTokenInstance.address}
-REACT_APP_LEVERAGED_TOKEN_MANAGER_TSLA=${leveragedTokenInstance.address}
-`
-    );
+            "../.env",
+            `
+    REACT_APP_QUOTE_TOKEN=${quoteToken.address}
+    REACT_APP_LEVERAGED_TOKEN_MANAGER_TSLA=${leveragedToken.address}
+    REACT_APP_TOKEN_FACTORY=${tokenFactoryAddress}
+    REACT_APP_EXCHANGE_CORE=${exchangeCore.address}
+    `
+        );
 
     }
-
-    
 
 }
