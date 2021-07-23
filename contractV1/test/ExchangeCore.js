@@ -31,9 +31,7 @@ contract('ExchangePair', accounts => {
                 from: admin
             }
         )
-
-
-
+        
         await exchangeCore.enable()
 
     })
