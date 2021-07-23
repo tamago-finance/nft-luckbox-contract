@@ -59,7 +59,7 @@ contract ExchangeCore is Lockable, Whitelist, ILeverageSize, IExchangeCore {
     event RemovedPair(uint256 pairId);
     event UpdatedPair(
         uint256 pairId,
-        uint8 leverageSize,
+        LeverageSize leverageSize,
         address pairLongTokenAddress,
         address pairShortTokenAddress
     );
@@ -189,24 +189,24 @@ contract ExchangeCore is Lockable, Whitelist, ILeverageSize, IExchangeCore {
     // setup leveraged token addresses
     function setLeveragedTokenAddress(
         uint256 pairId,
-        uint8 size,
+        LeverageSize size,
         address pairLongTokenAddress,
         address pairShortTokenAddress
     ) public nonReentrant() isReady() onlyWhitelisted() {
         require(_pairs.array.length > pairId, "Invalid pairId");
-        require(size != 0 || !(size > 4), "Invalid given leverage size");
+        require(size != LeverageSize.ZERO , "Invalid given leverage size");
         require(
-            size != 3,
+            size != LeverageSize.THREE,
             "Given leverage size is not support"
         );
 
-        if (size == 1) {
+        if (size == LeverageSize.ONE) {
             _pairs.table[pairId].longToken1xAddress = pairLongTokenAddress;
             _pairs.table[pairId].shortToken1xAddress = pairShortTokenAddress;
-        } else if (size == 2) {
+        } else if (size == LeverageSize.TWO) {
             _pairs.table[pairId].longToken2xAddress = pairLongTokenAddress;
             _pairs.table[pairId].shortToken2xAddress = pairShortTokenAddress;
-        } else if (size == 4) {
+        } else if (size == LeverageSize.FOUR) {
             _pairs.table[pairId].longToken4xAddress = pairLongTokenAddress;
             _pairs.table[pairId].shortToken4xAddress = pairShortTokenAddress;
         }

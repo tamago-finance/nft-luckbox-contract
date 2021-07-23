@@ -5,10 +5,15 @@ pragma solidity 0.6.9;
 import "./utility/Lockable.sol"; 
 import "./interfaces/IPriceFeeder.sol";
 import "./interfaces/ISide.sol";
+import "./interfaces/ILeverageSize.sol";
 import "./interfaces/IPriceResolver.sol";
 import "./utility/Whitelist.sol";
 import "./utility/Ownable.sol";
 import "./utility/LibMath.sol";
+
+/**
+ * @title TBD
+ */
 
 contract ProxyFeeder is IPriceFeeder, Ownable {
 
@@ -46,13 +51,16 @@ contract ProxyFeeder is IPriceFeeder, Ownable {
 }
 
 
-contract PriceResolver is Lockable, Whitelist, ISide, IPriceResolver {
+/**
+ * @title TBD
+ */
+
+contract PriceResolver is Lockable, Whitelist, ISide, IPriceResolver, ILeverageSize {
     
     using LibMathSigned for int256;
     using LibMathUnsigned for uint256;
 
     enum State {INITIAL, NORMAL, EMERGENCY, EXPIRED}
-    enum Leverage {ONE, TWO, THREE, FOUR}
 
     // Price feeder contract.
     IPriceFeeder public priceFeeder;
@@ -66,12 +74,12 @@ contract PriceResolver is Lockable, Whitelist, ISide, IPriceResolver {
     uint256 public referencePrice;
     uint256 public startingPrice;
     State public state;
-    Leverage public leverage;
+    LeverageSize public leverage;
 
     uint8 constant MAX_DATA_POINTS = 120; // Total data points to be observed
 
     constructor(
-        Leverage _leverage,
+        LeverageSize _leverage,
         address _priceFeederAddress,
         uint256 _referencePrice,
         uint256 _startingPrice,
@@ -91,6 +99,10 @@ contract PriceResolver is Lockable, Whitelist, ISide, IPriceResolver {
         state = State.INITIAL;
 
         addAddress(_devAddress);
+        
+        if (_devAddress != msg.sender) {
+            addAddress(msg.sender);
+        }
     }
 
     function init() public nonReentrant() onlyWhitelisted() {
@@ -178,13 +190,13 @@ contract PriceResolver is Lockable, Whitelist, ISide, IPriceResolver {
         int256 long = currentValue.wdiv(referencePrice.toInt256());
         int256 short = (long.sub(1000000000000000000).mul(-1)).add(1000000000000000000);
 
-        if (leverage == Leverage.TWO) {
+        if (leverage == LeverageSize.TWO) {
             long = long.wmul(long);
             short = short.wmul(short);
-        } else if (leverage == Leverage.THREE) {
+        } else if (leverage == LeverageSize.THREE) {
             long = long.wmul(long).wmul(long);
             short = short.wmul(short).wmul(short);
-        } else if (leverage == Leverage.FOUR) {
+        } else if (leverage == LeverageSize.FOUR) {
             long = long.wmul(long).wmul(long).wmul(long);
             short = short.wmul(short).wmul(short).wmul(short);
         }

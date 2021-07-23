@@ -9,12 +9,13 @@ import "./utility/LibMath.sol";
 import "./utility/SafeERC20.sol";
 import "./interfaces/IExpandedIERC20.sol";
 import "./interfaces/ISide.sol";
+import "./interfaces/ILeverageSize.sol";
 import "./interfaces/IPriceResolver.sol";
 import "./interfaces/IPriceFeeder.sol";
 import "./interfaces/IPmm.sol";
 import "./TokenFactory.sol";
 
-contract LeveragedTokenManager is Lockable, Whitelist, ISide {
+contract LeveragedTokenManager is Lockable, Whitelist, ISide, ILeverageSize {
     using LibMathSigned for int256;
     using LibMathUnsigned for uint256;
     using SafeERC20 for IERC20;
@@ -26,7 +27,6 @@ contract LeveragedTokenManager is Lockable, Whitelist, ISide {
     }
 
     enum State {INITIAL, NORMAL, EMERGENCY, EXPIRED}
-    enum Leverage {ONE, TWO, THREE, FOUR}
 
     // Contract state
     State public contractState;
@@ -38,7 +38,7 @@ contract LeveragedTokenManager is Lockable, Whitelist, ISide {
     // Leveraged tokens created by this contract.
     IExpandedIERC20 public longToken;
     IExpandedIERC20 public shortToken;
-    Leverage public leverage;
+    LeverageSize public leverage;
     // Quote Stablecoin
     IERC20 public quoteToken;
     // Keep track of short/long tokens that been issued
@@ -61,7 +61,7 @@ contract LeveragedTokenManager is Lockable, Whitelist, ISide {
     constructor(
         string memory _name,
         string memory _symbol,
-        Leverage _leverage,
+        LeverageSize _leverage,
         address _tokenFactoryAddress,
         address _priceResolverAddress,
         address _quoteTokenAddress,
