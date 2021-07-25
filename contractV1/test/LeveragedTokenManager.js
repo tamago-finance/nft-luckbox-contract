@@ -378,70 +378,70 @@ contract('Leveraged Token Manager', accounts => {
 
             // Pair-long
             // await leveragedTokenManager.addLiquidity(1, longTokenBalance, web3.utils.toWei(`${halfAmount}`), { from: alice })
-            await exchangePairLong.depositBase( longTokenBalance , { from: alice })
-            await exchangePairLong.depositQuote( usdBalance , { from: alice })
+            await exchangePairLong.depositBase(longTokenBalance, { from: alice })
+            await exchangePairLong.depositQuote(usdBalance, { from: alice })
 
             // Pair-short
             // await leveragedTokenManager.addLiquidity(2, shortTokenBalance, await quoteToken.balanceOf(alice), { from: alice })
-            await exchangePairShort.depositBase( shortTokenBalance , { from: alice })
+            await exchangePairShort.depositBase(shortTokenBalance, { from: alice })
 
         }
     })
 
     it('buy and sell long tokens by Bob', async () => {
-        
-        if (isMainnet) {
-            
-            await quoteToken.transfer(bob, web3.utils.toWei("10000"))
-        
-            await quoteToken.approve( exchangePairLong.address, web3.utils.toWei("10000") , { from : bob })
 
-            const buyPrice = await exchangePairLong.queryBuyBaseToken( web3.utils.toWei("2"))
-            await exchangePairLong.buyBaseToken( web3.utils.toWei("2"), buyPrice, { from: bob })
+        if (isMainnet) {
+
+            await quoteToken.transfer(bob, web3.utils.toWei("10000"))
+
+            await quoteToken.approve(exchangePairLong.address, web3.utils.toWei("10000"), { from: bob })
+
+            const buyPrice = await exchangePairLong.queryBuyBaseToken(web3.utils.toWei("2"))
+            await exchangePairLong.buyBaseToken(web3.utils.toWei("2"), buyPrice, { from: bob })
 
             let totalLong = await longToken.balanceOf(bob)
             assert("1.994", web3.utils.fromWei(totalLong))
 
             const before = await quoteToken.balanceOf(bob)
 
-            await longToken.approve( exchangePairLong.address,   web3.utils.toWei("10000") , { from : bob})
+            await longToken.approve(exchangePairLong.address, web3.utils.toWei("10000"), { from: bob })
 
-            const sellPrice = await exchangePairLong.querySellBaseToken( web3.utils.toWei("1"))
-            await exchangePairLong.sellBaseToken( web3.utils.toWei("1"), sellPrice, { from: bob })
+            const sellPrice = await exchangePairLong.querySellBaseToken(web3.utils.toWei("1"))
+            await exchangePairLong.sellBaseToken(web3.utils.toWei("1"), sellPrice, { from: bob })
 
             const after = await quoteToken.balanceOf(bob)
-            assert( Number(web3.utils.fromWei(after)) > Number(web3.utils.fromWei(before)) , true )
+            assert(Number(web3.utils.fromWei(after)) > Number(web3.utils.fromWei(before)), true)
             totalLong = await longToken.balanceOf(bob)
             assert("0.994", web3.utils.fromWei(totalLong))
         }
-    
+
     })
 
     it('buy and sell short tokens by Bob', async () => {
-        
-        if (isMainnet) {
-            
-            await quoteToken.approve( exchangePairShort.address, web3.utils.toWei("10000") , { from : bob })
 
-            const buyPrice = await exchangePairShort.queryBuyBaseToken( web3.utils.toWei("2"))
-            await exchangePairShort.buyBaseToken( web3.utils.toWei("2"), buyPrice, { from: bob })
+        if (isMainnet) {
+
+            await quoteToken.approve(exchangePairShort.address, web3.utils.toWei("10000"), { from: bob })
+
+            const buyPrice = await exchangePairShort.queryBuyBaseToken(web3.utils.toWei("2"))
+            await exchangePairShort.buyBaseToken(web3.utils.toWei("2"), buyPrice, { from: bob })
 
             let totalShort = await shortToken.balanceOf(bob)
             assert("1.994", web3.utils.fromWei(totalShort))
 
             const before = await quoteToken.balanceOf(bob)
 
-            await shortToken.approve( exchangePairShort.address,   web3.utils.toWei("10000") , { from : bob})
+            await shortToken.approve(exchangePairShort.address, web3.utils.toWei("10000"), { from: bob })
 
-            const sellPrice = await exchangePairShort.querySellBaseToken( web3.utils.toWei("1"))
-            await exchangePairShort.sellBaseToken( web3.utils.toWei("1"), sellPrice, { from: bob })
+            const sellPrice = await exchangePairShort.querySellBaseToken(web3.utils.toWei("1"))
+            await exchangePairShort.sellBaseToken(web3.utils.toWei("1"), sellPrice, { from: bob })
 
             const after = await quoteToken.balanceOf(bob)
-            assert( Number(web3.utils.fromWei(after)) > Number(web3.utils.fromWei(before)) , true )
+            assert(Number(web3.utils.fromWei(after)) > Number(web3.utils.fromWei(before)), true)
             totalShort = await shortToken.balanceOf(bob)
             assert("0.994", web3.utils.fromWei(totalShort))
         }
-    
+
     })
 
     it('mint more than capped amount', async () => {
@@ -451,7 +451,7 @@ contract('Leveraged Token Manager', accounts => {
 
             assert("10000", web3.utils.fromWei(totalCollateral))
 
-            await quoteToken.approve( leveragedTokenManager.address, web3.utils.toWei("100000") , {from : admin})
+            await quoteToken.approve(leveragedTokenManager.address, web3.utils.toWei("100000"), { from: admin })
             // able to mint at 20,000
             await leveragedTokenManager.mint(web3.utils.toWei("10000"), { from: admin })
             // failing at 50,001
@@ -461,8 +461,14 @@ contract('Leveraged Token Manager', accounts => {
                 assert(e.message.indexOf("Exceeding a capped amount") !== -1, true)
             }
 
+            // redeem some and mint again
+            await longToken.approve(leveragedTokenManager.address, web3.utils.toWei("100000"), { from: admin })
+            await shortToken.approve(leveragedTokenManager.address, web3.utils.toWei("100000"), { from: admin })
+            await leveragedTokenManager.redeem(web3.utils.toWei("10000"), { from: admin })
+
+            await leveragedTokenManager.mint(web3.utils.toWei("30001"), { from: admin })
             
-        }
+        }   
     })
 
 })
