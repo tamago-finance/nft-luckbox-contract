@@ -134,3 +134,65 @@ contract('PriceResolver', accounts => {
     })
 
 })
+
+
+contract('PriceResolver - 0.5x leverage', accounts => {
+
+    const admin = accounts[0]
+    const alice = accounts[1]
+    const bob = accounts[2]
+
+    before(async () => {
+
+        priceFeed = await PriceFeeder.new("TEST/USD")
+
+        await priceFeed.updateValue(web3.utils.toWei("1000"))
+
+        priceResolver = await PriceResolver.new(
+            0,
+            priceFeed.address,
+            web3.utils.toWei("1000"),
+            web3.utils.toWei("100"),
+            bob
+        )
+    })
+
+    it('Set state to normal ', async () => {
+        await priceResolver.init()
+
+        const cofficient = await priceResolver.currentCoefficient()
+        assert(web3.utils.fromWei(cofficient[0]), "1")
+        assert(web3.utils.fromWei(cofficient[1]), "1")
+
+        await priceFeed.updateValue(web3.utils.toWei("1000"))
+    })
+
+    it('Increase price up 10% from ref. price', async () => {
+        await priceFeed.updateValue(web3.utils.toWei("1100"))
+
+        const cofficient = await priceResolver.currentCoefficient()
+        
+        assert(web3.utils.fromWei(cofficient[0]), "1.048808848")
+        assert(web3.utils.fromWei(cofficient[1]), "0.948683298")
+
+        const adjusted = await priceResolver.getAdjustedPrice()
+        assert(web3.utils.fromWei(adjusted[0]), "104.8808848")
+        assert(web3.utils.fromWei(adjusted[1]), "94.8683298")
+    })
+
+    it('Dump price down 60% from ref. price', async () => {
+        await priceFeed.updateValue(web3.utils.toWei("400"))
+
+        const cofficient = await priceResolver.currentCoefficient()
+        assert(web3.utils.fromWei(cofficient[0]), "0.632455532")
+        assert(web3.utils.fromWei(cofficient[1]), "1.264911064")
+
+        const adjusted = await priceResolver.getAdjustedPrice()
+        assert(web3.utils.fromWei(adjusted[0]), "63.2455532")
+        assert(web3.utils.fromWei(adjusted[1]), "126.4911064")
+
+    })
+
+
+
+})

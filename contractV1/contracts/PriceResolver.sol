@@ -190,7 +190,10 @@ contract PriceResolver is Lockable, Whitelist, ISide, IPriceResolver, ILeverageS
         int256 long = currentValue.wdiv(referencePrice.toInt256());
         int256 short = (long.sub(1000000000000000000).mul(-1)).add(1000000000000000000);
 
-        if (leverage == LeverageSize.TWO) {
+        if (leverage == LeverageSize.HALF) {
+            long = _sqrt(long);
+            short = _sqrt(short);
+        } else if (leverage == LeverageSize.TWO) {
             long = long.wmul(long);
             short = short.wmul(short);
         } else if (leverage == LeverageSize.THREE) {
@@ -206,6 +209,20 @@ contract PriceResolver is Lockable, Whitelist, ISide, IPriceResolver, ILeverageS
 
     function _getUnixDay() internal view returns (uint) {
         return now.div(86400);
+    }
+
+    function _sqrt(int256 y) internal pure returns (int256 z) {
+        if (y > 3) {
+            z = y;
+            int256 x = (y / 2) + 1;
+            while (x < z) {
+                z = x;
+                x = ((y / x) + x) / 2;
+            }
+        } else if (y != 0) {
+            z = 1;
+        }
+        z = z.mul(10**9);
     }
 
 }

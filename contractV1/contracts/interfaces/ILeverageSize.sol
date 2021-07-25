@@ -4,7 +4,7 @@ pragma solidity 0.6.9;
 
 interface ILeverageSize {
     enum LeverageSize {
-        ZERO,
+        HALF,
         ONE,
         TWO,
         THREE,
