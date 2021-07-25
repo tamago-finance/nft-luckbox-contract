@@ -444,4 +444,25 @@ contract('Leveraged Token Manager', accounts => {
     
     })
 
+    it('mint more than capped amount', async () => {
+        if (isMainnet) {
+
+            const totalCollateral = await leveragedTokenManager.totalRawCollateral()
+
+            assert("10000", web3.utils.fromWei(totalCollateral))
+
+            await quoteToken.approve( leveragedTokenManager.address, web3.utils.toWei("100000") , {from : admin})
+            // able to mint at 20,000
+            await leveragedTokenManager.mint(web3.utils.toWei("10000"), { from: admin })
+            // failing at 50,001
+            try {
+                await leveragedTokenManager.mint(web3.utils.toWei("30001"), { from: admin })
+            } catch (e) {
+                assert(e.message.indexOf("Exceeding a capped amount") !== -1, true)
+            }
+
+            
+        }
+    })
+
 })

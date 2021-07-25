@@ -51,6 +51,9 @@ contract LeveragedTokenManager is Lockable, Whitelist, ISide, ILeverageSize {
         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
     uint256 constant ONE = 1000000000000000000; // 1
 
+    // Cap amount of tokens to be minted
+    uint256 constant public CAPPED_AMOUNT = 50000000000000000000000; // ~50,000 DAI
+
     event CreatedLeverageTokens();
     event Minted(address indexed account, uint256 tokenInAmount, uint256 longTokenOutAmount, uint256 shortTokenOutAmount);
     event Redeemed(address indexed account, uint256 tokenOutAmount, uint256 longTokenInAmount, uint256 shortTokenInAmount);
@@ -118,6 +121,7 @@ contract LeveragedTokenManager is Lockable, Whitelist, ISide, ILeverageSize {
 
     function mint(uint256 buyingAmount) public nonReentrant() {
         require( buyingAmount > 0 , "Amount must be greater than 0" );
+        require( CAPPED_AMOUNT >=  totalRawCollateral.add(buyingAmount), "Exceeding a capped amount"); 
 
         uint256 currentPrice = priceResolver.getCurrentPrice();
         uint256 tokenIn = buyingAmount.wdiv(currentPrice);
