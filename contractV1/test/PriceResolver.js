@@ -1,6 +1,7 @@
 const PriceFeeder = artifacts.require('PriceFeeder')
 const PriceResolver = artifacts.require('PriceResolver')
 const ProxyFeeder = artifacts.require('ProxyFeeder')
+const ChainlinkPriceFeeder = artifacts.require('ChainlinkPriceFeeder')
 
 let priceFeed
 let priceResolver
@@ -93,46 +94,6 @@ contract('PriceResolver', accounts => {
 
     })
 
-    it('dump prices', async () => {
-
-        let currentUnixDay = await priceResolver.currentUnixDay()
-        let todayPrice = await priceResolver.historicalPrices(currentUnixDay)
-        assert(todayPrice, 0)
-
-        await priceResolver.dump({ from: bob })
-
-        todayPrice = await priceResolver.historicalPrices(currentUnixDay)
-        assert(web3.utils.fromWei(todayPrice), "2500")
-
-        let avgPrice = await priceResolver.getAvgPrice()
-        assert(web3.utils.fromWei(avgPrice), "2500")
-
-        let count = 0
-        let dummyValue = 2500
-        while (true) {
-            // only 6 data points
-            if (count >= 60) {
-                break;
-            } else {
-                count = count + 10;
-            }
-            dummyValue = dummyValue + count
-            await priceResolver.forceDump(currentUnixDay - count, web3.utils.toWei(`${dummyValue}`), { from: bob })
-        }
-
-        avgPrice = await priceResolver.getAvgPrice()
-        assert(web3.utils.fromWei(avgPrice), "2580")
-
-        let referencePrice = await priceResolver.referencePrice()
-        assert(web3.utils.fromWei(referencePrice), "2500")
-
-        await priceResolver.updateReferencePrice({ from: bob })
-
-        referencePrice = await priceResolver.referencePrice()
-        assert(web3.utils.fromWei(referencePrice), "2580")
-
-    })
-
 })
 
 
@@ -171,7 +132,7 @@ contract('PriceResolver - 0.5x leverage', accounts => {
         await priceFeed.updateValue(web3.utils.toWei("1100"))
 
         const cofficient = await priceResolver.currentCoefficient()
-        
+
         assert(web3.utils.fromWei(cofficient[0]), "1.048808848")
         assert(web3.utils.fromWei(cofficient[1]), "0.948683298")
 
@@ -193,6 +154,90 @@ contract('PriceResolver - 0.5x leverage', accounts => {
 
     })
 
+})
+
+contract('PriceResolver - Bitcoin', accounts => {
+
+    const admin = accounts[0]
+    const alice = accounts[1]
+    const bob = accounts[2]
+
+    let isMainnet = false
+    let chainlinkPriceFeeder
+
+    before(async () => {
+
+        try {
+
+            chainlinkPriceFeeder = await ChainlinkPriceFeeder.new(
+                "Bitcoin",
+                "0xF4030086522a5bEEa4988F8cA5B36dbC97BeE88c",
+                8
+            )
+
+            if (await chainlinkPriceFeeder.getValue() !== 0) {
+                isMainnet = true
+            }
+
+            priceResolver = await PriceResolver.new(
+                1,
+                chainlinkPriceFeeder.address,
+                web3.utils.toWei("35000"),
+                web3.utils.toWei("100"),
+                bob
+            )
+
+        } catch (e) {
+            // console.log(e)
+        }
+
+    })
+
+    it('Initial values are correct', async () => {
+        if (isMainnet) {
+            const currentState = await priceResolver.state()
+            assert(currentState, 0)
+
+            const initialRate = await priceResolver.getCurrentPrice()
+            assert(web3.utils.fromWei(initialRate) !== "0", true)
+        }
+
+    })
+
+    it('Set state to normal ', async () => {
+
+        if (isMainnet) {
+            await priceResolver.init()
+            // normal state
+            const currentState = await priceResolver.state()
+            assert(currentState, 1)
+
+            const cofficient = await priceResolver.currentCoefficient()
+            assert(web3.utils.fromWei(cofficient[0]) !== "1", true)
+            assert(web3.utils.fromWei(cofficient[1]) !== "1", true)
+        }
+
+    })
+
+    it('Emergency & primary prices  are aligned with coefficient values ', async () => {
+
+        if (isMainnet) {
+            const cofficient = await priceResolver.currentCoefficient()
+
+            const emergencyPrice = await priceResolver.getEmergencyReferencePrice()
+            assert(web3.utils.fromWei(emergencyPrice) !== "0" , true)
+
+            const primaryPrice = await priceResolver.getPrimaryReferencePrice()
+
+            assert(web3.utils.fromWei(primaryPrice) !== "0" , true)
+            const currentPrice = await priceResolver.getCurrentPrice()
+            const ratio = Number(web3.utils.fromWei(currentPrice)) / Number(web3.utils.fromWei(primaryPrice))
+
+            assert( ratio.toFixed(2), Number(cofficient).toFixed(2))
+            assert( ratio.toFixed(2), Number(web3.utils.fromWei(cofficient[0])).toFixed(2))
+        }
+
+    })
 
 
 })
