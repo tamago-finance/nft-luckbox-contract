@@ -4,6 +4,7 @@ pragma solidity 0.6.9;
 
 import "./utility/Lockable.sol"; 
 import "./interfaces/IPriceFeeder.sol";
+import "./interfaces/IChainlinkPriceFeeder.sol";
 import "./interfaces/ISide.sol";
 import "./interfaces/ILeverageSize.sol";
 import "./interfaces/IPriceResolver.sol";
@@ -63,36 +64,33 @@ contract PriceResolver is Lockable, Whitelist, ISide, IPriceResolver, ILeverageS
     enum State {INITIAL, NORMAL, EMERGENCY, EXPIRED}
 
     // Price feeder contract.
-    IPriceFeeder public priceFeeder;
+    IChainlinkPriceFeeder public priceFeeder;
     // Proxy price feeder giving to leveraged tokens
     ProxyFeeder public priceFeederLong;
     ProxyFeeder public priceFeederShort;
 
-    // Day from 1970 => Price
-    mapping(uint => uint256) public historicalPrices;
-
-    uint256 public referencePrice;
+    uint256 public emergencyReferencePrice;
     uint256 public startingPrice;
     State public state;
     LeverageSize public leverage;
 
-    uint8 constant MAX_DATA_POINTS = 120; // Total data points to be observed
+    uint8 constant DAYS_TO_OBSERVE = 60;
 
     constructor(
         LeverageSize _leverage,
         address _priceFeederAddress,
-        uint256 _referencePrice,
+        uint256 _emergencyReferencePrice,
         uint256 _startingPrice,
         address _devAddress
     ) public nonReentrant() {
         require( _priceFeederAddress != address(0), "Invalid Price Feeder address" );
-        require( _referencePrice != 0, "Reference price can't be zero" );
+        require( _emergencyReferencePrice != 0, "Reference price can't be zero" );
 
         priceFeederLong = new ProxyFeeder(Side.LONG);
         priceFeederShort = new ProxyFeeder(Side.SHORT);
 
-        priceFeeder = IPriceFeeder(_priceFeederAddress);
-        referencePrice = _referencePrice;
+        priceFeeder = IChainlinkPriceFeeder(_priceFeederAddress);
+        emergencyReferencePrice = _emergencyReferencePrice;
         leverage = _leverage;
         startingPrice = _startingPrice;
 
@@ -114,45 +112,17 @@ contract PriceResolver is Lockable, Whitelist, ISide, IPriceResolver, ILeverageS
         state = State.NORMAL;
     }
 
-    // invoke it daily
-    function dump() public nonReentrant() onlyWhitelisted() {
-        uint256 value = priceFeeder.getValue();
-        uint day = _getUnixDay();
-
-        historicalPrices[day] = value;
+    function setEmergencyPrice(uint256 _value) public nonReentrant() onlyWhitelisted() {
+        emergencyReferencePrice = _value;
     }
 
-    function forceDump(uint day, uint256 value) public nonReentrant() onlyWhitelisted() {
-        historicalPrices[day] = value;
+    function getEmergencyReferencePrice() public view returns (uint256) {
+        return emergencyReferencePrice;
     }
 
-    // dangerous
-    function updateReferencePrice() public nonReentrant() onlyWhitelisted() {
-        uint256 price = getAvgPrice();
-        require(price!=0, "Avg Price error");
-        referencePrice = price;
-    }
-
-    function getAvgPrice() public view returns (uint256) {
-        uint day = _getUnixDay();
-
-        uint count = 0;
-        uint256 sum = 0;
-        uint256 totalSample = 0;
-
-        while (MAX_DATA_POINTS >= count) {
-
-            uint256 value = historicalPrices[day.sub(count)];
-
-            if (value != 0) {
-                sum = sum.add(value);
-                totalSample++;
-            }
-
-            count++;
-        }
-        
-        return sum.div(totalSample);
+    function getPrimaryReferencePrice() public view returns (uint256) {
+        (uint256 value, ) = priceFeeder.getAveragePrice( DAYS_TO_OBSERVE );
+        return value;
     }
 
     function getCurrentPrice() override external view returns (uint256) {
@@ -185,9 +155,32 @@ contract PriceResolver is Lockable, Whitelist, ISide, IPriceResolver, ILeverageS
         return _getUnixDay();
     }
 
+    
+    // INTERNAL FUNCTIONS
+ 
+    // Use 120-days average price from ChainlinkPriceFeed's contract as the reference price first, fallback to emergency reference price 
+    function _getReferencePrice() internal view returns (uint256) {
+        try priceFeeder.getAveragePrice( DAYS_TO_OBSERVE ) returns (
+            uint256 value,
+            uint8 count
+        ) {
+            
+            return value;
+        } catch Error(
+            string memory /*reason*/
+        ) {
+            return emergencyReferencePrice;
+        } catch (
+            bytes memory /*lowLevelData*/
+        ) {
+            return emergencyReferencePrice;
+        }
+    }
+
+
     function _coefficient() internal view returns (int256, int256) {
         int256 currentValue = (priceFeeder.getValue()).toInt256();
-        int256 long = currentValue.wdiv(referencePrice.toInt256());
+        int256 long = currentValue.wdiv(_getReferencePrice().toInt256());
         int256 short = (long.sub(1000000000000000000).mul(-1)).add(1000000000000000000);
 
         if (leverage == LeverageSize.HALF) {
