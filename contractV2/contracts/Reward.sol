@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 pragma solidity 0.6.12;
 
 import '@openzeppelin/contracts/math/SafeMath.sol';
@@ -8,7 +10,7 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
             
 import "./interfaces/IMasterChef.sol";
 
-contract MasterChef is Ownable, ReentrancyGuard {
+contract Reward is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
