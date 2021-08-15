@@ -6,11 +6,11 @@ import '@openzeppelin/contracts/math/SafeMath.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "./utility/Lockable.sol";
             
 import "./interfaces/IMasterChef.sol";
 
-contract Reward is Ownable, ReentrancyGuard {
+contract Reward is Ownable, Lockable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
