@@ -34,7 +34,7 @@ describe("PriceResolver contract", () => {
 
     });
 
-    it('all initial value are correct', async () => {
+    it('all initial values are correct', async () => {
 
         expect(fromEther(await priceResolver.getEmergencyReferencePrice())).to.equal("20.0")
         expect((await priceResolver.priceFeeder())).to.equal(priceFeeder.address)
