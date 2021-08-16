@@ -1,6 +1,6 @@
 const { expect } = require("chai");
 const { fromEther, toEther } = require("./Helpers")
-const { deployments, ethers } = require('hardhat');
+const {  ethers } = require('hardhat');
 
 
 let tokenManager
@@ -103,7 +103,7 @@ describe("TokenManager contract", () => {
 
     it('mint 1 synthetic token and redeem all', async () => {
 
-        const tokenIn = await tokenManager.estimateTokensIn(alice.address, toEther(1))
+        const tokenIn = await tokenManager.estimateTokensIn(  toEther(1))
 
         expect(fromEther(tokenIn[0])).to.equal("3000.0") // 3000 TAMG
         expect(fromEther(tokenIn[1])).to.equal("1500.0") // 1500 USDC
@@ -157,7 +157,7 @@ describe("TokenManager contract", () => {
 
     it('double mint and redeem all', async () => {
 
-        let tokenIn = await tokenManager.estimateTokensIn(alice.address, toEther(1))
+        let tokenIn = await tokenManager.estimateTokensIn( toEther(1))
 
         expect(fromEther(tokenIn[0])).to.equal("3000.0") // 3000 TAMG
         expect(fromEther(tokenIn[1])).to.equal("1500.0") // 1500 USDC
@@ -165,7 +165,7 @@ describe("TokenManager contract", () => {
         // Mint 1 Synthetic
         await tokenManager.connect(alice).mint(tokenIn[0], tokenIn[1], toEther(1))
 
-        tokenIn = await tokenManager.estimateTokensIn(alice.address, toEther(0.5))
+        tokenIn = await tokenManager.estimateTokensIn(toEther(0.5))
 
         // Mint another 0.5 Synthetic
         await tokenManager.connect(alice).mint(tokenIn[0], tokenIn[1], toEther(0.5))
@@ -184,7 +184,7 @@ describe("TokenManager contract", () => {
 
     it('mint 1 ETH at 300% and redeem 0.5 ETH back', async () => {
 
-        let tokenIn = await tokenManager.estimateTokensIn(alice.address, toEther(1))
+        let tokenIn = await tokenManager.estimateTokensIn( toEther(1))
 
         // Mint 1 Synthetic
         await tokenManager.connect(alice).mint(toEther(Number(fromEther(tokenIn[0])) * 2.5), toEther(Number(fromEther(tokenIn[1])) * 2.5), toEther(1))
@@ -216,7 +216,7 @@ describe("TokenManager contract", () => {
     })
 
     it('mint 1 ETH at 300% and deposit more collateral', async () => {
-        let tokenIn = await tokenManager.estimateTokensIn(alice.address, toEther(1))
+        let tokenIn = await tokenManager.estimateTokensIn(  toEther(1))
 
         // Mint 1 Synthetic
         await tokenManager.connect(alice).mint(toEther(Number(fromEther(tokenIn[0])) * 2.5), toEther(Number(fromEther(tokenIn[1])) * 2.5), toEther(1))
@@ -234,7 +234,7 @@ describe("TokenManager contract", () => {
     })
     
     it('mint 1 ETH at 300% and withdraw some collateral', async () => {
-        let tokenIn = await tokenManager.estimateTokensIn(alice.address, toEther(1))
+        let tokenIn = await tokenManager.estimateTokensIn(  toEther(1))
 
         // Mint 1 Synthetic
         await tokenManager.connect(alice).mint(toEther(Number(fromEther(tokenIn[0])) * 2.5), toEther(Number(fromEther(tokenIn[1])) * 2.5), toEther(1))
