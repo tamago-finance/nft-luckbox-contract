@@ -17,5 +17,15 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
+  networks: {
+    hardhat: {
+      // forking: {
+      //   url: "" 
+      // }
+    },
+  },
   solidity: "0.6.12",
+  mocha: {
+    timeout: 1200000
+  }
 };

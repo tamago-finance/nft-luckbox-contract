@@ -1,8 +1,7 @@
 {
     "private": true,
     "workspaces": [ 
-        "scheduler",
-        "acala",
-        "contractV1"
+        "contractV1",
+        "contractV2"
     ]
 }
