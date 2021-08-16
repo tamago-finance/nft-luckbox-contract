@@ -261,9 +261,9 @@ contract MasterChef is Ownable, ReentrancyGuard {
     function safeTamgTransfer(address _to, uint256 _amount) internal {
         uint256 tamgBal = tamg.balanceOf(address(this));
 		if (_amount > tamgBal) {
-		require(tamg.transfer(_to, tamgBal), "failed to transfer Tamago");
+		tamg.safeTransfer(_to, tamgBal);
 		} else {
-		require(tamg.transfer(_to, _amount), "failed to transfer Tamago");
+		tamg.safeTransfer(_to, _amount);
 		}
     }
 }
