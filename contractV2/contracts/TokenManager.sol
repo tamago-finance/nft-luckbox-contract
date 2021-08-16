@@ -172,12 +172,11 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
 
         PositionData storage positionData = positions[msg.sender];
 
-        // FIXME : combine exist position
         require(
             _checkCollateralization(
-                baseCollateral,
-                supportCollateral,
-                numTokens
+                positionData.rawBaseCollateral.add(baseCollateral),
+                positionData.rawSupportCollateral.add(supportCollateral),
+                positionData.tokensOutstanding.add(numTokens)
             ),
             "Position below than collateralization ratio"
         );
@@ -233,7 +232,7 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
     }
 
     // burn all synthetic tokens and send collateral tokens back to the minter
-    function redeemAll() public isReady nonReentrant {
+    function redeemAll() public isReadyOrEmergency nonReentrant {
         PositionData storage positionData = positions[msg.sender];
 
         emit Redeem(
@@ -255,10 +254,13 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
     }
 
     // estimate min. base and support tokens require to mint the given synthetic tokens
-    function estimateTokensToMint(uint256 numTokens) public view returns (uint256, uint256) {
-        
+    function estimateTokensToMint( address minter , uint256 numTokens) public view returns (uint256, uint256) {
+        PositionData storage positionData = positions[minter];
+
         uint256 currentRate = priceResolver.getCurrentPrice();
         uint256 currentBaseRate = priceResolver.getCurrentPriceCollateral();
+
+        numTokens = numTokens.add(positionData.tokensOutstanding);
 
         uint256 totalCollateralNeed = numTokens.wmul( currentRate );
         // multiply by liquidation ratio
@@ -275,6 +277,9 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
         
         uint256 adjustedBaseCollateralNeed = _adjustBaseAmountBack(baseCollateralNeed);
         uint256 adjustedSupportCollateralNeed = _adjustSupportAmountBack(supportCollateralNeed);
+
+        adjustedBaseCollateralNeed = adjustedBaseCollateralNeed.sub(positionData.rawBaseCollateral);
+        adjustedSupportCollateralNeed = adjustedSupportCollateralNeed.sub(positionData.rawSupportCollateral);
 
         return (adjustedBaseCollateralNeed, adjustedSupportCollateralNeed);
     }
@@ -487,6 +492,12 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
     // Check if the state is ready
     modifier isReady() {
         require((state) == ContractState.NORMAL, "Contract state is not ready");
+        _;
+    }
+
+    // Only Ready and Emergency
+    modifier isReadyOrEmergency() {
+        require((state) == ContractState.NORMAL || (state) == ContractState.EMERGENCY, "Contract state is not either ready or emergency");
         _;
     }
 }
