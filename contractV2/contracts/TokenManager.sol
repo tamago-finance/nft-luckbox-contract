@@ -408,17 +408,14 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
     }
 
     // estimate min. base and support tokens require to mint the given synthetic tokens
-    function estimateTokensIn(address minter, uint256 numTokens)
+    function estimateTokensIn(uint256 numTokens)
         public
         view
         returns (uint256, uint256)
     {
-        PositionData storage positionData = positions[minter];
 
         uint256 currentRate = priceResolver.getCurrentPrice();
         uint256 currentBaseRate = priceResolver.getCurrentPriceCollateral();
-
-        numTokens = numTokens.add(positionData.tokensOutstanding);
 
         uint256 totalCollateralNeed = numTokens.wmul(currentRate);
         // multiply by liquidation ratio
@@ -440,14 +437,6 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
         );
         uint256 adjustedSupportCollateralNeed = _adjustSupportAmountBack(
             supportCollateralNeed
-        );
-
-        // FIXME: Not sure why sometime got 'Unsubtraction overflow' error
-        adjustedBaseCollateralNeed = adjustedBaseCollateralNeed.sub(
-            positionData.rawBaseCollateral
-        );
-        adjustedSupportCollateralNeed = adjustedSupportCollateralNeed.sub(
-            positionData.rawSupportCollateral
         );
 
         return (adjustedBaseCollateralNeed, adjustedSupportCollateralNeed);

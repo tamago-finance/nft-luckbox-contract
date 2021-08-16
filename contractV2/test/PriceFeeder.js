@@ -48,58 +48,58 @@ describe("MockPriceFeeder contract", () => {
 
 // Provide an archive node URL at hardhat.config.js to run this file. 
 
-describe("ChainlinkPriceFeeder contract", () => {
+// describe("ChainlinkPriceFeeder contract", () => {
 
-    let isMainnet = false
+//     let isMainnet = false
 
-    before(async () => {
+//     before(async () => {
 
-        try {
+//         try {
 
-            [admin, alice] = await ethers.getSigners();
+//             [admin, alice] = await ethers.getSigners();
 
-            const ChainlinkPriceFeeder = await ethers.getContractFactory("ChainlinkPriceFeeder");
+//             const ChainlinkPriceFeeder = await ethers.getContractFactory("ChainlinkPriceFeeder");
 
-            chainlinkPriceFeeder = await ChainlinkPriceFeeder.deploy(
-                "Bitcoin",
-                "0xF4030086522a5bEEa4988F8cA5B36dbC97BeE88c",
-                8
-            )
+//             chainlinkPriceFeeder = await ChainlinkPriceFeeder.deploy(
+//                 "Bitcoin",
+//                 "0xF4030086522a5bEEa4988F8cA5B36dbC97BeE88c",
+//                 8
+//             )
 
-            if (await chainlinkPriceFeeder.getValue() !== 0) {
-                isMainnet = true
-            }
+//             if (await chainlinkPriceFeeder.getValue() !== 0) {
+//                 isMainnet = true
+//             }
 
-        } catch (e) {
-            // console.log(e)
-        }
-    })
+//         } catch (e) {
+//             // console.log(e)
+//         }
+//     })
 
-    it('retrieve current price and timestamp', async () => {
-        if (isMainnet) {
-            const value = await chainlinkPriceFeeder.getValue()
-            expect(Number(fromEther(value)) > 100).to.true
+//     it('retrieve current price and timestamp', async () => {
+//         if (isMainnet) {
+//             const value = await chainlinkPriceFeeder.getValue()
+//             expect(Number(fromEther(value)) > 100).to.true
 
-            const timestamp = await chainlinkPriceFeeder.getTimestamp()
-            expect(timestamp !== 0).to.true
-        }
-    })
+//             const timestamp = await chainlinkPriceFeeder.getTimestamp()
+//             expect(timestamp !== 0).to.true
+//         }
+//     })
 
-    it('retrive 30/60/90/120 days average prices ', async () => {
-        if (isMainnet) {
-            // 30 days
-            const avg30 = await chainlinkPriceFeeder.getAveragePrice(30)
-            expect(fromEther(avg30[0]) !== "0").to.true
-            // 60 days
-            const avg60 = await chainlinkPriceFeeder.getAveragePrice(60)
-            expect(fromEther(avg60[0]) !== "0").to.true
-            // 90 days
-            const avg90 = await chainlinkPriceFeeder.getAveragePrice(90)
-            expect(fromEther(avg90[0]) !== "0").to.true
-            //  120 days
-            const avg120 = await chainlinkPriceFeeder.getAveragePrice(120)
-            expect(fromEther(avg120[0]) !== "0").to.true
+//     it('retrive 30/60/90/120 days average prices ', async () => {
+//         if (isMainnet) {
+//             // 30 days
+//             const avg30 = await chainlinkPriceFeeder.getAveragePrice(30)
+//             expect(fromEther(avg30[0]) !== "0").to.true
+//             // 60 days
+//             const avg60 = await chainlinkPriceFeeder.getAveragePrice(60)
+//             expect(fromEther(avg60[0]) !== "0").to.true
+//             // 90 days
+//             const avg90 = await chainlinkPriceFeeder.getAveragePrice(90)
+//             expect(fromEther(avg90[0]) !== "0").to.true
+//             //  120 days
+//             const avg120 = await chainlinkPriceFeeder.getAveragePrice(120)
+//             expect(fromEther(avg120[0]) !== "0").to.true
 
-        }
-    })
-})
+//         }
+//     })
+// })
