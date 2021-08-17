@@ -5,7 +5,7 @@ pragma solidity ^0.6.0;
 import "@openzeppelin/contracts/utils/Context.sol";
 import "../interfaces/IERC20.sol";
 import "./SafeMath.sol";
-import "./Address.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 
 /**
  * @dev Implementation of the {IERC20} interface.
