@@ -604,10 +604,10 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
             // find no. of synthetic tokens require to liquidate the position
             uint256 remainingCollateralBase = positionData.rawBaseCollateral;
             uint256 remainingCollateralSupport = positionData.rawSupportCollateral;
-            uint256 penaltyBase = remainingCollateralBase.wmul( liquidationIncentive );
-            uint256 penaltySupport = remainingCollateralSupport.wmul( liquidationIncentive );
-            remainingCollateralBase = remainingCollateralBase.sub(penaltyBase);
-            remainingCollateralSupport = remainingCollateralSupport.sub(penaltySupport);
+            uint256 discountBase = remainingCollateralBase.wmul( liquidationIncentive );
+            uint256 discountSupport = remainingCollateralSupport.wmul( liquidationIncentive );
+            remainingCollateralBase = remainingCollateralBase.sub(discountBase);
+            remainingCollateralSupport = remainingCollateralSupport.sub(discountSupport);
 
             uint256 synthsNeed = _calculateSyntheticRedeemed(remainingCollateralBase , remainingCollateralSupport);
             return (true, synthsNeed);
@@ -635,10 +635,10 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
 
         uint256 remainingCollateralBase = positionData.rawBaseCollateral;
         uint256 remainingCollateralSupport = positionData.rawSupportCollateral;
-        uint256 penaltyBase = remainingCollateralBase.wmul( liquidationIncentive );
-        uint256 penaltySupport = remainingCollateralSupport.wmul( liquidationIncentive );
-        remainingCollateralBase = remainingCollateralBase.sub(penaltyBase);
-        remainingCollateralSupport = remainingCollateralSupport.sub(penaltySupport);
+        uint256 discountBase = remainingCollateralBase.wmul( liquidationIncentive );
+        uint256 discountSupport = remainingCollateralSupport.wmul( liquidationIncentive );
+        remainingCollateralBase = remainingCollateralBase.sub(discountBase);
+        remainingCollateralSupport = remainingCollateralSupport.sub(discountSupport);
 
         uint256 totalBurnt = _calculateSyntheticRedeemed(remainingCollateralBase , remainingCollateralSupport);
 
@@ -649,14 +649,14 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
             debts = debts.add( positionData.tokensOutstanding.sub(totalBurnt));
         }
 
-        // pay penalties to liquidator
+        // pay incentives + collateral tokens to liquidator
         supportCollateralToken.safeTransfer(
             msg.sender,
-            penaltySupport
+            positionData.rawSupportCollateral
         );
         baseCollateralToken.safeTransfer(
             msg.sender,
-            penaltyBase
+            positionData.rawBaseCollateral
         );
 
         // transfer synthetic tokens from liquidator to burn here

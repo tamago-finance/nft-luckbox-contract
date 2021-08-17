@@ -119,8 +119,8 @@ describe("TokenManager contract /w Liquidation", () => {
         expect(fromEther(positionData[1])).to.equal("0.0")
 
         // ensure Bob took penalties 
-        expect( fromEther( await baseCollateral.balanceOf( bob.address) )).to.equal( "4300.0")
-        expect( fromEther( await supportCollateral.balanceOf( bob.address) )).to.equal("7150.0")
+        expect( fromEther( await baseCollateral.balanceOf( bob.address) )).to.equal( "7000.0")
+        expect( fromEther( await supportCollateral.balanceOf( bob.address) )).to.equal("8500.0")
 
     })
 
