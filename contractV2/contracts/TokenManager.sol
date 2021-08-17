@@ -71,6 +71,10 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
     address public devAddress;
     // liquidation ratio
     uint256 public constant liquidationRatio = 1200000000000000000; // 120%
+    // Liquidation Incentive Fee 10%
+    uint256 public constant liquidationIncentive = 100000000000000000;
+    // Debts outstanding
+    uint256 public debts;
 
     // Helpers
     uint256 constant MAX =
@@ -92,8 +96,23 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
         uint256 supportAmount,
         uint256 syntheticAmount
     );
-    event Deposit(address indexed minter, uint256 baseAmount, uint256 supportAmount);
-    event Withdrawal(address indexed minter, uint256 baseAmount, uint256 supportAmount);
+    event Deposit(
+        address indexed minter,
+        uint256 baseAmount,
+        uint256 supportAmount
+    );
+    event Withdrawal(
+        address indexed minter,
+        uint256 baseAmount,
+        uint256 supportAmount
+    );
+    event PositionLiquidated(
+        address indexed minter,
+        address indexed liquidator,
+        uint256 syntheticAmount,
+        uint256 baseAmountBack,
+        uint256 supportAmountBack
+    );
 
     constructor(
         string memory _name,
@@ -302,14 +321,8 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
         emit Withdrawal(msg.sender, baseCollateral, supportCollateral);
 
         // Transfer collateral from contract to minter
-        baseCollateralToken.safeTransfer(
-            msg.sender, 
-            baseCollateral
-        );
-        supportCollateralToken.safeTransfer(
-            msg.sender, 
-            supportCollateral
-        );
+        baseCollateralToken.safeTransfer(msg.sender, baseCollateral);
+        supportCollateralToken.safeTransfer(msg.sender, supportCollateral);
     }
 
     // redeem synthetic tokens back to the minter
@@ -351,25 +364,16 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
             supportCollateral
         );
 
-        positionData.tokensOutstanding = positionData.tokensOutstanding.sub(numTokens);
-        tokenOutstanding = tokenOutstanding.sub(numTokens);
-
-        emit Redeem(
-            msg.sender,
-            baseCollateral,
-            supportCollateral,
+        positionData.tokensOutstanding = positionData.tokensOutstanding.sub(
             numTokens
         );
+        tokenOutstanding = tokenOutstanding.sub(numTokens);
+
+        emit Redeem(msg.sender, baseCollateral, supportCollateral, numTokens);
 
         // Transfer collateral from contract to caller and burn callers synthetic tokens.
-        baseCollateralToken.safeTransfer(
-            msg.sender, 
-            baseCollateral
-        );
-        supportCollateralToken.safeTransfer(
-            msg.sender, 
-            supportCollateral
-        );
+        baseCollateralToken.safeTransfer(msg.sender, baseCollateral);
+        supportCollateralToken.safeTransfer(msg.sender, supportCollateral);
 
         syntheticToken.safeTransferFrom(msg.sender, address(this), numTokens);
         syntheticToken.burn(numTokens);
@@ -413,7 +417,6 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
         view
         returns (uint256, uint256)
     {
-
         uint256 currentRate = priceResolver.getCurrentPrice();
         uint256 currentBaseRate = priceResolver.getCurrentPriceCollateral();
 
@@ -553,6 +556,142 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
     // check current mint ratio
     function getMintRatio() public view returns (uint256) {
         return priceResolver.getCurrentRatio();
+    }
+
+    // return the collateralization ratio of the given address
+    function collateralizationRatioOf(address minter)
+        public
+        view
+        returns (uint256 ratio)
+    {
+        PositionData storage positionData = positions[minter];
+        return
+            _getCollateralizationRatio(
+                positionData.rawBaseCollateral,
+                positionData.rawSupportCollateral,
+                positionData.tokensOutstanding
+            );
+    }
+
+    // return deposited collaterals of the given address
+    function tokensCollateralOf(address minter)
+        public
+        view
+        returns (uint256, uint256)
+    {
+        PositionData storage positionData = positions[minter];
+        return (
+            positionData.rawBaseCollateral,
+            positionData.rawSupportCollateral
+        );
+    }
+
+    // check whether the given address can be liquidated or not
+    function checkLiquidate(address minter)
+        public
+        view
+        returns (bool, uint256)
+    {
+        PositionData storage positionData = positions[minter];
+
+        uint256 currentRatio = _getCollateralizationRatio(
+            positionData.rawBaseCollateral,
+            positionData.rawSupportCollateral,
+            positionData.tokensOutstanding
+        );
+
+        if (liquidationRatio > currentRatio) {
+            // find no. of synthetic tokens require to liquidate the position
+            uint256 remainingCollateralBase = positionData.rawBaseCollateral;
+            uint256 remainingCollateralSupport = positionData.rawSupportCollateral;
+            uint256 discountBase = remainingCollateralBase.wmul( liquidationIncentive );
+            uint256 discountSupport = remainingCollateralSupport.wmul( liquidationIncentive );
+            remainingCollateralBase = remainingCollateralBase.sub(discountBase);
+            remainingCollateralSupport = remainingCollateralSupport.sub(discountSupport);
+
+            uint256 synthsNeed = _calculateSyntheticRedeemed(remainingCollateralBase , remainingCollateralSupport);
+            return (true, synthsNeed);
+        } else {
+            return (false, 0);
+        }
+    }
+
+    // liquidate the minter's position 
+    function liquidate( 
+        address minter, // address of the minter to be liquidated
+        uint256 maxNumTokens // max amount of synthetic tokens that effort to burn
+    ) public isReadyOrEmergency nonReentrant {
+        // Retrieve Position data for minter
+        PositionData storage positionData = positions[minter];
+
+        require(
+            _checkCollateralization(
+                positionData.rawBaseCollateral,
+                positionData.rawSupportCollateral,
+                positionData.tokensOutstanding
+            ) == false,
+            "Position above than liquidation ratio"
+        );
+
+        uint256 remainingCollateralBase = positionData.rawBaseCollateral;
+        uint256 remainingCollateralSupport = positionData.rawSupportCollateral;
+        uint256 discountBase = remainingCollateralBase.wmul( liquidationIncentive );
+        uint256 discountSupport = remainingCollateralSupport.wmul( liquidationIncentive );
+        remainingCollateralBase = remainingCollateralBase.sub(discountBase);
+        remainingCollateralSupport = remainingCollateralSupport.sub(discountSupport);
+
+        uint256 totalBurnt = _calculateSyntheticRedeemed(remainingCollateralBase , remainingCollateralSupport);
+
+        require( maxNumTokens >= totalBurnt , "Exceeding given maxNumtokens" );
+
+        if ( positionData.tokensOutstanding > totalBurnt ) {
+            // keep tack of debts
+            debts = debts.add( positionData.tokensOutstanding.sub(totalBurnt));
+        }
+
+        // pay incentives + collateral tokens to liquidator
+        supportCollateralToken.safeTransfer(
+            msg.sender,
+            positionData.rawSupportCollateral
+        );
+        baseCollateralToken.safeTransfer(
+            msg.sender,
+            positionData.rawBaseCollateral
+        );
+
+        // transfer synthetic tokens from liquidator to burn here
+        syntheticToken.safeTransferFrom(msg.sender, address(this), totalBurnt);
+        syntheticToken.burn(totalBurnt);
+
+        emit PositionLiquidated(
+            minter,
+            msg.sender,
+            totalBurnt,
+            positionData.rawBaseCollateral,
+            positionData.rawSupportCollateral
+        );
+
+        // delete the position
+        totalRawCollateral.baseToken = totalRawCollateral.baseToken.sub(
+            positionData.rawBaseCollateral
+        );
+        totalRawCollateral.supportToken = totalRawCollateral.supportToken.sub(
+            positionData.rawSupportCollateral
+        );
+
+        tokenOutstanding = tokenOutstanding.sub( totalBurnt );
+        // Reset the sponsors position to have zero outstanding and collateral.
+        delete positions[minter];
+    }
+
+    // repay debts 
+    function repayDebt(uint256 amount) public nonReentrant {
+        require( debts >= amount , "Amount > Outstanding debts" );
+
+        debts = debts.sub( amount );
+
+        syntheticToken.safeTransferFrom(msg.sender, address(this), amount);
+        syntheticToken.burn(amount);
     }
 
     // INTERNAL FUNCTIONS
@@ -704,7 +843,6 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
         totalRawCollateral.supportToken = totalRawCollateral.supportToken.sub(
             supportCollateral
         );
-
     }
 
     function _deleteSponsorPosition(address _minter) internal {
