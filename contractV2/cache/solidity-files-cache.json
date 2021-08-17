@@ -1,0 +1,2040 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/interfaces/IMasterChef.sol": {
+      "lastModificationDate": 1629103530469,
+      "contentHash": "85ca285b863cb771547f54069d5e1748",
+      "sourceName": "contracts/interfaces/IMasterChef.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
+      ],
+      "versionPragmas": [
+        "0.6.12"
+      ],
+      "artifacts": [
+        "IMigratorChef"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol": {
+      "lastModificationDate": 1629087143676,
+      "contentHash": "e0a41531d159d3a32f84b7a3ecf9fabb",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.6.0 <0.8.0"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/node_modules/@openzeppelin/contracts/math/SafeMath.sol": {
+      "lastModificationDate": 1629087144018,
+      "contentHash": "e03e12206057e809eb76c5f681170c32",
+      "sourceName": "@openzeppelin/contracts/math/SafeMath.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.6.0 <0.8.0"
+      ],
+      "artifacts": [
+        "SafeMath"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/node_modules/@openzeppelin/contracts/token/ERC20/SafeERC20.sol": {
+      "lastModificationDate": 1629087143992,
+      "contentHash": "33e22842646d746e5c4124c2fdc051aa",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/SafeERC20.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC20.sol",
+        "../../math/SafeMath.sol",
+        "../../utils/Address.sol"
+      ],
+      "versionPragmas": [
+        ">=0.6.0 <0.8.0"
+      ],
+      "artifacts": [
+        "SafeERC20"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/node_modules/@openzeppelin/contracts/access/Ownable.sol": {
+      "lastModificationDate": 1629087143870,
+      "contentHash": "6748815a5b45c4aeeda56819f41190e0",
+      "sourceName": "@openzeppelin/contracts/access/Ownable.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../utils/Context.sol"
+      ],
+      "versionPragmas": [
+        ">=0.6.0 <0.8.0"
+      ],
+      "artifacts": [
+        "Ownable"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/node_modules/@openzeppelin/contracts/utils/ReentrancyGuard.sol": {
+      "lastModificationDate": 1629087143968,
+      "contentHash": "1c60f58cee45c61469e1aea31e4dd879",
+      "sourceName": "@openzeppelin/contracts/utils/ReentrancyGuard.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.6.0 <0.8.0"
+      ],
+      "artifacts": [
+        "ReentrancyGuard"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/node_modules/@openzeppelin/contracts/utils/Address.sol": {
+      "lastModificationDate": 1629087142440,
+      "contentHash": "7aa46886ff5abe7515496208a5e2ce5a",
+      "sourceName": "@openzeppelin/contracts/utils/Address.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.6.2 <0.8.0"
+      ],
+      "artifacts": [
+        "Address"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/node_modules/@openzeppelin/contracts/utils/Context.sol": {
+      "lastModificationDate": 1629087142659,
+      "contentHash": "2adbd82f6d055a4751566d4671512b03",
+      "sourceName": "@openzeppelin/contracts/utils/Context.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.6.0 <0.8.0"
+      ],
+      "artifacts": [
+        "Context"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol": {
+      "lastModificationDate": 1629087143093,
+      "contentHash": "8065b340476f61365c076897199425f1",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../utils/Context.sol",
+        "./IERC20.sol",
+        "../../math/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        ">=0.6.0 <0.8.0"
+      ],
+      "artifacts": [
+        "ERC20"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/mockToken/MockERC20.sol": {
+      "lastModificationDate": 1629098446984,
+      "contentHash": "4baa5c254429d8552bf382946175739f",
+      "sourceName": "contracts/mockToken/MockERC20.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/ERC20.sol"
+      ],
+      "versionPragmas": [
+        "0.6.12"
+      ],
+      "artifacts": [
+        "MockERC20"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/feeders/ChainlinkPriceFeeder.sol": {
+      "lastModificationDate": 1629103530467,
+      "contentHash": "cac61404d75be0e1436d9f0722d81106",
+      "sourceName": "contracts/feeders/ChainlinkPriceFeeder.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "../utility/Whitelist.sol",
+        "../interfaces/IChainlinkPriceFeeder.sol",
+        "../utility/LibMath.sol",
+        "../utility/chainlink/interfaces/AggregatorV3Interface.sol"
+      ],
+      "versionPragmas": [
+        "0.6.12"
+      ],
+      "artifacts": [
+        "ChainlinkPriceFeeder"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/Whitelist.sol": {
+      "lastModificationDate": 1629103530472,
+      "contentHash": "1a6f6893c36aa10094161dd36962e677",
+      "sourceName": "contracts/utility/Whitelist.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "./Address.sol",
+        "@openzeppelin/contracts/utils/Context.sol"
+      ],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "Whitelist"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/interfaces/IChainlinkPriceFeeder.sol": {
+      "lastModificationDate": 1629103530467,
+      "contentHash": "9c939d94f369c6276f1825f257921738",
+      "sourceName": "contracts/interfaces/IChainlinkPriceFeeder.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IPriceFeeder.sol"
+      ],
+      "versionPragmas": [
+        "0.6.12"
+      ],
+      "artifacts": [
+        "IChainlinkPriceFeeder"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/LibMath.sol": {
+      "lastModificationDate": 1629103530471,
+      "contentHash": "35b9df996676910bba73016411df55f9",
+      "sourceName": "contracts/utility/LibMath.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "LibMathSigned",
+        "LibMathUnsigned"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/chainlink/interfaces/AggregatorV3Interface.sol": {
+      "lastModificationDate": 1629103530474,
+      "contentHash": "8e23314b120377fd91b8dca3a69acbf1",
+      "sourceName": "contracts/utility/chainlink/interfaces/AggregatorV3Interface.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.6.0"
+      ],
+      "artifacts": [
+        "AggregatorV3Interface"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/Address.sol": {
+      "lastModificationDate": 1629103530470,
+      "contentHash": "059d94823a0a61c585f3b93cff67ad76",
+      "sourceName": "contracts/utility/Address.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.6.2 <0.8.0"
+      ],
+      "artifacts": [
+        "Address"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/interfaces/IPriceFeeder.sol": {
+      "lastModificationDate": 1629103530469,
+      "contentHash": "a89fffb6f5c61495d0156d7314e71c48",
+      "sourceName": "contracts/interfaces/IPriceFeeder.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.6.12"
+      ],
+      "artifacts": [
+        "IPriceFeeder"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/PriceResolver.sol": {
+      "lastModificationDate": 1629103530466,
+      "contentHash": "e422cb86215c1165a3953c6d58db3370",
+      "sourceName": "contracts/PriceResolver.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./utility/Lockable.sol",
+        "./utility/Whitelist.sol",
+        "./interfaces/IPriceResolver.sol",
+        "./interfaces/IChainlinkPriceFeeder.sol",
+        "./utility/LibMath.sol"
+      ],
+      "versionPragmas": [
+        "0.6.12"
+      ],
+      "artifacts": [
+        "PriceResolver"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/Lockable.sol": {
+      "lastModificationDate": 1629103530471,
+      "contentHash": "6abea0fe5d6a069dbea71f34ba5c772a",
+      "sourceName": "contracts/utility/Lockable.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "Lockable"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/interfaces/IPriceResolver.sol": {
+      "lastModificationDate": 1629103530469,
+      "contentHash": "9cb463f26bfee19007fb5d084666c291",
+      "sourceName": "contracts/interfaces/IPriceResolver.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.6.12"
+      ],
+      "artifacts": [
+        "IPriceResolver"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/mocks/MockPriceFeeder.sol": {
+      "lastModificationDate": 1629103530469,
+      "contentHash": "0178d1d9f7919c342db7f9fba8cd7ca0",
+      "sourceName": "contracts/mocks/MockPriceFeeder.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "../utility/Whitelist.sol",
+        "../interfaces/IChainlinkPriceFeeder.sol"
+      ],
+      "versionPragmas": [
+        "0.6.12"
+      ],
+      "artifacts": [
+        "MockPriceFeeder"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/Reward.sol": {
+      "lastModificationDate": 1629103530514,
+      "contentHash": "8bea24b096796af1595df8da4cae51d9",
+      "sourceName": "contracts/Reward.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/math/SafeMath.sol",
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/token/ERC20/SafeERC20.sol",
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "./utility/Lockable.sol",
+        "./interfaces/IMasterChef.sol"
+      ],
+      "versionPragmas": [
+        "0.6.12"
+      ],
+      "artifacts": [
+        "Reward"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/SyntheticToken.sol": {
+      "lastModificationDate": 1629103530472,
+      "contentHash": "0d137702c193d07ef1024fb487f9ae48",
+      "sourceName": "contracts/utility/SyntheticToken.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./ExpandedERC20.sol",
+        "./Lockable.sol"
+      ],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "SyntheticToken"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/ExpandedERC20.sol": {
+      "lastModificationDate": 1629103530471,
+      "contentHash": "64d9678bf6cec401b680c4da09efafc6",
+      "sourceName": "contracts/utility/ExpandedERC20.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./ERC20.sol",
+        "./MultiRole.sol",
+        "../interfaces/IExpandedIERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "ExpandedERC20"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/ERC20.sol": {
+      "lastModificationDate": 1629103530470,
+      "contentHash": "9be3d3e3c8bb0cbf7bfc2aab2a0ddc98",
+      "sourceName": "contracts/utility/ERC20.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/utils/Context.sol",
+        "../interfaces/IERC20.sol",
+        "./SafeMath.sol",
+        "./Address.sol"
+      ],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "ERC20"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/MultiRole.sol": {
+      "lastModificationDate": 1629103530471,
+      "contentHash": "306eed42fd75054f5dfa25205d7ed75c",
+      "sourceName": "contracts/utility/MultiRole.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "Exclusive",
+        "MultiRole",
+        "Shared"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/interfaces/IExpandedIERC20.sol": {
+      "lastModificationDate": 1629103530468,
+      "contentHash": "73212ff853cc1ed8f9b78260475640be",
+      "sourceName": "contracts/interfaces/IExpandedIERC20.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "IExpandedIERC20"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/interfaces/IERC20.sol": {
+      "lastModificationDate": 1629103530467,
+      "contentHash": "a34ec547a96492b0c5ca778dc4b057b2",
+      "sourceName": "contracts/interfaces/IERC20.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/SafeMath.sol": {
+      "lastModificationDate": 1629103530472,
+      "contentHash": "f331f7437cd371d2342a24f791df9efd",
+      "sourceName": "contracts/utility/SafeMath.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "SafeMath"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/TokenFactory.sol": {
+      "lastModificationDate": 1629103530466,
+      "contentHash": "5d6ee2e66df57c3755e5e2769ed6df89",
+      "sourceName": "contracts/TokenFactory.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./utility/SyntheticToken.sol",
+        "./interfaces/IExpandedIERC20.sol",
+        "./utility/Lockable.sol"
+      ],
+      "versionPragmas": [
+        "0.6.12"
+      ],
+      "artifacts": [
+        "TokenFactory"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/SafeERC20.sol": {
+      "lastModificationDate": 1629103530472,
+      "contentHash": "923cafbd90983d30e1f1b8be86024b48",
+      "sourceName": "contracts/utility/SafeERC20.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IERC20.sol",
+        "./SafeMath.sol",
+        "./Address.sol"
+      ],
+      "versionPragmas": [
+        ">=0.6.0 <0.8.0"
+      ],
+      "artifacts": [
+        "SafeERC20"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/mocks/MockToken.sol": {
+      "lastModificationDate": 1629103530470,
+      "contentHash": "433e6899ef32f9bdda9f791ceb4fb479",
+      "sourceName": "contracts/mocks/MockToken.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../utility/ERC20.sol"
+      ],
+      "versionPragmas": [
+        "0.6.12"
+      ],
+      "artifacts": [
+        "MockToken"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/chainlink/Chainlink.sol": {
+      "lastModificationDate": 1629103530473,
+      "contentHash": "9d6b4bc8b6460fb7e41fa67a3533c78d",
+      "sourceName": "contracts/utility/chainlink/Chainlink.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./vendor/CBORChainlink.sol",
+        "./vendor/BufferChainlink.sol"
+      ],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "Chainlink"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/chainlink/vendor/CBORChainlink.sol": {
+      "lastModificationDate": 1629103530476,
+      "contentHash": "269470abd865ba74b83960c409d20be0",
+      "sourceName": "contracts/utility/chainlink/vendor/CBORChainlink.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./BufferChainlink.sol"
+      ],
+      "versionPragmas": [
+        ">=0.4.19 <0.7.0"
+      ],
+      "artifacts": [
+        "CBORChainlink"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/chainlink/vendor/BufferChainlink.sol": {
+      "lastModificationDate": 1629103530476,
+      "contentHash": "04966391e53771109b19621d4e791783",
+      "sourceName": "contracts/utility/chainlink/vendor/BufferChainlink.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "BufferChainlink"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/chainlink/ChainlinkClient.sol": {
+      "lastModificationDate": 1629103530474,
+      "contentHash": "ea0d78bddf1d778b11dfe8c6f17df69e",
+      "sourceName": "contracts/utility/chainlink/ChainlinkClient.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./Chainlink.sol",
+        "./interfaces/ENSInterface.sol",
+        "./interfaces/LinkTokenInterface.sol",
+        "./interfaces/ChainlinkRequestInterface.sol",
+        "./interfaces/PointerInterface.sol",
+        "./vendor/ENSResolver.sol"
+      ],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "ChainlinkClient"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/chainlink/interfaces/ENSInterface.sol": {
+      "lastModificationDate": 1629103530474,
+      "contentHash": "07aa004a0c5a9e680594444c9f7f704f",
+      "sourceName": "contracts/utility/chainlink/interfaces/ENSInterface.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "ENSInterface"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/chainlink/interfaces/LinkTokenInterface.sol": {
+      "lastModificationDate": 1629103530475,
+      "contentHash": "5a9384126d053441347b43384814306c",
+      "sourceName": "contracts/utility/chainlink/interfaces/LinkTokenInterface.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "LinkTokenInterface"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/chainlink/interfaces/ChainlinkRequestInterface.sol": {
+      "lastModificationDate": 1629103530474,
+      "contentHash": "5615ce5ca5b0953f152843fe7d0f0085",
+      "sourceName": "contracts/utility/chainlink/interfaces/ChainlinkRequestInterface.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "ChainlinkRequestInterface"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/chainlink/interfaces/PointerInterface.sol": {
+      "lastModificationDate": 1629103530475,
+      "contentHash": "68989bf1902a52355636833387e11227",
+      "sourceName": "contracts/utility/chainlink/interfaces/PointerInterface.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "PointerInterface"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/chainlink/vendor/ENSResolver.sol": {
+      "lastModificationDate": 1629103530476,
+      "contentHash": "4bc49b75e25f2ec0bb39ae7a4de4f2b5",
+      "sourceName": "contracts/utility/chainlink/vendor/ENSResolver.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.6.0"
+      ],
+      "artifacts": [
+        "ENSResolver"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/DODOMath.sol": {
+      "lastModificationDate": 1629103530470,
+      "contentHash": "a7934c3ba257124a6ef20988f4abf229",
+      "sourceName": "contracts/utility/DODOMath.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.6.12"
+      ],
+      "artifacts": [
+        "DODOMath",
+        "DecimalMath",
+        "SafeMathDODO"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/synthetix/Collateral.sol": {
+      "lastModificationDate": 1629103530477,
+      "contentHash": "f656ef42d70d4b7a51eb866e94222f8e",
+      "sourceName": "contracts/utility/synthetix/Collateral.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./interfaces/ICollateralLoan.sol",
+        "./CollateralState.sol"
+      ],
+      "versionPragmas": [
+        ">=0.5.16"
+      ],
+      "artifacts": [
+        "Collateral"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/synthetix/interfaces/ICollateralLoan.sol": {
+      "lastModificationDate": 1629103530478,
+      "contentHash": "8be3377f355f42894b869205c0b12032",
+      "sourceName": "contracts/utility/synthetix/interfaces/ICollateralLoan.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.24"
+      ],
+      "artifacts": [
+        "ICollateralLoan"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/synthetix/CollateralState.sol": {
+      "lastModificationDate": 1629103530477,
+      "contentHash": "edd50969597ab308d8c6a1a46f39ce2c",
+      "sourceName": "contracts/utility/synthetix/CollateralState.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./interfaces/ICollateralLoan.sol"
+      ],
+      "versionPragmas": [
+        ">=0.5.16"
+      ],
+      "artifacts": [
+        "CollateralState"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/synthetix/CollateralEth.sol": {
+      "lastModificationDate": 1629103530477,
+      "contentHash": "3eb95245d3dc40d45b51bf7254ecc41e",
+      "sourceName": "contracts/utility/synthetix/CollateralEth.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./interfaces/ICollateralEth.sol",
+        "./Collateral.sol"
+      ],
+      "versionPragmas": [
+        ">=0.5.16"
+      ],
+      "artifacts": [
+        "CollateralEth"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/synthetix/interfaces/ICollateralEth.sol": {
+      "lastModificationDate": 1629103530478,
+      "contentHash": "1460e8f7a7caf856057ca4909f199646",
+      "sourceName": "contracts/utility/synthetix/interfaces/ICollateralEth.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.24"
+      ],
+      "artifacts": [
+        "ICollateralEth"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/synthetix/interfaces/IAddressResolver.sol": {
+      "lastModificationDate": 1629103530477,
+      "contentHash": "4d373ca45e6c6537f85dbc50dd53ca5b",
+      "sourceName": "contracts/utility/synthetix/interfaces/IAddressResolver.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.24"
+      ],
+      "artifacts": [
+        "IAddressResolver"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/synthetix/interfaces/ICollateralErc20.sol": {
+      "lastModificationDate": 1629103530478,
+      "contentHash": "5c2f3afa7cbd04d55a314ba100431e88",
+      "sourceName": "contracts/utility/synthetix/interfaces/ICollateralErc20.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.24"
+      ],
+      "artifacts": [
+        "ICollateralErc20"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/synthetix/interfaces/ICollateralManager.sol": {
+      "lastModificationDate": 1629103530478,
+      "contentHash": "e240afc681c2d563bea0ef95a0f65ade",
+      "sourceName": "contracts/utility/synthetix/interfaces/ICollateralManager.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.24"
+      ],
+      "artifacts": [
+        "ICollateralManager"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/synthetix/interfaces/IDebtCache.sol": {
+      "lastModificationDate": 1629103530479,
+      "contentHash": "e48417d15b1bf87f152da05887ae7eb9",
+      "sourceName": "contracts/utility/synthetix/interfaces/IDebtCache.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.24"
+      ],
+      "artifacts": [
+        "IDebtCache"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/synthetix/interfaces/IDepot.sol": {
+      "lastModificationDate": 1629103530479,
+      "contentHash": "84235fb623c8bbe3db85e8d5996a38fa",
+      "sourceName": "contracts/utility/synthetix/interfaces/IDepot.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.24"
+      ],
+      "artifacts": [
+        "IDepot"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/synthetix/interfaces/ISupplySchedule.sol": {
+      "lastModificationDate": 1629103530479,
+      "contentHash": "4e01ca249f653113a8852d009c8a4f9e",
+      "sourceName": "contracts/utility/synthetix/interfaces/ISupplySchedule.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.24"
+      ],
+      "artifacts": [
+        "ISupplySchedule"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/synthetix/interfaces/ISynth.sol": {
+      "lastModificationDate": 1629103530479,
+      "contentHash": "4d49ee8b2f6b9939669d5ebbc1c63918",
+      "sourceName": "contracts/utility/synthetix/interfaces/ISynth.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.24"
+      ],
+      "artifacts": [
+        "ISynth"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/synthetix/interfaces/IVirtualSynth.sol": {
+      "lastModificationDate": 1629103530480,
+      "contentHash": "97c8e66c5eca08a04f200df3a619cd3e",
+      "sourceName": "contracts/utility/synthetix/interfaces/IVirtualSynth.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./ISynth.sol"
+      ],
+      "versionPragmas": [
+        ">=0.4.24"
+      ],
+      "artifacts": [
+        "IVirtualSynth"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/synthetix/interfaces/ISynthetix.sol": {
+      "lastModificationDate": 1629103530479,
+      "contentHash": "d119d6c578626ccead7ddf3967584e09",
+      "sourceName": "contracts/utility/synthetix/interfaces/ISynthetix.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./ISynth.sol",
+        "./IVirtualSynth.sol"
+      ],
+      "versionPragmas": [
+        ">=0.4.24"
+      ],
+      "artifacts": [
+        "ISynthetix"
+      ]
+    },
+    "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/synthetix/interfaces/ISynthetixState.sol": {
+      "lastModificationDate": 1629103530480,
+      "contentHash": "7db35cd8d2faf26e8d71c64d1f34851c",
+      "sourceName": "contracts/utility/synthetix/interfaces/ISynthetixState.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.24"
+      ],
+      "artifacts": [
+        "ISynthetixState"
+      ]
+    }
+  }
+}
