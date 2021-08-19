@@ -181,6 +181,27 @@ describe("TokenManager contract", () => {
         expect(await syntheticToken.balanceOf(alice.address)).to.equal(toEther(0))
     })
 
+    it('mint from existing position and redeem all', async () => {
+
+        let tokenIn = await tokenManager.estimateTokensIn( toEther(1))
+
+        // Mint 1 Synthetic at 300%
+        await tokenManager.connect(alice).mint(toEther(Number(fromEther(tokenIn[0])) * 2.5), toEther(Number(fromEther(tokenIn[1])) * 2.5), toEther(1))
+
+        tokenIn = await tokenManager.estimateTokensIn(toEther(3))
+
+        // Mint another 0.25 Synthetic from existing position
+        await tokenManager.connect(alice).mint(0, 0, toEther(0.25))
+
+        expect(fromEther(await tokenManager.connect(alice).myCollateralizationRatio())).to.equal("2.4")
+        expect(fromEther(await syntheticToken.balanceOf(alice.address))).to.equal("1.25")
+
+        // Redeem All
+        await tokenManager.connect(alice).redeemAll()
+
+        expect(await syntheticToken.balanceOf(alice.address)).to.equal(toEther(0))
+    })
+
 
     it('mint 1 ETH at 300% and redeem 0.5 ETH back', async () => {
 

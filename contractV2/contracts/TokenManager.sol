@@ -180,9 +180,9 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
         uint256 supportCollateral, // stablecoin
         uint256 numTokens // synthetic tokens to be minted
     ) public isReady nonReentrant {
-        require(baseCollateral > 0, "baseCollateral must be greater than 0");
+        require(baseCollateral >= 0, "baseCollateral must be greater than 0");
         require(
-            supportCollateral > 0,
+            supportCollateral >= 0,
             "supportCollateral must be greater than 0"
         );
         require(numTokens > 0, "numTokens must be greater than 0");
@@ -231,17 +231,22 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
         );
 
         // Transfer tokens into the contract from caller and mint corresponding synthetic tokens to the caller's address.
-        baseCollateralToken.safeTransferFrom(
-            msg.sender,
-            address(this),
-            baseCollateral
-        );
-        supportCollateralToken.safeTransferFrom(
-            msg.sender,
-            address(this),
-            supportCollateral
-        );
-
+        if (baseCollateral > 0) {
+            baseCollateralToken.safeTransferFrom(
+                msg.sender,
+                address(this),
+                baseCollateral
+            );
+        }
+        
+        if (supportCollateral > 0) {
+            supportCollateralToken.safeTransferFrom(
+                msg.sender,
+                address(this),
+                supportCollateral
+            );
+        }
+        
         require(
             syntheticToken.mint(msg.sender, numTokens),
             "Minting synthetic tokens failed"
