@@ -6,11 +6,12 @@ import '@openzeppelin/contracts/math/SafeMath.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
+import "./utility/Whitelist.sol";
 import "./utility/Lockable.sol";
             
 import "./interfaces/IMasterChef.sol";
 
-contract Reward is Ownable, Lockable {
+contract Reward is Ownable, Lockable, Whitelist {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -40,9 +41,7 @@ contract Reward is Ownable, Lockable {
     }
 
     // The Tamg TOKEN!
-    IERC20 public tamg;
-    // Dev address.
-    address public devaddr;
+    IERC20 public tamg; 
     // Tamg tokens created per block.
     uint256 public tamgPerBlock;
     // Bonus muliplier for early tamg makers.
@@ -54,7 +53,7 @@ contract Reward is Ownable, Lockable {
     PoolInfo[] public poolInfo;
     // Info of each user that stakes LP tokens.
     mapping(uint256 => mapping(address => UserInfo)) public userInfo;
-    // Total allocation poitns. Must be the sum of all allocation points in all pools.
+    // Total allocation points. Must be the sum of all allocation points in all pools.
     uint256 public totalAllocPoint = 0;
     // The block number when Tamg mining starts.
     uint256 public startBlock;
@@ -69,31 +68,33 @@ contract Reward is Ownable, Lockable {
 
     constructor(
         IERC20 _tamg,
-        address _devaddr,
         uint256 _tamgPerBlock,
-        uint256 _startBlock
-    ) public {
+        uint256 _startBlock,
+        address _adminAddress
+    ) public nonReentrant() {
         tamg = _tamg;
-        devaddr = _devaddr;
         tamgPerBlock = _tamgPerBlock;
         startBlock = _startBlock;
+
+        addAddress(_adminAddress);
+        
+        if (_adminAddress != msg.sender) {
+            addAddress(msg.sender);
+        }
     }
 
-    function updateMultiplier(uint256 multiplierNumber) public onlyOwner {
-        BONUS_MULTIPLIER = multiplierNumber;
-    }
+    // ONLY ADMIN
 
-    function poolLength() external view returns (uint256) {
-        return poolInfo.length;
-    }
+    /**
+     * @notice Add a new lp to the pool. Can only be called by the owner.
+     * @dev DO NOT add the same LP token more than once. Rewards will be messed up if you do.
+     */
 
-    // Add a new lp to the pool. Can only be called by the owner.
-    // XXX DO NOT add the same LP token more than once. Rewards will be messed up if you do.
     function add(
         uint256 _allocPoint,
         IERC20 _lpToken,
         bool _withUpdate
-    ) public onlyOwner {
+    ) public  onlyWhitelisted() nonReentrant() {
         if (_withUpdate) {
             massUpdatePools();
         }
@@ -115,7 +116,7 @@ contract Reward is Ownable, Lockable {
         uint256 _pid,
         uint256 _allocPoint,
         bool _withUpdate
-    ) public onlyOwner {
+    ) public  onlyWhitelisted() nonReentrant() {
         if (_withUpdate) {
             massUpdatePools();
         }
@@ -125,9 +126,45 @@ contract Reward is Ownable, Lockable {
         poolInfo[_pid].allocPoint = _allocPoint;
     }
 
+    function updateMultiplier(uint256 _multiplierNumber) public onlyWhitelisted nonReentrant() {
+        require( _multiplierNumber != 0, "Invalid value" );
+        BONUS_MULTIPLIER = _multiplierNumber;
+    }
+
+    function updateTamgPerBlock(uint256 _tamgPerBlock) public onlyWhitelisted nonReentrant() {
+        require( _tamgPerBlock != 0, "Invalid value" );
+        tamgPerBlock = _tamgPerBlock;
+    }
+
+    function addTamg(uint256 _amount) public onlyWhitelisted nonReentrant() {
+        require( _amount != 0, "Invalid amount" );
+
+        tamg.safeTransferFrom(
+                msg.sender,
+                address(this),
+                _amount
+            );
+    }
+
+    function removeTamg(uint256 _amount) public onlyWhitelisted nonReentrant() {
+        require( _amount != 0, "Invalid amount" );
+        require( tamg.balanceOf( address(this) ) >= _amount , "Insufficent balance"  );
+
+        tamg.safeTransfer(msg.sender, _amount);
+    }
+
+    // ONLY OWNER
+    
     // Set the migrator contract. Can only be called by the owner.
     function setMigrator(IMigratorChef _migrator) public onlyOwner {
         migrator = _migrator;
+    }
+
+    // PUBLIC
+
+    // total pool in the system
+    function poolLength() external view returns (uint256) {
+        return poolInfo.length;
     }
 
     // Migrate lp token to another lp contract. Can be called by anyone. We trust that migrator contract is good.
@@ -258,6 +295,9 @@ contract Reward is Ownable, Lockable {
         user.rewardDebt = 0;
         emit EmergencyWithdraw(msg.sender, _pid, user.amount);
     }
+
+
+    // INTERNAL
 
     // Safe tamg transfer function, just in case if rounding error causes pool to not have enough Tamgs.
     function safeTamgTransfer(address _to, uint256 _amount) internal {
