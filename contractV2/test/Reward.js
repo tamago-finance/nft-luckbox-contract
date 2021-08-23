@@ -41,9 +41,9 @@ describe("Reward", () => {
     const Reward = await ethers.getContractFactory("Reward")
     reward = await Reward.deploy(
       tamg.address,
-      await dev.getAddress(),
       TAMG_PER_BLOCK,
-      0
+      0,
+      await dev.getAddress()
     )
     await reward.deployed()
 
