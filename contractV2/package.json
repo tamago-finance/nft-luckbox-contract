@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "ganache" : "ganache-cli"
+    "local" : "ganache-cli",
+    "forked-polygon": "ganache-cli --fork $(grep FORKED_POLYGON_URL .env | cut -d '=' -f2) --mnemonic $(grep MNEMONIC .env | cut -d '=' -f2)"
   },
   "keywords": [],
   "author": "",
