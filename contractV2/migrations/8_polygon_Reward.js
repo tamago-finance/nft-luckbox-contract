@@ -35,7 +35,7 @@ module.exports = async (deployer, network, accounts) => {
         await deployer.deploy(
             Reward,
             TAMG_TOKEN,
-            toEther(1), // REWARD PER BLOCK
+            toEther(0.005), // REWARD PER BLOCK
             currentBlock, // START BLOCK
             DEV_ADDRESS,
             {
@@ -88,9 +88,9 @@ module.exports = async (deployer, network, accounts) => {
                 chainId: 137
             })
 
-        // supply 2000 TAMG
+        // supply 10000 TAMG
         await rewardContract.addTamg(
-            toEther(2000),
+            toEther(10000),
             {
                 from: admin,
                 chainId: 137
