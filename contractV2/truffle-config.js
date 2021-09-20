@@ -3,7 +3,7 @@ const HDWalletProvider = require("@truffle/hdwallet-provider")
 module.exports = {
   plugins: ["truffle-plugin-verify"],
   api_keys: {
-    polygonscan: "Z8M1S2HSHCZ494TRAM1GY95ND3CVNZQ3WS",
+    polygonscan: "",
   },
   networks: {
     development: {
