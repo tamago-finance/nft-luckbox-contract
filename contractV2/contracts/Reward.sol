@@ -5,11 +5,10 @@ pragma solidity 0.6.12;
 import '@openzeppelin/contracts/math/SafeMath.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
-import '@openzeppelin/contracts/access/Ownable.sol';
 import "./utility/Whitelist.sol";
 import "./utility/Lockable.sol";
 
-contract Reward is Ownable, Lockable, Whitelist {
+contract Reward is Lockable, Whitelist {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -43,7 +42,7 @@ contract Reward is Ownable, Lockable, Whitelist {
     // Tamg tokens created per block.
     uint256 public tamgPerBlock;
     // Bonus muliplier for early tamg makers.
-    uint256 public BONUS_MULTIPLIER = 1;
+    uint256 public bonusMultiplier = 1;
 
     // Info of each pool.
     PoolInfo[] public poolInfo;
@@ -67,7 +66,7 @@ contract Reward is Ownable, Lockable, Whitelist {
         uint256 _tamgPerBlock,
         uint256 _startBlock,
         address _adminAddress
-    ) public nonReentrant() {
+    ) public nonReentrant {
         tamg = _tamg;
         tamgPerBlock = _tamgPerBlock;
         startBlock = _startBlock;
@@ -90,7 +89,7 @@ contract Reward is Ownable, Lockable, Whitelist {
         uint256 _allocPoint,
         IERC20 _lpToken,
         bool _withUpdate
-    ) public  onlyWhitelisted() nonReentrant() {
+    ) public  onlyWhitelisted nonReentrant {
         if (_withUpdate) {
             massUpdatePools();
         }
@@ -112,7 +111,7 @@ contract Reward is Ownable, Lockable, Whitelist {
         uint256 _pid,
         uint256 _allocPoint,
         bool _withUpdate
-    ) public  onlyWhitelisted() nonReentrant() {
+    ) public  onlyWhitelisted nonReentrant {
         if (_withUpdate) {
             massUpdatePools();
         }
@@ -124,15 +123,17 @@ contract Reward is Ownable, Lockable, Whitelist {
 
     function updateMultiplier(uint256 _multiplierNumber) public onlyWhitelisted nonReentrant() {
         require( _multiplierNumber != 0, "Invalid value" );
-        BONUS_MULTIPLIER = _multiplierNumber;
+        massUpdatePools();
+        bonusMultiplier = _multiplierNumber;
     }
 
     function updateTamgPerBlock(uint256 _tamgPerBlock) public onlyWhitelisted nonReentrant() {
         require( _tamgPerBlock != 0, "Invalid value" );
+        massUpdatePools();
         tamgPerBlock = _tamgPerBlock;
     }
 
-    function addTamg(uint256 _amount) public onlyWhitelisted nonReentrant() {
+    function addTamg(uint256 _amount) public onlyWhitelisted nonReentrant {
         require( _amount != 0, "Invalid amount" );
 
         tamg.safeTransferFrom(
@@ -142,7 +143,7 @@ contract Reward is Ownable, Lockable, Whitelist {
             );
     }
 
-    function removeTamg(uint256 _amount) public onlyWhitelisted nonReentrant() {
+    function removeTamg(uint256 _amount) public onlyWhitelisted nonReentrant {
         require( _amount != 0, "Invalid amount" );
         require( tamg.balanceOf( address(this) ) >= _amount , "Insufficent balance"  );
 
@@ -162,7 +163,7 @@ contract Reward is Ownable, Lockable, Whitelist {
         view
         returns (uint256)
     {
-        return _to.sub(_from).mul(BONUS_MULTIPLIER);
+        return _to.sub(_from).mul(bonusMultiplier);
     }
 
     // View function to see pending Tamgs on frontend.
@@ -230,11 +231,13 @@ contract Reward is Ownable, Lockable, Whitelist {
                 user.amount.mul(pool.accTamgPerShare).div(1e12).sub(
                     user.rewardDebt
                 );
-            safeTamgTransfer(msg.sender, pending);
+            if(pending > 0) {
+                safeTamgTransfer(msg.sender, pending);
+            }
         }
         if (_amount > 0) {
             pool.lpToken.safeTransferFrom(
-                address(msg.sender),
+                msg.sender,
                 address(this),
                 _amount
             );
@@ -254,10 +257,12 @@ contract Reward is Ownable, Lockable, Whitelist {
             user.amount.mul(pool.accTamgPerShare).div(1e12).sub(
                 user.rewardDebt
             );
-        safeTamgTransfer(msg.sender, pending);
+        if(pending > 0) {
+            safeTamgTransfer(msg.sender, pending);
+        }
         if (_amount > 0) {
             user.amount = user.amount.sub(_amount);
-    	    pool.lpToken.safeTransfer(address(msg.sender), _amount);       
+    	    pool.lpToken.safeTransfer(msg.sender, _amount);       
         }
         user.rewardDebt = user.amount.mul(pool.accTamgPerShare).div(1e12);
         emit Withdraw(msg.sender, _pid, _amount);
@@ -267,10 +272,11 @@ contract Reward is Ownable, Lockable, Whitelist {
     function emergencyWithdraw(uint256 _pid) public nonReentrant{
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
-        pool.lpToken.safeTransfer(address(msg.sender), user.amount);
+        pool.lpToken.safeTransfer(msg.sender, user.amount);
+        uint256 amount = user.amount;
         user.amount = 0;
         user.rewardDebt = 0;
-        emit EmergencyWithdraw(msg.sender, _pid, user.amount);
+        emit EmergencyWithdraw(msg.sender, _pid, amount);
     }
 
 

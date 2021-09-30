@@ -30,7 +30,7 @@ contract PriceResolver is Lockable, Whitelist, IPriceResolver {
         address _priceFeederCollateralAddress,
         uint256 _emergencyAvgPrice,
         address _devAddress
-    ) public nonReentrant() {
+    ) public nonReentrant {
         require( _priceFeederAddress != address(0), "Invalid _priceFeederAddress" );
         require( _priceFeederCollateralAddress != address(0), "Invalid _priceFeederCollateralAddress" );
         require( _emergencyAvgPrice != 0, "Reference price can't be zero" );
@@ -48,7 +48,7 @@ contract PriceResolver is Lockable, Whitelist, IPriceResolver {
     }
 
     // update the fall-back avg price
-    function setEmergencyPrice(uint256 _value) public nonReentrant() onlyWhitelisted() {
+    function setEmergencyPrice(uint256 _value) public nonReentrant onlyWhitelisted {
         emergencyAvgPrice = _value;
     }
 

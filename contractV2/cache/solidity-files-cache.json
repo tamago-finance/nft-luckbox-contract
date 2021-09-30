@@ -360,8 +360,8 @@
       ]
     },
     "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/Whitelist.sol": {
-      "lastModificationDate": 1631588910678,
-      "contentHash": "7e319dae044a3a16634391e15ec1c3f9",
+      "lastModificationDate": 1632988773360,
+      "contentHash": "79b3eda589ac6daf0813b3aaa6eb3421",
       "sourceName": "contracts/utility/Whitelist.sol",
       "solcConfig": {
         "version": "0.6.12",
@@ -571,8 +571,8 @@
       ]
     },
     "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/PriceResolver.sol": {
-      "lastModificationDate": 1631588910666,
-      "contentHash": "e422cb86215c1165a3953c6d58db3370",
+      "lastModificationDate": 1632988700490,
+      "contentHash": "46097e6e1a0eb9baf323946fd331b4bb",
       "sourceName": "contracts/PriceResolver.sol",
       "solcConfig": {
         "version": "0.6.12",
@@ -679,8 +679,8 @@
       ]
     },
     "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/mocks/MockPriceFeeder.sol": {
-      "lastModificationDate": 1631588910674,
-      "contentHash": "0178d1d9f7919c342db7f9fba8cd7ca0",
+      "lastModificationDate": 1632988762096,
+      "contentHash": "67aa4d8a6c8728de609b17e7d37745c5",
       "sourceName": "contracts/mocks/MockPriceFeeder.sol",
       "solcConfig": {
         "version": "0.6.12",
@@ -717,8 +717,8 @@
       ]
     },
     "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/Reward.sol": {
-      "lastModificationDate": 1631588910666,
-      "contentHash": "d919573914b67f98d4bb21ae7dcbe912",
+      "lastModificationDate": 1632989909708,
+      "contentHash": "79f3afa5bc5159342944248af0999a17",
       "sourceName": "contracts/Reward.sol",
       "solcConfig": {
         "version": "0.6.12",
@@ -746,7 +746,6 @@
         "@openzeppelin/contracts/math/SafeMath.sol",
         "@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "@openzeppelin/contracts/token/ERC20/SafeERC20.sol",
-        "@openzeppelin/contracts/access/Ownable.sol",
         "./utility/Whitelist.sol",
         "./utility/Lockable.sol"
       ],
@@ -758,8 +757,8 @@
       ]
     },
     "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/SyntheticToken.sol": {
-      "lastModificationDate": 1632111326779,
-      "contentHash": "0d137702c193d07ef1024fb487f9ae48",
+      "lastModificationDate": 1632988969754,
+      "contentHash": "c62039d7bb7e6d729a61ceaa6e22a46b",
       "sourceName": "contracts/utility/SyntheticToken.sol",
       "solcConfig": {
         "version": "0.6.12",
@@ -1012,8 +1011,8 @@
       ]
     },
     "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/TokenFactory.sol": {
-      "lastModificationDate": 1631588910667,
-      "contentHash": "5d6ee2e66df57c3755e5e2769ed6df89",
+      "lastModificationDate": 1632988949279,
+      "contentHash": "9571cc2b59367dafe92e63abd8d99317",
       "sourceName": "contracts/TokenFactory.sol",
       "solcConfig": {
         "version": "0.6.12",
@@ -2001,8 +2000,8 @@
       ]
     },
     "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/TokenManager.sol": {
-      "lastModificationDate": 1631588910667,
-      "contentHash": "20730beefbd8633ce45174bcd5b1d9fa",
+      "lastModificationDate": 1632988954310,
+      "contentHash": "90379a9ec975c04f19609e274ab5608d",
       "sourceName": "contracts/TokenManager.sol",
       "solcConfig": {
         "version": "0.6.12",
