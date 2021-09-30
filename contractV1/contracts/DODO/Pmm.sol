@@ -72,7 +72,7 @@ contract Pmm is Lockable, Whitelist, IPmm {
         address _quoteToken,
         address _priceFeeder,
         uint256 _k
-    ) public nonReentrant() {
+    ) public nonReentrant {
         require(address(_priceFeeder) != address(0), "Invalid PriceFeeder address");
         require(address(_quoteToken) != address(0), "Invalid QuoteToken address");
         require(address(_baseToken) != address(0), "Invalid BaseToken address");
@@ -141,8 +141,8 @@ contract Pmm is Lockable, Whitelist, IPmm {
 
     function depositQuoteTo(address to, uint256 amount)
         public
-        nonReentrant()
-        onlyWhitelisted()
+        nonReentrant
+        onlyWhitelisted
         returns (uint256)
     {
         (, uint256 quoteTarget) = getExpectedTarget();
@@ -166,8 +166,8 @@ contract Pmm is Lockable, Whitelist, IPmm {
 
     function depositBaseTo(address to, uint256 amount)
         public
-        nonReentrant()
-        onlyWhitelisted()
+        nonReentrant
+        onlyWhitelisted
         returns (uint256)
     {
         (uint256 baseTarget, ) = getExpectedTarget();
@@ -191,8 +191,8 @@ contract Pmm is Lockable, Whitelist, IPmm {
 
     function withdrawQuoteTo(address to, uint256 amount)
         public
-        nonReentrant()
-        onlyWhitelisted()
+        nonReentrant
+        onlyWhitelisted
         returns (uint256)
     {
         // calculate capital
@@ -219,8 +219,8 @@ contract Pmm is Lockable, Whitelist, IPmm {
 
     function withdrawBaseTo(address to, uint256 amount)
         public
-        nonReentrant()
-        onlyWhitelisted()
+        nonReentrant
+        onlyWhitelisted
         returns (uint256)
     {
         // calculate capital
@@ -262,8 +262,8 @@ contract Pmm is Lockable, Whitelist, IPmm {
     function buyBaseToken(uint256 amount, uint256 maxPayQuote)
         external
         override
-        nonReentrant()
-        onlyWhitelisted()
+        nonReentrant
+        onlyWhitelisted
         returns (uint256)
     {
         // query price
@@ -300,8 +300,8 @@ contract Pmm is Lockable, Whitelist, IPmm {
         uint256 amount,
         uint256 minReceiveQuote
     ) external override 
-        nonReentrant() 
-        onlyWhitelisted() 
+        nonReentrant 
+        onlyWhitelisted 
     returns (uint256) {
         // query price
         (

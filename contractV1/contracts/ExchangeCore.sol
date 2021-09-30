@@ -71,7 +71,7 @@ contract ExchangeCore is Lockable, Whitelist, ILeverageSize, IExchangeCore {
     event Withdraw(address indexed account, address indexed token,  uint256 indexed amount);
 
 
-    constructor(address _quoteTokenAddress, address _devAddress) public nonReentrant() {
+    constructor(address _quoteTokenAddress, address _devAddress) public nonReentrant {
         require(_quoteTokenAddress != address(0), "Invalid quoteToken address");
 
         state = ContractState.NotReady;
@@ -124,7 +124,7 @@ contract ExchangeCore is Lockable, Whitelist, ILeverageSize, IExchangeCore {
     }
 
     // make a deposit of quote asset from the pair contract only
-    function deposit(uint256 amount) external override nonReentrant() isValidPair(msg.sender) {
+    function deposit(uint256 amount) external override nonReentrant isValidPair(msg.sender) {
         require(amount > 0 , "Invalid amount");
 
         // quoteToken.safeTransferFrom(msg.sender, address(this), amount);
@@ -133,7 +133,7 @@ contract ExchangeCore is Lockable, Whitelist, ILeverageSize, IExchangeCore {
     }
 
     // make a withdrawal of quote asset from the pair contract only
-    function withdraw(uint256 amount, address recipient) external override nonReentrant() isValidPair(msg.sender) {
+    function withdraw(uint256 amount, address recipient) external override nonReentrant isValidPair(msg.sender) {
         require(amount > 0 , "Invalid amount");
 
         quoteToken.safeTransfer(recipient , amount);
@@ -142,19 +142,19 @@ contract ExchangeCore is Lockable, Whitelist, ILeverageSize, IExchangeCore {
     }
 
     // enable this contract
-    function enable() public nonReentrant() onlyWhitelisted() {
+    function enable() public nonReentrant onlyWhitelisted {
         require(state != ContractState.Ready, "Invalid state");
         state = ContractState.Ready;
     }
 
     // disable this contract
-    function disable() public nonReentrant() onlyWhitelisted() {
+    function disable() public nonReentrant onlyWhitelisted {
         require(state != ContractState.NotReady, "Invalid state");
         state = ContractState.NotReady;
     }
 
     // set trading fee
-    function setFee(uint256 feeAmount) public nonReentrant() onlyWhitelisted() {
+    function setFee(uint256 feeAmount) public nonReentrant onlyWhitelisted {
         require(feeAmount >= 0 && 100000000000000000 >= feeAmount, "Fee amount must be between 0%-10% ");
         fee = feeAmount;
     }
@@ -162,9 +162,9 @@ contract ExchangeCore is Lockable, Whitelist, ILeverageSize, IExchangeCore {
     // add new exchange pair
     function addPair(string memory _name)
         public
-        nonReentrant()
-        isReady()
-        onlyWhitelisted()
+        nonReentrant
+        isReady
+        onlyWhitelisted
     {
         uint256 index = _pairs.array.length;
         _pairs.array.push(index);
@@ -179,9 +179,9 @@ contract ExchangeCore is Lockable, Whitelist, ILeverageSize, IExchangeCore {
     // remove an exchange pair
     function removePair(uint256 pairId)
         public
-        nonReentrant()
-        isReady()
-        onlyWhitelisted()
+        nonReentrant
+        isReady
+        onlyWhitelisted
     {
         require(_pairs.array.length > pairId, "Invalid pairId");
         _pairs.table[pairId].active = false;
@@ -197,7 +197,7 @@ contract ExchangeCore is Lockable, Whitelist, ILeverageSize, IExchangeCore {
         LeverageSize size,
         address pairLongTokenAddress,
         address pairShortTokenAddress
-    ) public nonReentrant() isReady() onlyWhitelisted() {
+    ) public nonReentrant isReady onlyWhitelisted {
         require(_pairs.array.length > pairId, "Invalid pairId");
 
         if (size == LeverageSize.HALF) {

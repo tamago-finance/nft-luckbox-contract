@@ -51,7 +51,7 @@ contract ExchangePair is Lockable, Whitelist, IExchangePair {
         address _exchangeCoreAddress,
         address _baseToken,
         address _priceFeeder
-    ) public nonReentrant() {
+    ) public nonReentrant {
         require(address(_exchangeCoreAddress) != address(0), "Invalid ExchangeCore address");
         require(address(_baseToken) != address(0), "Invalid BaseToken address");
         require(address(_priceFeeder) != address(0), "Invalid PriceFeeder address");
