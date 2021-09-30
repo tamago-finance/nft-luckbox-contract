@@ -272,6 +272,31 @@ describe("TokenManager contract", () => {
         expect(await syntheticToken.balanceOf(alice.address)).to.equal(toEther(0))
     })
 
+    it('able to update price resolver contract', async () => {
+
+        const currentAddress = await tokenManager.priceResolver()
+
+        const DUMMY = "0xBab2fBa60058A8af598c041eff79A6BbC8A39D92"
+
+        await tokenManager.setPriceResolver(DUMMY)
+
+        // should not be the same
+        expect(  await tokenManager.priceResolver() ).to.not.equal(currentAddress)
+
+        // update it back
+        await tokenManager.setPriceResolver(currentAddress)
+
+        expect(  await tokenManager.priceResolver() ).to.equal(currentAddress)
+
+        // should be failed if Alice try to do it
+        try {
+            await tokenManager.connect(alice).setPriceResolver(DUMMY)
+        } catch (e) {
+            expect( (e.message).indexOf("caller is not the owner") !== -1 ).to.true
+        }
+
+    })
+
     // TODO: Do complex tests
     
 
