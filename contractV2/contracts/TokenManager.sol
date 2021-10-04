@@ -113,6 +113,7 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
         uint256 baseAmountBack,
         uint256 supportAmountBack
     );
+    event PriceResolverUpdated(address contractAddress);
 
     constructor(
         string memory _name,
@@ -163,6 +164,8 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
         }
 
         emit CreatedSyntheticToken();
+
+        emit PriceResolverUpdated(_priceResolverAddress);
     }
 
     // update the contract state
@@ -172,6 +175,17 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
         onlyWhitelisted
     {
         state = _state;
+    }
+
+    // update the price resolver contract
+    function setPriceResolver(address _priceResolverAddress)
+        public
+        nonReentrant
+        onlyWhitelisted
+    {
+        priceResolver = IPriceResolver(_priceResolverAddress);
+        
+        emit PriceResolverUpdated(_priceResolverAddress);
     }
 
     // mint synthetic tokens from the given collateral tokens
