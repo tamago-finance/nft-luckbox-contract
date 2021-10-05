@@ -17,6 +17,8 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
     using SafeERC20 for IToken;
     using SafeERC20 for IExpandedIERC20;
 
+    uint256 TWO_HOURS = 2 hours;
+
     enum ContractState {
         INITIAL,
         NORMAL,
@@ -31,6 +33,8 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
         uint256 rawBaseCollateral;
         // Raw collateral value of support token (stablecoin)
         uint256 rawSupportCollateral;
+        // Mint timestamp
+        uint256 timestamp;
     }
 
     struct Minters {
@@ -260,6 +264,8 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
                 supportCollateral
             );
         }
+
+        positionData.timestamp = block.timestamp;
         
         require(
             syntheticToken.mint(msg.sender, numTokens),
@@ -401,6 +407,8 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
     // burn all synthetic tokens and send collateral tokens back to the minter
     function redeemAll() public isReadyOrEmergency nonReentrant {
         PositionData storage positionData = positions[msg.sender];
+
+        require(block.timestamp >= positionData.timestamp + TWO_HOURS, "Can redeem when mint time more than 2 hours");
 
         emit Redeem(
             msg.sender,

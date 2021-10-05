@@ -146,9 +146,17 @@ describe("TokenManager contract", () => {
 
         await syntheticToken.connect(alice).approve(tokenManager.address, toEther(10000))
 
-        // Redeem All
-        await tokenManager.connect(alice).redeemAll()
+        // Redeem All with revert
+        await expect(
+            tokenManager.connect(alice).redeemAll()
+          ).to.be.revertedWith("Can redeem when mint time more than 2 hours")
 
+        await network.provider.send("evm_increaseTime", [7200])
+        await network.provider.send("evm_mine")
+
+        // Redeem all
+        await tokenManager.connect(alice).redeemAll()
+        
         expect(await baseCollateral.balanceOf(alice.address)).to.equal(toEther(10000))
         expect(await supportCollateral.balanceOf(alice.address)).to.equal(toEther(10000))
         expect(await syntheticToken.balanceOf(alice.address)).to.equal(toEther(0))
@@ -175,6 +183,14 @@ describe("TokenManager contract", () => {
 
         expect(fromEther(await syntheticToken.balanceOf(alice.address))).to.equal("1.5")
 
+        // Redeem All with revert
+        await expect(
+            tokenManager.connect(alice).redeemAll()
+          ).to.be.revertedWith("Can redeem when mint time more than 2 hours")
+
+        await network.provider.send("evm_increaseTime", [7200])
+        await network.provider.send("evm_mine")
+
         // Redeem All
         await tokenManager.connect(alice).redeemAll()
 
@@ -195,6 +211,14 @@ describe("TokenManager contract", () => {
 
         expect(fromEther(await tokenManager.connect(alice).myCollateralizationRatio())).to.equal("2.4")
         expect(fromEther(await syntheticToken.balanceOf(alice.address))).to.equal("1.25")
+
+        // Redeem All with revert
+        await expect(
+            tokenManager.connect(alice).redeemAll()
+          ).to.be.revertedWith("Can redeem when mint time more than 2 hours")
+
+        await network.provider.send("evm_increaseTime", [7200])
+        await network.provider.send("evm_mine")
 
         // Redeem All
         await tokenManager.connect(alice).redeemAll()
@@ -229,6 +253,13 @@ describe("TokenManager contract", () => {
         expect( fromEther( await supportCollateral.balanceOf( alice.address ) )).to.equal("7250.0")
         expect( fromEther( await tokenManager.connect(alice).myCollateralizationRatio() )).to.equal("3.000000000000000001")
 
+        // Redeem All with revert
+        await expect(
+            tokenManager.connect(alice).redeemAll()
+          ).to.be.revertedWith("Can redeem when mint time more than 2 hours")
+
+        await network.provider.send("evm_increaseTime", [7200])
+        await network.provider.send("evm_mine")
 
         // Redeem All
         await tokenManager.connect(alice).redeemAll()
@@ -248,6 +279,14 @@ describe("TokenManager contract", () => {
     
         expect( fromEther( await tokenManager.connect(alice).myCollateralizationRatio() )).to.equal("3.8")
 
+        // Redeem All with revert
+        await expect(
+            tokenManager.connect(alice).redeemAll()
+          ).to.be.revertedWith("Can redeem when mint time more than 2 hours")
+
+        await network.provider.send("evm_increaseTime", [7200])
+        await network.provider.send("evm_mine")
+
         // Redeem All
         await tokenManager.connect(alice).redeemAll()
 
@@ -265,7 +304,15 @@ describe("TokenManager contract", () => {
         await tokenManager.connect(alice).withdraw( toEther("2000")  , toEther("1000"))
 
         expect( fromEther( await tokenManager.connect(alice).myCollateralizationRatio() )).to.equal("2.2")
-    
+
+        // Redeem All with revert
+        await expect(
+            tokenManager.connect(alice).redeemAll()
+          ).to.be.revertedWith("Can redeem when mint time more than 2 hours")
+
+        await network.provider.send("evm_increaseTime", [7200])
+        await network.provider.send("evm_mine")
+
         // Redeem All
         await tokenManager.connect(alice).redeemAll()
 
