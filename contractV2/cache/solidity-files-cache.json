@@ -2000,8 +2000,8 @@
       ]
     },
     "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/TokenManager.sol": {
-      "lastModificationDate": 1632988954310,
-      "contentHash": "90379a9ec975c04f19609e274ab5608d",
+      "lastModificationDate": 1633329578568,
+      "contentHash": "eb3a6f821cb31cbf80fd7f42c7d81612",
       "sourceName": "contracts/TokenManager.sol",
       "solcConfig": {
         "version": "0.6.12",
@@ -2116,8 +2116,8 @@
       ]
     },
     "/Users/kantapatchankasem/Work/tamago-finance/contractV2/contracts/utility/Timelock.sol": {
-      "lastModificationDate": 1632154377401,
-      "contentHash": "af9772e30362a19b1e6e5e93d0860544",
+      "lastModificationDate": 1633324733571,
+      "contentHash": "2347ae1a17e6b7a85343c0fc30e9406d",
       "sourceName": "contracts/utility/Timelock.sol",
       "solcConfig": {
         "version": "0.6.12",
@@ -2144,7 +2144,8 @@
       "imports": [
         "@openzeppelin/contracts/access/Ownable.sol",
         "../interfaces/IERC20.sol",
-        "./SafeERC20.sol"
+        "./SafeERC20.sol",
+        "./Lockable.sol"
       ],
       "versionPragmas": [
         "^0.6.0"
