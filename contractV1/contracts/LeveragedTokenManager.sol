@@ -69,7 +69,7 @@ contract LeveragedTokenManager is Lockable, Whitelist, ISide, ILeverageSize {
         address _priceResolverAddress,
         address _quoteTokenAddress,
         address _devAddress // admin
-    ) public nonReentrant() {
+    ) public nonReentrant {
         require( _tokenFactoryAddress != address(0), "Invalid TokenFactory address" );
         require( _priceResolverAddress != address(0), "Invalid PriceResolver address" );
         require( _quoteTokenAddress != address(0), "Invalid QuoteToken address" );
@@ -119,7 +119,7 @@ contract LeveragedTokenManager is Lockable, Whitelist, ISide, ILeverageSize {
         return (longPrice.wmul(buyingAmount.wdiv(currentPrice)), shortPrice.wmul(buyingAmount.wdiv(currentPrice)));
     }
 
-    function mint(uint256 buyingAmount) public nonReentrant() {
+    function mint(uint256 buyingAmount) public nonReentrant {
         require( buyingAmount > 0 , "Amount must be greater than 0" );
         require( CAPPED_AMOUNT >=  totalRawCollateral.add(buyingAmount), "Exceeding a capped amount"); 
 
@@ -143,7 +143,7 @@ contract LeveragedTokenManager is Lockable, Whitelist, ISide, ILeverageSize {
         emit Minted(msg.sender, tokenIn, totalLong, totalShort);
     }
 
-    function redeem(uint256 redeemingAmount) public nonReentrant() {
+    function redeem(uint256 redeemingAmount) public nonReentrant {
         require( redeemingAmount > 0 , "Amount must be greater than 0" );
 
         uint256 currentPrice = priceResolver.getCurrentPrice();
@@ -203,7 +203,7 @@ contract LeveragedTokenManager is Lockable, Whitelist, ISide, ILeverageSize {
     }
 
     // not used
-    function buyLeveragedToken(Side side, uint256 amount, uint256 max) public nonReentrant() {
+    function buyLeveragedToken(Side side, uint256 amount, uint256 max) public nonReentrant {
         require( side != Side.FLAT , "Side must be long or short" );
 
         if (side == Side.LONG) {
@@ -222,7 +222,7 @@ contract LeveragedTokenManager is Lockable, Whitelist, ISide, ILeverageSize {
     }
 
      // not used
-    function sellLeveragedToken(Side side, uint256 amount, uint256 min) public nonReentrant() {
+    function sellLeveragedToken(Side side, uint256 amount, uint256 min) public nonReentrant {
         require( side != Side.FLAT , "Side must be long or short" );
 
         if (side == Side.LONG) {
@@ -243,7 +243,7 @@ contract LeveragedTokenManager is Lockable, Whitelist, ISide, ILeverageSize {
     // ONLY ADMIN
 
     // Setup PMM contract address
-    function setupPmm(address pmmLongAddress, address pmmShortAddress) external onlyWhitelisted() {
+    function setupPmm(address pmmLongAddress, address pmmShortAddress) external onlyWhitelisted {
         pmmLong = IPmm(pmmLongAddress);
         pmmShort = IPmm(pmmShortAddress);
 

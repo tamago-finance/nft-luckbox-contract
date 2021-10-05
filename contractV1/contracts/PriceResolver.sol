@@ -82,7 +82,7 @@ contract PriceResolver is Lockable, Whitelist, ISide, IPriceResolver, ILeverageS
         uint256 _emergencyReferencePrice,
         uint256 _startingPrice,
         address _devAddress
-    ) public nonReentrant() {
+    ) public nonReentrant {
         require( _priceFeederAddress != address(0), "Invalid Price Feeder address" );
         require( _emergencyReferencePrice != 0, "Reference price can't be zero" );
 
@@ -103,7 +103,7 @@ contract PriceResolver is Lockable, Whitelist, ISide, IPriceResolver, ILeverageS
         }
     }
 
-    function init() public nonReentrant() onlyWhitelisted() {
+    function init() public nonReentrant onlyWhitelisted {
         require( state == State.INITIAL , "Invalid state" );
 
         priceFeederLong.init(address(this));
@@ -112,7 +112,7 @@ contract PriceResolver is Lockable, Whitelist, ISide, IPriceResolver, ILeverageS
         state = State.NORMAL;
     }
 
-    function setEmergencyPrice(uint256 _value) public nonReentrant() onlyWhitelisted() {
+    function setEmergencyPrice(uint256 _value) public nonReentrant onlyWhitelisted {
         emergencyReferencePrice = _value;
     }
 

@@ -123,7 +123,7 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
         address _baseCollateralTokenAddress,
         address _supportCollateralTokenAddress,
         address _devAddress // dev wallet
-    ) public nonReentrant() {
+    ) public nonReentrant {
         require(
             _tokenFactoryAddress != address(0),
             "Invalid TokenFactory address"

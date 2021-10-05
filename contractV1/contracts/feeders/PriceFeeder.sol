@@ -23,7 +23,7 @@ contract PriceFeeder is Whitelist, IPriceFeeder {
         side = Side.FLAT;
     }
 
-    function updateValue(uint256 _newValue) public onlyWhitelisted() {
+    function updateValue(uint256 _newValue) public onlyWhitelisted {
         value = _newValue;
         timestamp = now;
     }

@@ -27,7 +27,7 @@ contract TokenFactory is Lockable {
         string calldata tokenName,
         string calldata tokenSymbol,
         uint8 tokenDecimals
-    ) external nonReentrant() returns (IExpandedIERC20 newToken) {
+    ) external nonReentrant returns (IExpandedIERC20 newToken) {
         SyntheticToken mintableToken = new SyntheticToken(tokenName, tokenSymbol, tokenDecimals);
         mintableToken.addMinter(msg.sender);
         mintableToken.addBurner(msg.sender);

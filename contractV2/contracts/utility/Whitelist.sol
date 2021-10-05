@@ -45,7 +45,7 @@ contract Whitelist is Ownable {
     */
     function addAddress(address _address)
         public
-        onlyWhitelisted()
+        onlyWhitelisted
     {
         if (whitelist[_address]) // checks if the address is already whitelisted
             return;
@@ -58,7 +58,7 @@ contract Whitelist is Ownable {
       * 
       * @param _address address to remove
     */
-    function removeAddress(address _address) public onlyWhitelisted() {
+    function removeAddress(address _address) public onlyWhitelisted {
         if (!whitelist[_address]) // checks if the address is actually whitelisted
             return;
 

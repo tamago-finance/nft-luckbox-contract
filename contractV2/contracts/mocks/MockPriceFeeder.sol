@@ -20,7 +20,7 @@ contract MockPriceFeeder is Whitelist, IChainlinkPriceFeeder {
         addAddress(msg.sender);
     }
 
-    function updateValue(uint256 _newValue) public onlyWhitelisted() {
+    function updateValue(uint256 _newValue) public onlyWhitelisted {
         value = _newValue;
         timestamp = now;
     }
@@ -42,7 +42,7 @@ contract MockPriceFeeder is Whitelist, IChainlinkPriceFeeder {
         return (pastValue,now);
     }
 
-    function setPastValue(int256 _newValue) public onlyWhitelisted() {
+    function setPastValue(int256 _newValue) public onlyWhitelisted {
         pastValue = _newValue;
     }
 
@@ -55,7 +55,7 @@ contract MockPriceFeeder is Whitelist, IChainlinkPriceFeeder {
         return (averagePrice,6);
     }
 
-    function setAveragePrice(uint256 _newValue) public onlyWhitelisted() {
+    function setAveragePrice(uint256 _newValue) public onlyWhitelisted {
         averagePrice = _newValue;
     }
 

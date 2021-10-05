@@ -21,14 +21,14 @@ contract SyntheticToken is ExpandedERC20, Lockable {
         string memory tokenName,
         string memory tokenSymbol,
         uint8 tokenDecimals
-    ) public ExpandedERC20(tokenName, tokenSymbol, tokenDecimals) nonReentrant() {}
+    ) public ExpandedERC20(tokenName, tokenSymbol, tokenDecimals) nonReentrant {}
 
     /**
      * @notice Add Minter role to account.
      * @dev The caller must have the Owner role.
      * @param account The address to which the Minter role is added.
      */
-    function addMinter(address account) external nonReentrant() {
+    function addMinter(address account) external nonReentrant {
         addMember(uint256(Roles.Minter), account);
     }
 
@@ -37,7 +37,7 @@ contract SyntheticToken is ExpandedERC20, Lockable {
      * @dev The caller must have the Owner role.
      * @param account The address from which the Minter role is removed.
      */
-    function removeMinter(address account) external nonReentrant() {
+    function removeMinter(address account) external nonReentrant {
         removeMember(uint256(Roles.Minter), account);
     }
 
@@ -46,7 +46,7 @@ contract SyntheticToken is ExpandedERC20, Lockable {
      * @dev The caller must have the Owner role.
      * @param account The address to which the Burner role is added.
      */
-    function addBurner(address account) external nonReentrant() {
+    function addBurner(address account) external nonReentrant {
         addMember(uint256(Roles.Burner), account);
     }
 
@@ -55,7 +55,7 @@ contract SyntheticToken is ExpandedERC20, Lockable {
      * @dev The caller must have the Owner role.
      * @param account The address from which the Burner role is removed.
      */
-    function removeBurner(address account) external nonReentrant() {
+    function removeBurner(address account) external nonReentrant {
         removeMember(uint256(Roles.Burner), account);
     }
 
@@ -64,7 +64,7 @@ contract SyntheticToken is ExpandedERC20, Lockable {
      * @dev The caller must have the Owner role.
      * @param account The new holder of the Owner role.
      */
-    function resetOwner(address account) external nonReentrant() {
+    function resetOwner(address account) external nonReentrant {
         resetMember(uint256(Roles.Owner), account);
     }
 
