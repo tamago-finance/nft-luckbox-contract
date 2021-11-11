@@ -273,6 +273,145 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
         );
     }
 
+    // mint synthetic tokens from the given baseCollateral tokens
+    function mintWithBaseCollateral(
+        uint256 baseCollateral, // main token
+        uint256 numTokens // synthetic tokens to be minted
+    ) public isReady nonReentrant {
+        require(baseCollateral >= 0, "baseCollateral must be greater than 0");
+        require(numTokens > 0, "numTokens must be greater than 0");
+
+        PositionData storage positionData = positions[msg.sender];
+
+        require(
+            _checkCollateralization(
+                positionData.rawBaseCollateral.add(baseCollateral),
+                positionData.rawSupportCollateral.add(0),
+                positionData.tokensOutstanding.add(numTokens)
+            ),
+            "Position below than collateralization ratio"
+        );
+
+        if (positionData.tokensOutstanding == 0) {
+            emit NewMinter(msg.sender);
+
+            if (!minters.active[msg.sender]) {
+                minters.active[msg.sender] = true;
+                uint256 index = minters.array.length;
+                minters.array.push(index);
+                minters.list[index] = msg.sender;
+            }
+        }
+
+        // Increase the position and global collateral balance by collateral amount.
+        _incrementCollateralBalances(
+            positionData,
+            baseCollateral,
+            0
+        );
+
+        // Add the number of tokens created to the position's outstanding tokens.
+        positionData.tokensOutstanding = positionData.tokensOutstanding.add(
+            numTokens
+        );
+
+        tokenOutstanding = tokenOutstanding.add(numTokens);
+
+        emit PositionCreated(
+            msg.sender,
+            baseCollateral,
+            0,
+            numTokens
+        );
+
+        // Transfer tokens into the contract from caller and mint corresponding synthetic tokens to the caller's address.
+        if (baseCollateral > 0) {
+            baseCollateralToken.safeTransferFrom(
+                msg.sender,
+                address(this),
+                baseCollateral
+            );
+        }
+
+        positionData.timestamp = block.timestamp;
+        
+        require(
+            syntheticToken.mint(msg.sender, numTokens),
+            "Minting synthetic tokens failed"
+        );
+    }
+
+    // mint synthetic tokens from the given support collateral tokens
+    function mintWithSupportCollateral(
+        uint256 supportCollateral, // stablecoin
+        uint256 numTokens // synthetic tokens to be minted
+    ) public isReady nonReentrant {
+        require(
+            supportCollateral >= 0,
+            "supportCollateral must be greater than 0"
+        );
+        require(numTokens > 0, "numTokens must be greater than 0");
+
+        PositionData storage positionData = positions[msg.sender];
+
+        require(
+            _checkCollateralization(
+                positionData.rawBaseCollateral.add(0),
+                positionData.rawSupportCollateral.add(supportCollateral),
+                positionData.tokensOutstanding.add(numTokens)
+            ),
+            "Position below than collateralization ratio"
+        );
+
+        if (positionData.tokensOutstanding == 0) {
+            emit NewMinter(msg.sender);
+
+            if (!minters.active[msg.sender]) {
+                minters.active[msg.sender] = true;
+                uint256 index = minters.array.length;
+                minters.array.push(index);
+                minters.list[index] = msg.sender;
+            }
+        }
+
+        // Increase the position and global collateral balance by collateral amount.
+        _incrementCollateralBalances(
+            positionData,
+            0,
+            supportCollateral
+        );
+
+        // Add the number of tokens created to the position's outstanding tokens.
+        positionData.tokensOutstanding = positionData.tokensOutstanding.add(
+            numTokens
+        );
+
+        tokenOutstanding = tokenOutstanding.add(numTokens);
+
+        emit PositionCreated(
+            msg.sender,
+            0,
+            supportCollateral,
+            numTokens
+        );
+
+        // Transfer tokens into the contract from caller and mint corresponding synthetic tokens to the caller's address.
+        if (supportCollateral > 0) {
+            supportCollateralToken.safeTransferFrom(
+                msg.sender,
+                address(this),
+                supportCollateral
+            );
+        }
+
+        positionData.timestamp = block.timestamp;
+        
+        require(
+            syntheticToken.mint(msg.sender, numTokens),
+            "Minting synthetic tokens failed"
+        );
+    }
+
     // increase collateralization ratio by deposit more collateral
     function deposit(
         uint256 baseCollateral, // main token
