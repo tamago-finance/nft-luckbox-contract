@@ -489,6 +489,72 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
         supportCollateralToken.safeTransfer(msg.sender, supportCollateral);
     }
 
+    // decrease collateralization ratio by withdraw base collateral as long as the new postion above the liquidation ratio
+    function withdrawBaseCollateral(
+        uint256 baseCollateral, // main token
+    ) public isReady nonReentrant {
+        PositionData storage positionData = positions[msg.sender];
+
+        require(
+            positionData.rawBaseCollateral >= baseCollateral,
+            "Insufficient base collateral tokens amount"
+        );
+
+        require(
+            _checkCollateralization(
+                positionData.rawBaseCollateral.sub(baseCollateral),
+                positionData.rawSupportCollateral.sub(0),
+                positionData.tokensOutstanding
+            ),
+            "Position below than collateralization ratio"
+        );
+
+        // Decrement the minter's collateral and global collateral amounts.
+        _decrementCollateralBalances(
+            positionData,
+            baseCollateral,
+            0 
+        );
+
+        emit Withdrawal(msg.sender, baseCollateral, 0);
+
+        // Transfer collateral from contract to minter
+        baseCollateralToken.safeTransfer(msg.sender, baseCollateral);
+    }
+
+    // decrease collateralization ratio by withdraw some collateral as long as the new postion above the liquidation ratio
+    function withdrawSupportCollateral(
+        uint256 supportCollateral // stablecoin
+    ) public isReady nonReentrant {
+        PositionData storage positionData = positions[msg.sender];
+
+        require(
+            positionData.rawSupportCollateral >= supportCollateral,
+            "Insufficient support collateral tokens amount"
+        );
+
+        require(
+            _checkCollateralization(
+                positionData.rawBaseCollateral.sub(0),
+                positionData.rawSupportCollateral.sub(supportCollateral),
+                positionData.tokensOutstanding
+            ),
+            "Position below than collateralization ratio"
+        );
+
+        // Decrement the minter's collateral and global collateral amounts.
+        _decrementCollateralBalances(
+            positionData,
+            0,
+            supportCollateral
+        );
+
+        emit Withdrawal(msg.sender, 0, supportCollateral);
+
+        // Transfer collateral from contract to minter
+        supportCollateralToken.safeTransfer(msg.sender, supportCollateral);
+    }
+
     // redeem synthetic tokens back to the minter
     function redeem(
         uint256 baseCollateral, // main token
@@ -537,6 +603,102 @@ contract TokenManager is Lockable, Whitelist, ITokenManager {
 
         // Transfer collateral from contract to caller and burn callers synthetic tokens.
         baseCollateralToken.safeTransfer(msg.sender, baseCollateral);
+        supportCollateralToken.safeTransfer(msg.sender, supportCollateral);
+
+        syntheticToken.safeTransferFrom(msg.sender, address(this), numTokens);
+        syntheticToken.burn(numTokens);
+    }
+
+    // redeem synthetic tokens back to the minter
+    function redeemWithBaseCollateral(
+        uint256 baseCollateral, // main token
+        uint256 numTokens // synthetic tokens to be redeemed
+    ) public isReady nonReentrant {
+        require(numTokens > 0, "numTokens must be greater than 0");
+
+        PositionData storage positionData = positions[msg.sender];
+
+        require(
+            positionData.rawBaseCollateral >= baseCollateral,
+            "Insufficient base collateral tokens amount"
+        );
+        require(
+            positionData.tokensOutstanding >= numTokens,
+            "Insufficient synthetics amount"
+        );
+
+        require(
+            _checkCollateralization(
+                positionData.rawBaseCollateral.sub(baseCollateral),
+                positionData.rawSupportCollateral.sub(0),
+                positionData.tokensOutstanding.sub(numTokens)
+            ),
+            "Position below than collateralization ratio"
+        );
+
+        // Decrement the minter's collateral and global collateral amounts.
+        _decrementCollateralBalances(
+            positionData,
+            baseCollateral,
+            0
+        );
+
+        positionData.tokensOutstanding = positionData.tokensOutstanding.sub(
+            numTokens
+        );
+        tokenOutstanding = tokenOutstanding.sub(numTokens);
+
+        emit Redeem(msg.sender, baseCollateral, 0, numTokens);
+
+        // Transfer collateral from contract to caller and burn callers synthetic tokens.
+        baseCollateralToken.safeTransfer(msg.sender, baseCollateral);
+
+        syntheticToken.safeTransferFrom(msg.sender, address(this), numTokens);
+        syntheticToken.burn(numTokens);
+    }
+
+    // redeem synthetic tokens back to the minter
+    function redeemWithSupportCollateral(
+        uint256 supportCollateral, // stablecoin
+        uint256 numTokens // synthetic tokens to be redeemed
+    ) public isReady nonReentrant {
+        require(numTokens > 0, "numTokens must be greater than 0");
+
+        PositionData storage positionData = positions[msg.sender];
+
+        require(
+            positionData.rawSupportCollateral >= supportCollateral,
+            "Insufficient support collateral tokens amount"
+        );
+        require(
+            positionData.tokensOutstanding >= numTokens,
+            "Insufficient synthetics amount"
+        );
+
+        require(
+            _checkCollateralization(
+                positionData.rawBaseCollateral.sub(0),
+                positionData.rawSupportCollateral.sub(supportCollateral),
+                positionData.tokensOutstanding.sub(numTokens)
+            ),
+            "Position below than collateralization ratio"
+        );
+
+        // Decrement the minter's collateral and global collateral amounts.
+        _decrementCollateralBalances(
+            positionData,
+            0,
+            supportCollateral
+        );
+
+        positionData.tokensOutstanding = positionData.tokensOutstanding.sub(
+            numTokens
+        );
+        tokenOutstanding = tokenOutstanding.sub(numTokens);
+
+        emit Redeem(msg.sender, 0, supportCollateral, numTokens);
+
+        // Transfer collateral from contract to caller and burn callers synthetic tokens.
         supportCollateralToken.safeTransfer(msg.sender, supportCollateral);
 
         syntheticToken.safeTransferFrom(msg.sender, address(this), numTokens);
