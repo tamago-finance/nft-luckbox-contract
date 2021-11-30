@@ -1,7 +1,0 @@
-{
-    "private": true,
-    "workspaces": [ 
-        "contractV1",
-        "contractV2"
-    ]
-}
