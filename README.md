@@ -1,28 +1,15 @@
-![slide](logo.png)
+# Basic Sample Hardhat Project
 
-## Overview
+This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
 
-Tamago Finance is an over-collateralization synthetic protocol for the creation of synthetic tokens backed by the value of multi-collateral crypto assets, uses Chainlink price feeds to ensure proper collateralization and during minting and redeeming processses as well as the project emerged from Chainlink Hackathon Spring 2021. 
+Try running some of the following tasks:
 
-## Documentation 
-
-The more detailed documentation is available on [docs.tamago.finance](https://docs.tamago.finance/).
-
-## Getting started
-
-The project has been setup by [Hardhat](https://hardhat.org/), make sure you know how to use it then run.
-
-`
-yarn
-`
-
-### Verification
-
-`
+```shell
+npx hardhat accounts
+npx hardhat compile
+npx hardhat clean
 npx hardhat test
-`
-
-
-## License
-
-* Open-source [MIT](LICENSE)
+npx hardhat node
+node scripts/sample-script.js
+npx hardhat help
+```
