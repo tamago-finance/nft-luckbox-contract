@@ -7,3 +7,7 @@ exports.fromEther = (value) => {
 exports.toEther = (value) => {
     return ethers.utils.parseEther(`${value}`)
 }
+
+exports.deploy = () => {
+    
+}
