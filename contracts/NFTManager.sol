@@ -50,7 +50,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager {
         // token id for this variant
         uint256 tokenId;
         // value
-        uint256 value;
+        uint256 tokenValue;
         // total tokens that been minted
         uint256 totalOutstanding;
         // total tokens that been issued 
@@ -76,7 +76,9 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager {
     // Target currency in the registry
     bytes32 public syntheticSymbol;
     // Synthetic NFT variants
-    mapping(uint256 => SyntheticVariant) public syntheticVariants;
+    mapping(uint8 => SyntheticVariant) public syntheticVariants;
+    // Total Synthetic NFT variants
+    uint8 public syntheticVariantCount;
     // Outstanding NFTs
     mapping(uint256 => uint256) public outstandingNfts;
     // Total raw collateral
@@ -141,6 +143,14 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager {
 
     }
 
+    function mint() public nonReentrant {
+
+    }
+
+    function redeem() public nonReentrant {
+        
+    }
+
     // get price per redeem token
     function getRedeemTokenPrice() public view returns (uint256) {
         require( priceResolver.isValid(redeemTokenSymbol) , "redeemTokenSymbol is not valid");
@@ -160,6 +170,30 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager {
     }
 
     // ONLY ADMIN CAN PROCEED
+
+    // add NFT variant
+    function addSyntheticVariant(
+        string memory _name,
+        uint256 _tokenId,
+        uint256 _tokenValue
+    )
+        public 
+        nonReentrant
+        onlyWhitelisted
+    {
+
+        syntheticVariants[syntheticVariantCount].name = _name;
+        syntheticVariants[syntheticVariantCount].tokenId = _tokenId;
+        syntheticVariants[syntheticVariantCount].tokenValue = _tokenValue;
+
+        syntheticVariantCount += 1;
+    }
+
+    // enable/disable synthetic NFT variant
+    function setSyntheticVariantDisable(uint8 _id, bool _disabled) public nonReentrant onlyWhitelisted {
+        require( syntheticVariantCount > _id , "Invalid given _id");
+        syntheticVariants[_id].disabled = _disabled;
+    }
 
     // update the contract state
     function setContractState(ContractState _state)

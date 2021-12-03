@@ -40,6 +40,10 @@ describe("NFTManager contract with mock feeders", () => {
             admin.address
         )
 
+        // setup NFT variants
+        await nftManager.addSyntheticVariant("Ang Bao 1 USD", 1, toEther(1))
+        await nftManager.addSyntheticVariant("Ang Bao 10 USD", 2, toEther(10))
+        await nftManager.addSyntheticVariant("Ang Bao 100 USD", 3, toEther(100))
 
     });
 
@@ -62,7 +66,23 @@ describe("NFTManager contract with mock feeders", () => {
         const syntheticNftAddress = await nftManager.syntheticNFT()
         syntheticNft = await ethers.getContractAt('SyntheticNFT', syntheticNftAddress)
 
-        
+        expect( await syntheticNft.uri(0)).to.equal("https://api.cryptokitties.co/kitties/{id}")
+
+        // check variants
+        const firstVariant = await nftManager.syntheticVariants(0);
+        expect( firstVariant[0] ).to.equal("Ang Bao 1 USD")
+        expect( firstVariant[1] ).to.equal(1)
+        expect( firstVariant[2] ).to.equal( toEther(1) )
+
+        const secondVariant = await nftManager.syntheticVariants(1);
+        expect( secondVariant[0] ).to.equal("Ang Bao 10 USD")
+        expect( secondVariant[1] ).to.equal(2)
+        expect( secondVariant[2] ).to.equal(toEther(10))
+
+        const thirdVariant = await nftManager.syntheticVariants(2);
+        expect( thirdVariant[0] ).to.equal("Ang Bao 100 USD")
+        expect( thirdVariant[1] ).to.equal(3)
+        expect( thirdVariant[2] ).to.equal(toEther(100))
 
     })
 
