@@ -110,6 +110,8 @@ contract PriceResolver is ReentrancyGuard, Whitelist, IPriceResolver {
         priceFeeders[_symbol].fallbackValue = _fallbackValue;
     }
 
-
+    function isValid(bytes32 _symbol) external override view returns (bool) {
+        return (priceFeeders[_symbol].priceFeederAddress != address(0));
+    }
 
 }

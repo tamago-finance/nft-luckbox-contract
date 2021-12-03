@@ -10,13 +10,14 @@ import "./utility/Whitelist.sol";
 import "./utility/SyntheticNFT.sol";
 import "./interfaces/IPriceResolver.sol";
 import "./interfaces/ISyntheticNFT.sol";
-import "./interfaces/ITokenManager.sol";
+import "./interfaces/INFTManager.sol";
+import "./interfaces/IShare.sol";
 
 /**
- * @title A contract to collaterizes asset and mints NFT
- */
+ * @title A contract to collaterizes LP and mints NFT
+*/
 
-contract TokenManager is ReentrancyGuard, Whitelist, ITokenManager {
+contract NFTManager is ReentrancyGuard, Whitelist, INFTManager {
     using LibMathSigned for int256;
     using LibMathUnsigned for uint256;
 
@@ -37,19 +38,10 @@ contract TokenManager is ReentrancyGuard, Whitelist, ITokenManager {
         uint256 tokenId;
         // Raw collateral value
         uint256 rawCollateral;
-        // Collateral token address
-        bytes32 rawCollateralToken;
         // Timestamp
         uint timestamp;
-    }
-
-    struct SupportCollateral {
-        // the symbol in the price feeder registry
-        bytes32 priceFeeder;
-        // ERC-20 token address
-        address tokenAddress;
-        // active status
-        bool disabled;
+        // Minter who will receive the redeem fee
+        address minter;
     }
 
     struct SyntheticVariant {
@@ -77,10 +69,10 @@ contract TokenManager is ReentrancyGuard, Whitelist, ITokenManager {
     IPriceResolver public priceResolver;
     // Synthetic NFT created by this contract.
     ISyntheticNFT public override syntheticNFT;
-    // Support collateral assets
-    mapping(uint8 => SupportCollateral) public supportCollaterals;
-    // Total support collaterals 
-    uint8 public supportCollateralCount;
+    // Collateral share
+    IShare public override collateralShare;
+    // Collateral share's symbol for price calculation
+    bytes32 public collateralShareSymbol;
     // Target currency in the registry
     bytes32 public syntheticSymbol;
     // Synthetic NFT variants
@@ -95,9 +87,14 @@ contract TokenManager is ReentrancyGuard, Whitelist, ITokenManager {
     bytes32 public redeemTokenSymbol;
     // Global collatelization ratio
     uint256 public globalCollatelizationRatio;
+    // Ratio step
+    uint256 public ratioStep;
 
     // Dev address
-    address devAddress;
+    address public devAddress;
+    // Redeem fees for minter / dev
+    uint256 public redeemFeeDev; 
+    uint256 public redeemFeeMinter;
 
     uint256 constant ONE = 1 ether; // 1
 
@@ -105,6 +102,8 @@ contract TokenManager is ReentrancyGuard, Whitelist, ITokenManager {
         string memory _name,
         string memory _nftUri,
         address _priceResolverAddress,
+        address _collateralShareAddress, // LP TOKEN
+        bytes32 _collateralShareSymbol, // LP TOKEN
         address _redeemTokenAddress, // TAMG 
         bytes32 _redeemTokenSymbol, // TAMG
         bytes32 _syntheticSymbol,
@@ -114,12 +113,18 @@ contract TokenManager is ReentrancyGuard, Whitelist, ITokenManager {
         name = _name;
         syntheticSymbol = _syntheticSymbol; 
         state = ContractState.INITIAL;
+        collateralShare = IShare(_collateralShareAddress);
+        collateralShareSymbol = _collateralShareSymbol;
         redeemToken = IERC20(_redeemTokenAddress);
         redeemTokenSymbol = _redeemTokenSymbol;
         
         priceResolver = IPriceResolver(_priceResolverAddress);
 
         globalCollatelizationRatio = 1 ether;  // should be 100% at the start
+        ratioStep = 2500000000000000; // 0.25%
+
+        redeemFeeDev = 15000000000000000; // 1.5%
+        redeemFeeMinter = 15000000000000000; // 1.5%
 
         // Deploy the synthetic NFT contract
         SyntheticNFT deployedContract = new SyntheticNFT(_nftUri);
@@ -136,8 +141,23 @@ contract TokenManager is ReentrancyGuard, Whitelist, ITokenManager {
 
     }
 
+    // get price per redeem token
+    function getRedeemTokenPrice() public view returns (uint256) {
+        require( priceResolver.isValid(redeemTokenSymbol) , "redeemTokenSymbol is not valid");
+        return priceResolver.getCurrentPrice(redeemTokenSymbol);
+    }
     
+    // get price per 1 synthetic token
+    function getSyntheticPrice() public view returns (uint256) {
+        require( priceResolver.isValid(syntheticSymbol) , "syntheticSymbol is not valid");
+        return priceResolver.getCurrentPrice(syntheticSymbol);
+    }
 
+    // get price per 1 LP
+    function getCollateralSharePrice() public view returns (uint256) {
+        require( priceResolver.isValid(collateralShareSymbol) , "collateralShareSymbol is not valid");
+        return priceResolver.getCurrentPrice(collateralShareSymbol);
+    }
 
     // ONLY ADMIN CAN PROCEED
 
@@ -202,6 +222,43 @@ contract TokenManager is ReentrancyGuard, Whitelist, ITokenManager {
         onlyWhitelisted
     {
         redeemTokenSymbol = _symbol;
+    }
+
+    // update collateral share contract address
+    function setCollateralShare(address _address)
+        public
+        nonReentrant
+        onlyWhitelisted
+    {
+        collateralShare = IShare(_address);
+    }
+
+    // update collateral share symbol
+    function setCollateralShareSymbol(bytes32 _symbol)
+        public 
+        nonReentrant
+        onlyWhitelisted
+    {
+        collateralShareSymbol = _symbol;
+    }
+
+    // update step ratio
+    function setRatioStep(uint256 _ratioStep) 
+        public
+        nonReentrant
+        onlyWhitelisted
+    {
+        ratioStep = _ratioStep;
+    }
+
+    // update redeem fees
+    function setRedeemFees(uint256 _minter, uint256 _dev)
+        public
+        nonReentrant
+        onlyWhitelisted
+    {
+        redeemFeeDev = _dev;
+        redeemFeeMinter = _minter;
     }
 
     // INTERNAL FUNCTIONS
