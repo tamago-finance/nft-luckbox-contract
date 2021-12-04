@@ -30,7 +30,7 @@ describe("NFTManager contract with mock feeders", () => {
 
         nftManager = await NFTManager.deploy(
             "Ang Bao USD",
-            "https://api.cryptokitties.co/kitties/{id}",
+            "ERC-1155_URI",
             priceResolver.address,
             shareToken.address,
             ethers.utils.formatBytes32String("USDC-TAMG-SHARE/USD"),
@@ -50,40 +50,96 @@ describe("NFTManager contract with mock feeders", () => {
     it('verify initial params', async () => {
 
         // intial params
-        expect( await nftManager.name() ).to.equal("Ang Bao USD")
-        expect( await nftManager.priceResolver()).to.equal( priceResolver.address)
-        expect( await nftManager.collateralShare()).to.equal( shareToken.address)
-        expect( await nftManager.redeemToken()).to.equal( tamgToken.address)
-        expect( await nftManager.devAddress()).to.equal( admin.address)
+        expect(await nftManager.name()).to.equal("Ang Bao USD")
+        expect(await nftManager.priceResolver()).to.equal(priceResolver.address)
+        expect(await nftManager.collateralShare()).to.equal(shareToken.address)
+        expect(await nftManager.redeemToken()).to.equal(tamgToken.address)
+        expect(await nftManager.devAddress()).to.equal(admin.address)
 
         // check prices
         expect(await nftManager.getRedeemTokenPrice()).to.equal(toEther(0.4))
         expect(await nftManager.getSyntheticPrice()).to.equal(toEther(1))
         expect(await nftManager.getCollateralSharePrice()).to.equal(toEther(1380000))
 
-        // base URI of ERC-1155
-
+        // update base URI of ERC-1155
         const syntheticNftAddress = await nftManager.syntheticNFT()
         syntheticNft = await ethers.getContractAt('SyntheticNFT', syntheticNftAddress)
 
-        expect( await syntheticNft.uri(0)).to.equal("https://api.cryptokitties.co/kitties/{id}")
+        await nftManager.setNftUri("https://api.cryptokitties.co/kitties/{id}")
+        expect(await syntheticNft.uri(0)).to.equal("https://api.cryptokitties.co/kitties/{id}")
 
         // check variants
         const firstVariant = await nftManager.syntheticVariants(0);
-        expect( firstVariant[0] ).to.equal("Ang Bao 1 USD")
-        expect( firstVariant[1] ).to.equal(1)
-        expect( firstVariant[2] ).to.equal( toEther(1) )
+        expect(firstVariant[0]).to.equal("Ang Bao 1 USD")
+        expect(firstVariant[1]).to.equal(1)
+        expect(firstVariant[2]).to.equal(toEther(1))
 
         const secondVariant = await nftManager.syntheticVariants(1);
-        expect( secondVariant[0] ).to.equal("Ang Bao 10 USD")
-        expect( secondVariant[1] ).to.equal(2)
-        expect( secondVariant[2] ).to.equal(toEther(10))
+        expect(secondVariant[0]).to.equal("Ang Bao 10 USD")
+        expect(secondVariant[1]).to.equal(2)
+        expect(secondVariant[2]).to.equal(toEther(10))
 
         const thirdVariant = await nftManager.syntheticVariants(2);
-        expect( thirdVariant[0] ).to.equal("Ang Bao 100 USD")
-        expect( thirdVariant[1] ).to.equal(3)
-        expect( thirdVariant[2] ).to.equal(toEther(100))
+        expect(thirdVariant[0]).to.equal("Ang Bao 100 USD")
+        expect(thirdVariant[1]).to.equal(3)
+        expect(thirdVariant[2]).to.equal(toEther(100))
 
     })
+
+    it('force mint x3 Ang Bao 10 USD', async () => {
+
+        // check required LP share need to mint
+        const syntheticPrice = fromEther(await nftManager.getSyntheticPrice())
+        const sharePrice = fromEther(await nftManager.getCollateralSharePrice())
+
+        const nftValue = fromEther((await nftManager.syntheticVariants(1))[2])
+
+        const lpPerNft = Number(nftValue) * Number(syntheticPrice) / Number(sharePrice)
+
+        await shareToken.approve(nftManager.address, ethers.constants.MaxUint256)
+
+        for (let i = 0; i < 3; i++) {
+            await nftManager.forceMint(1, toEther(lpPerNft.toFixed(18)))
+        }
+
+        expect((await syntheticNft.balanceOf(admin.address, 2))).to.equal(3)
+
+        // verify entries
+        expect(await nftManager.getMinterAmount(admin.address, 1)).to.equal(3)
+
+        let variantInfo = await nftManager.syntheticVariants(1)
+
+        expect(variantInfo.totalOutstanding).to.equal(toEther(30))
+        expect((variantInfo.totalIssued)).to.equal(3)
+        expect(fromEther(variantInfo.totalRawCollateral)).to.equal("0.000021739130434782")
+        expect(fromEther(await nftManager.totalRawCollateral())).to.equal("0.000021739130434782")
+        expect((await nftManager.totalOutstanding())).to.equal(toEther(30))
+
+        // check the collatelization ratio
+
+        expect( fromEther( await nftManager.globalCollatelizationRatio()) ).to.equal("0.999999999999972")
+        expect( fromEther( await nftManager.variantCollatelizationRatio(1)) ).to.equal("0.999999999999972")
+
+        // redeem all NFTs back
+
+        await syntheticNft.setApprovalForAll(nftManager.address, true)
+
+        for (let i = 0; i < 3; i++) {
+            await nftManager.forceRedeem(1, toEther(lpPerNft.toFixed(18)))
+        }
+
+        // verfiy entires
+        expect(await nftManager.getMinterAmount(admin.address, 1)).to.equal(0)
+
+        variantInfo = await nftManager.syntheticVariants(1)
+
+        expect(variantInfo.totalOutstanding).to.equal(0)
+        expect((variantInfo.totalBurnt)).to.equal(3)
+
+        expect((variantInfo.totalRawCollateral)).to.equal(0)
+        expect( await nftManager.totalRawCollateral()).to.equal(0)
+        expect( await nftManager.totalOutstanding()).to.equal(0)
+    })
+
 
 })
