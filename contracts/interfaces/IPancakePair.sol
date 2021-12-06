@@ -2,9 +2,7 @@
 
 pragma solidity ^0.6.0;
 
-// derived from IPancakePair
-
-interface IShare {
+interface IPancakePair {
     event Approval(address indexed owner, address indexed spender, uint value);
     event Transfer(address indexed from, address indexed to, uint value);
 
