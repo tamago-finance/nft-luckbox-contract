@@ -382,15 +382,6 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         priceResolver = IPriceResolver(_priceResolverAddress);
     }
 
-    // update the synthetic symbol
-    function setSyntheticSymbol(bytes32 _syntheticSymbol)
-        public
-        nonReentrant
-        onlyWhitelisted
-    {
-        syntheticSymbol = _syntheticSymbol;
-    }
-
     // update dev address
     function setDevAddress(address _devAddress)
         public
@@ -403,42 +394,6 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     // update NFT uri
     function setNftUri(string memory _uri) public nonReentrant onlyWhitelisted {
         syntheticNFT.setUri(_uri);
-    }
-
-    // update redeem token contract address
-    function setRedeemTokenAddress(address _address)
-        public
-        nonReentrant
-        onlyWhitelisted
-    {
-        redeemToken = IERC20(_address);
-    }
-
-    // update redeem token symbol
-    function setRedeemTokenSymbol(bytes32 _symbol)
-        public
-        nonReentrant
-        onlyWhitelisted
-    {
-        redeemTokenSymbol = _symbol;
-    }
-
-    // update collateral share contract address
-    function setCollateralShare(address _address)
-        public
-        nonReentrant
-        onlyWhitelisted
-    {
-        collateralShare = IPancakePair(_address);
-    }
-
-    // update collateral share symbol
-    function setCollateralShareSymbol(bytes32 _symbol)
-        public
-        nonReentrant
-        onlyWhitelisted
-    {
-        collateralShareSymbol = _symbol;
     }
 
     // update redeem fees
