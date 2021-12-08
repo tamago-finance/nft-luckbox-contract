@@ -97,7 +97,7 @@ exports.deployPriceResolver = async ({
         this.toEther(0.9998)
     )
     await priceResolver.registerPriceFeeder(
-        ethers.utils.formatBytes32String("TAMG/USD"),
+        ethers.utils.formatBytes32String("TAMG/USDC"),
         feederTamg.address,
         false,
         this.toEther(0.4)
@@ -109,7 +109,7 @@ exports.deployPriceResolver = async ({
         this.toEther(1)
     )
     await priceResolver.registerPriceFeeder(
-        ethers.utils.formatBytes32String("USDC-TAMG-SHARE/USD"),
+        ethers.utils.formatBytes32String("USDC-TAMG-SHARE"),
         feederUsdcTamgShare.address,
         false,
         this.toEther(1380000)
