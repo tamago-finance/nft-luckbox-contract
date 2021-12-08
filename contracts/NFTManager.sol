@@ -155,18 +155,13 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
             addAddress(msg.sender);
         }
 
-        IERC20( collateralShare.token0() ).approve(ROUTER_ADDRESS , MAX_UINT256 );
-        IERC20( collateralShare.token1() ).approve(ROUTER_ADDRESS , MAX_UINT256 );
+        if (collateralShare.token0() != address(0)) {
+            IERC20( collateralShare.token0() ).approve(ROUTER_ADDRESS , MAX_UINT256 );
+            IERC20( collateralShare.token1() ).approve(ROUTER_ADDRESS , MAX_UINT256 );
+        }
     }
 
-    function mint(uint8 _id, uint256 _tokenAmount) public nonReentrant isReady {
-        require(syntheticVariantCount > _id, "Invalid given _id");
-        require(
-            syntheticVariants[_id].disabled == false,
-            "The given _id is disabled"
-        );
-        require( _tokenAmount != 0, "_tokenAmount can't be zero");
-        require( MAX_NFT >= _tokenAmount , "Exceed MAX_NFT");
+    function mint(uint8 _id, uint256 _tokenAmount) public nonReentrant isReady validateId(_id, _tokenAmount) {
 
         (uint256 baseAmount, uint256 pairAmount) = _estimateMint(_id, _tokenAmount);
 
@@ -197,15 +192,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
 
     }
 
-    function estimateMint(uint8 _id, uint256 _tokenAmount) public view returns (uint256 baseTokenAmount, uint256 pairTokenAmount) {
-        require(syntheticVariantCount > _id, "Invalid given _id");
-        require(
-            syntheticVariants[_id].disabled == false,
-            "The given _id is disabled"
-        );
-        require( _tokenAmount != 0, "_tokenAmount can't be zero");
-        require( MAX_NFT >= _tokenAmount , "Exceed MAX_NFT");
-        
+    function estimateMint(uint8 _id, uint256 _tokenAmount) public validateId(_id, _tokenAmount) view returns (uint256 baseTokenAmount, uint256 pairTokenAmount) {
         return _estimateMint(_id, _tokenAmount);
     }
 
@@ -304,15 +291,8 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         public
         nonReentrant
         onlyWhitelisted
+        validateId(_id, _tokenAmount)
     {
-        require(syntheticVariantCount > _id, "Invalid given _id");
-        require(
-            syntheticVariants[_id].disabled == false,
-            "The given _id is disabled"
-        );
-        require( _tokenAmount != 0, "_tokenAmount can't be zero");
-        require( MAX_NFT >= _tokenAmount , "Exceed MAX_NFT");
-
         _createPosition(_id, _collateralAmount, _tokenAmount);
 
         // FIXME: use safeTransferFrom
@@ -336,10 +316,8 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         public
         nonReentrant
         onlyWhitelisted
+        validateId(_id, _tokenAmount)
     {
-        require(syntheticVariantCount > _id, "Invalid given _id");
-        require( _tokenAmount != 0, "_tokenAmount can't be zero");
-        require( MAX_NFT >= _tokenAmount , "Exceed MAX_NFT");
         
         _removePosition(_id, _collateralAmount, _tokenAmount);
 
@@ -410,6 +388,17 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     // Check if the state is ready
     modifier isReady() {
         require((state) == ContractState.NORMAL, "Contract state is not ready");
+        _;
+    }
+
+    modifier validateId(uint8 _id, uint256 _tokenAmount) {
+        require(syntheticVariantCount > _id, "Invalid given _id");
+        require(
+            syntheticVariants[_id].disabled == false,
+            "The given _id is disabled"
+        );
+        require( _tokenAmount != 0, "_tokenAmount can't be zero");
+        require( MAX_NFT >= _tokenAmount , "Exceed MAX_NFT");
         _;
     }
 
