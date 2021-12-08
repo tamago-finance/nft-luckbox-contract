@@ -22,12 +22,13 @@ describe("NFTManager contract with mocks", () => {
         const PriceResolver = await ethers.getContractFactory("PriceResolver");
         const NFTManager = await ethers.getContractFactory("NFTManager");
         const MockERC20 = await ethers.getContractFactory("MockERC20");
+        const MockLP = await ethers.getContractFactory("MockLP");
         const MockPriceFeeder = await ethers.getContractFactory("MockPriceFeeder");
 
         priceResolver = await deployPriceResolverMock({ PriceResolver, MockPriceFeeder, admin })
 
         tamgToken = await MockERC20.deploy("Tamago Token", "TAMG")
-        shareToken = await MockERC20.deploy("Share Token", "SHARE")
+        shareToken = await MockLP.deploy("Share Token", "SHARE")
 
         nftManager = await NFTManager.deploy(
             "Ang Bao USD",
