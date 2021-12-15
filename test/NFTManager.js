@@ -36,8 +36,6 @@ describe("NFTManager contract with mocks", () => {
             priceResolver.address,
             shareToken.address,
             ethers.utils.formatBytes32String("USDC-TAMG-SHARE/USD"),
-            tamgToken.address,
-            ethers.utils.formatBytes32String("TAMG/USD"),
             ethers.utils.formatBytes32String("USD"),
             admin.address
         )
@@ -55,11 +53,9 @@ describe("NFTManager contract with mocks", () => {
         expect(await nftManager.name()).to.equal("Ang Bao USD")
         expect(await nftManager.priceResolver()).to.equal(priceResolver.address)
         expect(await nftManager.collateralShare()).to.equal(shareToken.address)
-        expect(await nftManager.redeemToken()).to.equal(tamgToken.address)
         expect(await nftManager.devAddress()).to.equal(admin.address)
 
         // check prices
-        expect(await nftManager.getRedeemTokenPrice()).to.equal(toEther(0.4))
         expect(await nftManager.getSyntheticPrice()).to.equal(toEther(1))
         expect(await nftManager.getCollateralSharePrice()).to.equal(toEther(1380000))
 
@@ -118,8 +114,8 @@ describe("NFTManager contract with mocks", () => {
         expect((await nftManager.totalOutstanding())).to.equal(toEther(30))
 
         // check the collatelization ratio
-        expect( fromEther( await nftManager.globalCollatelizationRatio()) ).to.equal("0.999999999999972")
-        expect( fromEther( await nftManager.variantCollatelizationRatio(1)) ).to.equal("0.999999999999972")
+        expect(fromEther(await nftManager.globalCollatelizationRatio())).to.equal("0.999999999999972")
+        expect(fromEther(await nftManager.variantCollatelizationRatio(1))).to.equal("0.999999999999972")
 
         // redeem all NFTs back
 
@@ -138,10 +134,37 @@ describe("NFTManager contract with mocks", () => {
         expect((variantInfo.totalBurnt)).to.equal(3)
 
         expect((variantInfo.totalRawCollateral)).to.equal(0)
-        expect( await nftManager.totalRawCollateral()).to.equal(0)
-        expect( await nftManager.totalOutstanding()).to.equal(0)
+        expect(await nftManager.totalRawCollateral()).to.equal(0)
+        expect(await nftManager.totalOutstanding()).to.equal(0)
     })
 
+
+    it('verify CR offset/discount', async () => {
+
+        const syntheticPrice = fromEther(await nftManager.getSyntheticPrice())
+        const sharePrice = fromEther(await nftManager.getCollateralSharePrice())
+        const nftValue = fromEther((await nftManager.syntheticVariants(1))[2])
+        const lpPerNft = Number(nftValue) * Number(syntheticPrice) / Number(sharePrice)
+
+        // mint 1 NFT with 50% value backed
+        await nftManager.forceMint(1, toEther((lpPerNft * 0.5).toFixed(18)), 1)
+
+        expect(fromEther(await nftManager.globalCollatelizationRatio())).to.equal("0.499999999999986") // 49%
+
+        // check target CR
+        expect(fromEther((await nftManager.targetCollatelizationRatio(1))[0])).to.equal("0.75204844781942852") // offset
+        expect(fromEther((await nftManager.targetCollatelizationRatio(1))[1])).to.equal("1.0") // discount
+
+
+        // mint another 1 NFT to shift the CR > 1
+        await nftManager.forceMint(1, toEther((lpPerNft * 3).toFixed(18)), 1)
+
+        // then check the params
+        expect(fromEther(await nftManager.globalCollatelizationRatio())).to.equal("1.75000000000002") // 175%
+        expect(fromEther((await nftManager.targetCollatelizationRatio(1))[0])).to.equal("1.0") // offset
+        expect(fromEther((await nftManager.targetCollatelizationRatio(1))[1])).to.equal("1.237418056046240693") // discount
+
+    })
 
 })
 
@@ -157,54 +180,57 @@ describe("NFTManager contract on forked Polygon chain", () => {
 
     before(async () => {
 
-        [admin, alice, bob, charlie] = await ethers.getSigners();
+        try {
 
-        const PriceResolver = await ethers.getContractFactory("PriceResolver");
-        const NFTManager = await ethers.getContractFactory("NFTManager");
+            [admin, alice, bob, charlie] = await ethers.getSigners();
 
-        const MockPriceFeeder = await ethers.getContractFactory("MockPriceFeeder");
-        const ChainlinkPriceFeeder = await ethers.getContractFactory("ChainlinkPriceFeeder");
-        const QuickswapTokenFeeder = await ethers.getContractFactory("QuickswapTokenFeeder");
-        const QuickswapLPFeeder = await ethers.getContractFactory("QuickswapLPFeeder");
+            const PriceResolver = await ethers.getContractFactory("PriceResolver");
+            const NFTManager = await ethers.getContractFactory("NFTManager");
 
-        tamgToken = await ethers.getContractAt('MockERC20', TAMG_ADDRESS)
-        usdcToken = await ethers.getContractAt('MockERC20', USDC_ADDRESS)
-        shareToken = await ethers.getContractAt("IPancakePair", USDC_TAMG_LP_ADDRESS)
+            const MockPriceFeeder = await ethers.getContractFactory("MockPriceFeeder");
+            const ChainlinkPriceFeeder = await ethers.getContractFactory("ChainlinkPriceFeeder");
+            const QuickswapTokenFeeder = await ethers.getContractFactory("QuickswapTokenFeeder");
+            const QuickswapLPFeeder = await ethers.getContractFactory("QuickswapLPFeeder");
 
-        priceResolver = await deployPriceResolver({
-            PriceResolver,
-            MockPriceFeeder,
-            ChainlinkPriceFeeder,
-            QuickswapTokenFeeder,
-            QuickswapLPFeeder,
-            TamgToken: tamgToken,
-            Admin: admin
-        })
+            tamgToken = await ethers.getContractAt('MockERC20', TAMG_ADDRESS)
+            usdcToken = await ethers.getContractAt('MockERC20', USDC_ADDRESS)
+            shareToken = await ethers.getContractAt("IPancakePair", USDC_TAMG_LP_ADDRESS)
 
-        nftManager = await NFTManager.deploy(
-            "Ang Bao USD",
-            "https://api.cryptokitties.co/kitties/{id}",
-            priceResolver.address,
-            shareToken.address,
-            ethers.utils.formatBytes32String("USDC-TAMG-SHARE"),
-            tamgToken.address,
-            ethers.utils.formatBytes32String("TAMG/USDC"),
-            ethers.utils.formatBytes32String("USD"),
-            admin.address
-        )
+            priceResolver = await deployPriceResolver({
+                PriceResolver,
+                MockPriceFeeder,
+                ChainlinkPriceFeeder,
+                QuickswapTokenFeeder,
+                QuickswapLPFeeder,
+                TamgToken: tamgToken,
+                Admin: admin
+            })
 
-        // setup NFT variants
-        await nftManager.addSyntheticVariant("Ang Bao 1 USD", 1, toEther(1))
-        await nftManager.addSyntheticVariant("Ang Bao 10 USD", 2, toEther(10))
-        await nftManager.addSyntheticVariant("Ang Bao 100 USD", 3, toEther(100))
+            nftManager = await NFTManager.deploy(
+                "Ang Bao USD",
+                "https://api.cryptokitties.co/kitties/{id}",
+                priceResolver.address,
+                shareToken.address,
+                ethers.utils.formatBytes32String("USDC-TAMG-SHARE"),
+                ethers.utils.formatBytes32String("USD"),
+                admin.address
+            )
 
-        await nftManager.setContractState(1)
+            // setup NFT variants
+            await nftManager.addSyntheticVariant("Ang Bao 1 USD", 1, toEther(1))
+            await nftManager.addSyntheticVariant("Ang Bao 10 USD", 2, toEther(10))
+            await nftManager.addSyntheticVariant("Ang Bao 100 USD", 3, toEther(100))
 
-        const syntheticNftAddress = await nftManager.syntheticNFT()
-        syntheticNft = await ethers.getContractAt('SyntheticNFT', syntheticNftAddress)
+            await nftManager.setContractState(1)
 
-        // trade TAMG
-        router = await ethers.getContractAt('IPancakeRouter02', ROUTER_ADDRESS)
+            const syntheticNftAddress = await nftManager.syntheticNFT()
+            syntheticNft = await ethers.getContractAt('SyntheticNFT', syntheticNftAddress)
+
+            // trade TAMG
+            router = await ethers.getContractAt('IPancakeRouter02', ROUTER_ADDRESS)
+        } catch (e) {
+
+        }
 
 
     });
@@ -220,7 +246,6 @@ describe("NFTManager contract on forked Polygon chain", () => {
             expect(await nftManager.name()).to.equal("Ang Bao USD")
             expect(await nftManager.priceResolver()).to.equal(priceResolver.address)
             expect(await nftManager.collateralShare()).to.equal(shareToken.address)
-            expect(await nftManager.redeemToken()).to.equal(tamgToken.address)
             expect(await nftManager.devAddress()).to.equal(admin.address)
 
         } catch (e) {
@@ -229,7 +254,7 @@ describe("NFTManager contract on forked Polygon chain", () => {
 
     })
 
-    it('Mint/redeem x3 Ang Bao 10 USD', async () => {
+    it('Mint/redeem Ang Bao NFTs', async () => {
 
         try {
             // buy USDC /w 1000 Matic
@@ -252,7 +277,7 @@ describe("NFTManager contract on forked Polygon chain", () => {
             await usdcToken.approve(nftManager.address, ethers.constants.MaxUint256)
 
             // mint x3 Ang Bao NFTs
-            await nftManager.mint( 1, 3 )
+            await nftManager.mint(1, 3)
 
             // verify
             expect((await syntheticNft.balanceOf(admin.address, 2))).to.equal(3)
@@ -262,13 +287,57 @@ describe("NFTManager contract on forked Polygon chain", () => {
 
             expect(variantInfo.totalOutstanding).to.equal(toEther(30))
             expect((variantInfo.totalIssued)).to.equal(3)
-            expect( variantInfo.totalRawCollateral).to.not.equal(0)
-            expect( await nftManager.totalRawCollateral()).to.not.equal(0)
+            expect(variantInfo.totalRawCollateral).to.not.equal(0)
+            expect(await nftManager.totalRawCollateral()).to.not.equal(0)
 
-            expect( Number(fromEther(await nftManager.globalCollatelizationRatio())) > 0.9 ).to.true
-            expect( Number(fromEther(await nftManager.variantCollatelizationRatio(1))) > 0.9 ).to.true
+            expect(Number(fromEther(await nftManager.globalCollatelizationRatio())) > 0.9).to.true
+            expect(Number(fromEther(await nftManager.variantCollatelizationRatio(1))) > 0.9).to.true
 
-            // TODO : Redeem
+            // mint x1 NFT without collaterals to bring down the CR
+            await nftManager.forceMint(1, 0, 2)
+
+            expect( 0.8 > Number(fromEther(await nftManager.variantCollatelizationRatio(1)))).to.true
+
+            await syntheticNft.setApprovalForAll(nftManager.address, true)
+
+            await nftManager.redeem( 1, 2 )
+
+            expect((await syntheticNft.balanceOf(admin.address, 2))).to.equal(4)
+        } catch (e) {
+            console.log(e)
+        }
+
+    })
+
+    it('Mint x1 NFT when the CR > 1', async () => {
+
+        try {
+
+            // trade LP tokens
+            await tamgToken.approve(router.address, ethers.constants.MaxUint256)
+            await usdcToken.approve(router.address, ethers.constants.MaxUint256)
+            await shareToken.approve(nftManager.address, ethers.constants.MaxUint256)
+            
+            // estimate USDC, TAMG tokens needed to mint 5 NFTs
+            const inputs = await nftManager.estimateMint(1, 5)
+            const baseAmount = Number(ethers.utils.formatUnits(inputs[0], 6))
+            const pairAmount = Number(ethers.utils.formatUnits(inputs[1], 18))
+
+            await router.addLiquidity(usdcToken.address, tamgToken.address, ethers.utils.parseUnits( `${baseAmount}` , 6 ), ethers.utils.parseUnits( `${pairAmount}` , 18 ) , ethers.utils.parseUnits( `${(baseAmount * 0.97).toFixed(6)}`, 6 ), ethers.utils.parseUnits( `${ (pairAmount * 0.97).toFixed(18)}` , 18), admin.address, 9999999999999)
+
+            // mint x1 NFT with 5x collaterals to bring up the CR
+            await nftManager.forceMint(1,  await shareToken.balanceOf(admin.address) , 1)
+
+            const beforeMintRatio = await nftManager.variantCollatelizationRatio(1)
+                
+            expect(Number(fromEther(beforeMintRatio)) > 1.1).to.true
+
+            console.log(Number(fromEther(await nftManager.variantCollatelizationRatio(1))))
+
+            // mint x2 Ang Bao NFTs
+            await nftManager.mint(1, 2)
+
+            console.log(Number(fromEther(await nftManager.variantCollatelizationRatio(1))))
 
         } catch (e) {
             console.log(e)

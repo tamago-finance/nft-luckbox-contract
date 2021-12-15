@@ -54,7 +54,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
 
     struct Minter {
         mapping(uint8 => uint256) amount;
-        uint timestamp;
+        uint256 timestamp;
         uint256 redeemClaimed;
     }
 
@@ -82,26 +82,25 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     uint256 public totalRawCollateral;
     // Total NFT synthetics outstanding
     uint256 public totalOutstanding;
-    // Redeem token
-    IERC20 public redeemToken;
-    // Redeem token's symbol for price calculation
-    bytes32 public redeemTokenSymbol;
-
     // Dev address
     address public devAddress;
     // Redeem fee
     uint256 public redeemFee;
+    // Ignore offset/discount fees when active
+    bool public offsetDisabled;
+    bool public discountDisabled;
 
     // cooldown period before the minter can mint again
     uint256 COOLDOWN_PERIOD = 1 minutes;
-    // max collateral ratio before the offset / bonus in place
-    uint256 MAX_COLLATERAL_RATIO = 1 ether; // 100%
     // max NFT that can be minted per time
     uint256 MAX_NFT = 20;
 
     uint256 constant ONE = 1 ether; // 1
     uint256 constant MAX_UINT256 = uint256(-1);
-    address constant ROUTER_ADDRESS = 0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff; // Quickswap Router
+    address constant ROUTER_ADDRESS =
+        0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff; // Quickswap Router
+    int256 constant BASE = 10 ether;
+    int256 constant K = 9.3 ether;
 
     event PositionCreated(
         address minter,
@@ -125,8 +124,6 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         address _priceResolverAddress,
         address _collateralShareAddress, // LP TOKEN
         bytes32 _collateralShareSymbol, // LP TOKEN
-        address _redeemTokenAddress, // TAMG
-        bytes32 _redeemTokenSymbol, // TAMG
         bytes32 _syntheticSymbol,
         address _devAddress
     ) public nonReentrant {
@@ -135,8 +132,6 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         state = ContractState.INITIAL;
         collateralShare = IPancakePair(_collateralShareAddress);
         collateralShareSymbol = _collateralShareSymbol;
-        redeemToken = IERC20(_redeemTokenAddress);
-        redeemTokenSymbol = _redeemTokenSymbol;
 
         priceResolver = IPriceResolver(_priceResolverAddress);
 
@@ -156,28 +151,83 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         }
 
         if (collateralShare.token0() != address(0)) {
-            IERC20( collateralShare.token0() ).approve(ROUTER_ADDRESS , MAX_UINT256 );
-            IERC20( collateralShare.token1() ).approve(ROUTER_ADDRESS , MAX_UINT256 );
+            IERC20(collateralShare.token0()).approve(
+                ROUTER_ADDRESS,
+                MAX_UINT256
+            );
+            IERC20(collateralShare.token1()).approve(
+                ROUTER_ADDRESS,
+                MAX_UINT256
+            );
+            IERC20(address(collateralShare)).approve(
+                ROUTER_ADDRESS,
+                MAX_UINT256
+            );
         }
     }
 
-    function mint(uint8 _id, uint256 _tokenAmount) public nonReentrant isReady validateId(_id, _tokenAmount) {
+    function estimateMint(uint8 _id, uint256 _tokenAmount)
+        public
+        view
+        validateId(_id, _tokenAmount)
+        returns (uint256 baseTokenAmount, uint256 pairTokenAmount, uint256 lpAmount, uint256 discount)
+    {
+        ( baseTokenAmount, pairTokenAmount, lpAmount, discount) = _estimateMint(
+            _id,
+            _tokenAmount
+        );
+    }
 
-        (uint256 baseAmount, uint256 pairAmount) = _estimateMint(_id, _tokenAmount);
+    function estimateRedeem(uint8 _id, uint256 _tokenAmount)
+        public
+        view
+        validateId(_id, _tokenAmount)
+        returns (
+            uint256 baseTokenAmount,
+            uint256 pairTokenAmount,
+            uint256 lpAmount,
+            uint256 offset
+        )
+    {
+        (baseTokenAmount, pairTokenAmount, lpAmount, offset ) = _estimateRedeem(
+            _id,
+            _tokenAmount
+        );
+    }
 
-        // take both ERC-20 tokens
-        IERC20( collateralShare.token0() ).safeTransferFrom(
+    function mint(uint8 _id, uint256 _tokenAmount)
+        public
+        nonReentrant
+        isReady
+        validateId(_id, _tokenAmount)
+    {
+        (uint256 baseAmount, uint256 pairAmount, , ) = _estimateMint(
+            _id,
+            _tokenAmount
+        );
+
+        // takes ERC-20 tokens
+        IERC20(collateralShare.token0()).safeTransferFrom(
             msg.sender,
             address(this),
             baseAmount
         );
-        IERC20( collateralShare.token1() ).safeTransferFrom(
+        IERC20(collateralShare.token1()).safeTransferFrom(
             msg.sender,
             address(this),
             pairAmount
         );
 
-        (,,uint lpAmount ) = IPancakeRouter02(ROUTER_ADDRESS).addLiquidity(collateralShare.token0(), collateralShare.token1() ,  baseAmount , pairAmount , baseAmount.wmul(970000000000000000), pairAmount.wmul(970000000000000000), address(this), now + 86400);
+        (, , uint256 lpAmount) = IPancakeRouter02(ROUTER_ADDRESS).addLiquidity(
+            collateralShare.token0(),
+            collateralShare.token1(),
+            baseAmount,
+            pairAmount,
+            baseAmount.wmul(0.97 ether),
+            pairAmount.wmul(0.97 ether),
+            address(this),
+            now + 86400
+        );
 
         _createPosition(_id, lpAmount, _tokenAmount);
 
@@ -188,24 +238,52 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
             _tokenAmount,
             _toBytes(0)
         );
-
-
     }
 
-    function estimateMint(uint8 _id, uint256 _tokenAmount) public validateId(_id, _tokenAmount) view returns (uint256 baseTokenAmount, uint256 pairTokenAmount) {
-        return _estimateMint(_id, _tokenAmount);
-    }
+    
 
-    function redeem() public nonReentrant {}
+    function redeem(uint8 _id, uint256 _tokenAmount)
+        public
+        nonReentrant
+        isReady
+        validateId(_id, _tokenAmount)
+    {
+        (, , uint256 lpAmount,) = _estimateRedeem(_id, _tokenAmount);
 
-    // get price per redeem token
-    function getRedeemTokenPrice() public view returns (uint256) {
-        require(
-            priceResolver.isValid(redeemTokenSymbol),
-            "redeemTokenSymbol is not valid"
+        _removePosition(_id, lpAmount, _tokenAmount);
+
+        // burn NFT
+        syntheticNFT.safeTransferFrom(
+            msg.sender,
+            address(this),
+            syntheticVariants[_id].tokenId,
+            _tokenAmount,
+            _toBytes(0)
         );
-        return priceResolver.getCurrentPrice(redeemTokenSymbol);
+        syntheticNFT.burn(
+            address(this),
+            syntheticVariants[_id].tokenId,
+            _tokenAmount
+        );
+
+        (uint256 baseTokenAmount, uint256 pairTokenAmount) = IPancakeRouter02(
+            ROUTER_ADDRESS
+        ).removeLiquidity(
+                collateralShare.token0(),
+                collateralShare.token1(),
+                lpAmount,
+                0,
+                0,
+                address(this),
+                now + 86400
+            );
+
+        // return tokens back
+        IERC20(collateralShare.token0()).transfer(msg.sender, baseTokenAmount);
+        IERC20(collateralShare.token1()).transfer(msg.sender, pairTokenAmount);
     }
+
+    
 
     // get price per 1 synthetic token
     function getSyntheticPrice() public view returns (uint256) {
@@ -226,14 +304,22 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     }
 
     // total token that the given minter has been minted
-    function getMinterAmount(address _minter, uint8 _id) public view returns (uint256) {
+    function getMinterAmount(address _minter, uint8 _id)
+        public
+        view
+        returns (uint256)
+    {
         return minters[_minter].amount[_id];
     }
 
     // check global CR for this synthetic NFT
     function globalCollatelizationRatio() public view returns (uint256) {
-        require( totalRawCollateral > 0, "No collaterals in the contract");
-        return _calculateCollateralizationRatio( totalRawCollateral, totalOutstanding );
+        require(totalRawCollateral > 0, "No collaterals in the contract");
+        return
+            _calculateCollateralizationRatio(
+                totalRawCollateral,
+                totalOutstanding
+            );
     }
 
     // check CR for each variant
@@ -245,11 +331,24 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         require(syntheticVariantCount > _id, "Invalid given _id");
 
         if (syntheticVariants[_id].totalRawCollateral > 0) {
-            return _calculateCollateralizationRatio( syntheticVariants[_id].totalRawCollateral, syntheticVariants[_id].totalOutstanding );
+            return
+                _calculateCollateralizationRatio(
+                    syntheticVariants[_id].totalRawCollateral,
+                    syntheticVariants[_id].totalOutstanding
+                );
         } else {
             // return 100% when no collaterals
             return 1 ether;
         }
+    }
+
+    function targetCollatelizationRatio(uint8 _id)
+        public
+        view
+        returns (int256, int256)
+    {
+        require(syntheticVariantCount > _id, "Invalid given _id");
+        return (_calculateTargetCROffset(_id), _calculateTargetCRDiscount(_id));
     }
 
     // ONLY ADMIN CAN PROCEED
@@ -287,12 +386,11 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     }
 
     // force mint ERC-1155
-    function forceMint(uint8 _id, uint256 _collateralAmount, uint256 _tokenAmount)
-        public
-        nonReentrant
-        onlyWhitelisted
-        validateId(_id, _tokenAmount)
-    {
+    function forceMint(
+        uint8 _id,
+        uint256 _collateralAmount,
+        uint256 _tokenAmount
+    ) public nonReentrant onlyWhitelisted validateId(_id, _tokenAmount) {
         _createPosition(_id, _collateralAmount, _tokenAmount);
 
         // FIXME: use safeTransferFrom
@@ -312,13 +410,11 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         );
     }
 
-    function forceRedeem(uint8 _id, uint256 _collateralAmount, uint256 _tokenAmount)
-        public
-        nonReentrant
-        onlyWhitelisted
-        validateId(_id, _tokenAmount)
-    {
-        
+    function forceRedeem(
+        uint8 _id,
+        uint256 _collateralAmount,
+        uint256 _tokenAmount
+    ) public nonReentrant onlyWhitelisted validateId(_id, _tokenAmount) {
         _removePosition(_id, _collateralAmount, _tokenAmount);
 
         // burn NFT
@@ -336,10 +432,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         );
 
         // return collaterals back to the minter
-        collateralShare.transfer(
-            msg.sender,
-            _collateralAmount
-        );
+        collateralShare.transfer(msg.sender, _collateralAmount);
     }
 
     // update the contract state
@@ -375,12 +468,18 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     }
 
     // update redeem fees
-    function setRedeemFee(uint256 _fee)
-        public
-        nonReentrant
-        onlyWhitelisted
-    {
+    function setRedeemFee(uint256 _fee) public nonReentrant onlyWhitelisted {
         redeemFee = _fee;
+    }
+
+    // enable / disable offset fees
+    function setOffsetDisabled(bool _active) public nonReentrant onlyWhitelisted {
+        offsetDisabled = _active;
+    }
+
+    // enable / disable discount fees
+    function setDiscountDisabled(bool _active) public nonReentrant onlyWhitelisted {
+        discountDisabled = _active;
     }
 
     // INTERNAL FUNCTIONS
@@ -397,8 +496,8 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
             syntheticVariants[_id].disabled == false,
             "The given _id is disabled"
         );
-        require( _tokenAmount != 0, "_tokenAmount can't be zero");
-        require( MAX_NFT >= _tokenAmount , "Exceed MAX_NFT");
+        require(_tokenAmount != 0, "_tokenAmount can't be zero");
+        require(MAX_NFT >= _tokenAmount, "Exceed MAX_NFT");
         _;
     }
 
@@ -409,17 +508,27 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         }
     }
 
-    function _createPosition(uint8 _id, uint256 _collateralAmount, uint256 _tokenAmount) internal {
-       
-        syntheticVariants[_id].totalOutstanding += (syntheticVariants[_id]
-            .tokenValue.mul(_tokenAmount));
+    function _createPosition(
+        uint8 _id,
+        uint256 _collateralAmount,
+        uint256 _tokenAmount
+    ) internal {
+        syntheticVariants[_id].totalOutstanding += (
+            syntheticVariants[_id].tokenValue.mul(_tokenAmount)
+        );
         syntheticVariants[_id].totalIssued += _tokenAmount;
         syntheticVariants[_id].totalRawCollateral += _collateralAmount;
 
         minters[msg.sender].amount[_id] += _tokenAmount;
         minters[msg.sender].timestamp = now;
 
-        emit PositionCreated(msg.sender, _id, syntheticVariants[_id].tokenValue, _collateralAmount, _tokenAmount);
+        emit PositionCreated(
+            msg.sender,
+            _id,
+            syntheticVariants[_id].tokenValue,
+            _collateralAmount,
+            _tokenAmount
+        );
 
         totalRawCollateral = totalRawCollateral.add(_collateralAmount);
         totalOutstanding = totalOutstanding.add(
@@ -427,16 +536,31 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         );
     }
 
-    function _removePosition(uint8 _id, uint256 _collateralAmount, uint256 _tokenAmount) internal {
-
-        syntheticVariants[_id].totalOutstanding = syntheticVariants[_id].totalOutstanding.sub(syntheticVariants[_id].tokenValue.mul(_tokenAmount));
+    function _removePosition(
+        uint8 _id,
+        uint256 _collateralAmount,
+        uint256 _tokenAmount
+    ) internal {
+        syntheticVariants[_id].totalOutstanding = syntheticVariants[_id]
+            .totalOutstanding
+            .sub(syntheticVariants[_id].tokenValue.mul(_tokenAmount));
         syntheticVariants[_id].totalBurnt += _tokenAmount;
-        syntheticVariants[_id].totalRawCollateral = syntheticVariants[_id].totalRawCollateral.sub(_collateralAmount);
+        syntheticVariants[_id].totalRawCollateral = syntheticVariants[_id]
+            .totalRawCollateral
+            .sub(_collateralAmount);
 
-        minters[msg.sender].amount[_id] = minters[msg.sender].amount[_id].sub(_tokenAmount);
+        minters[msg.sender].amount[_id] = minters[msg.sender].amount[_id].sub(
+            _tokenAmount
+        );
         minters[msg.sender].timestamp = now;
 
-        emit PositionRemoved(msg.sender, _id, syntheticVariants[_id].tokenValue, _collateralAmount, _tokenAmount);
+        emit PositionRemoved(
+            msg.sender,
+            _id,
+            syntheticVariants[_id].tokenValue,
+            _collateralAmount,
+            _tokenAmount
+        );
 
         totalRawCollateral = totalRawCollateral.sub(_collateralAmount);
         totalOutstanding = totalOutstanding.sub(
@@ -448,8 +572,9 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         uint256 collateralAmount,
         uint256 syntheticAmount
     ) internal view returns (uint256) {
-
-        uint256 collateralRate = priceResolver.getCurrentPrice(collateralShareSymbol);
+        uint256 collateralRate = priceResolver.getCurrentPrice(
+            collateralShareSymbol
+        );
         uint256 syntheticRate = priceResolver.getCurrentPrice(syntheticSymbol);
 
         uint256 numerator = collateralRate.wmul(collateralAmount);
@@ -458,20 +583,149 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         return numerator.wdiv(denominator);
     }
 
-    function _estimateMint(
-        uint8 _id, 
-        uint256 _tokenAmount
-    ) internal view returns (uint256 baseTokenAmount, uint256 pairTokenAmount) {
+    function _estimateInputs(uint8 _id, uint256 _tokenAmount)
+        internal
+        view
+        returns (
+            uint256 baseTokenAmount,
+            uint256 pairTokenAmount,
+            uint256 lpAmount
+        )
+    {
         uint256 syntheticPrice = priceResolver.getCurrentPrice(syntheticSymbol);
-        uint256 sharePrice = priceResolver.getCurrentPrice(collateralShareSymbol);
-        uint256 mintedValue = syntheticPrice.wmul( syntheticVariants[_id].tokenValue.mul(_tokenAmount) );
+        uint256 sharePrice = priceResolver.getCurrentPrice(
+            collateralShareSymbol
+        );
+        uint256 mintedValue = syntheticPrice.wmul(
+            syntheticVariants[_id].tokenValue.mul(_tokenAmount)
+        );
         uint256 lpNeeded = mintedValue.wdiv(sharePrice);
 
-        uint256 baseInLp = IERC20( collateralShare.token0() ).balanceOf(address(collateralShare));
-        uint256 pairInLp = IERC20( collateralShare.token1() ).balanceOf(address(collateralShare));
+        lpAmount = lpNeeded;
 
-        baseTokenAmount = (lpNeeded.mul(baseInLp)).div( collateralShare.totalSupply() );
-        pairTokenAmount = (lpNeeded.mul(pairInLp)).div( collateralShare.totalSupply());
+        uint256 baseInLp = IERC20(collateralShare.token0()).balanceOf(
+            address(collateralShare)
+        );
+        uint256 pairInLp = IERC20(collateralShare.token1()).balanceOf(
+            address(collateralShare)
+        );
+
+        baseTokenAmount = (lpNeeded.mul(baseInLp)).div(
+            collateralShare.totalSupply()
+        );
+        pairTokenAmount = (lpNeeded.mul(pairInLp)).div(
+            collateralShare.totalSupply()
+        );
     }
 
+    function _estimateRedeem(uint8 _id, uint256 _tokenAmount)
+        internal
+        view
+        returns (
+            uint256 baseTokenAmount,
+            uint256 pairTokenAmount,
+            uint256 lpAmount,
+            uint256 offset
+        )
+    {
+        (baseTokenAmount, pairTokenAmount, lpAmount) = _estimateInputs(
+            _id,
+            _tokenAmount
+        );
+
+        int256 targetCR = _calculateTargetCROffset(_id);
+
+        // adjusting redeemed amount when CR < 1
+        if (targetCR != 1 ether && targetCR > 0 && offsetDisabled == false) {
+            uint256 newTotalCollateral = syntheticVariants[_id].totalRawCollateral.sub(lpAmount);
+            uint256 newCR = _calculateCollateralizationRatio(
+                newTotalCollateral,
+                syntheticVariants[_id].totalOutstanding.sub(
+                    syntheticVariants[_id].tokenValue.mul(_tokenAmount)
+                )
+            );
+
+            uint256 adjustedTotalCollateral = ((targetCR.toUint256()).wmul(newTotalCollateral)).wdiv(newCR);
+            offset = (adjustedTotalCollateral.sub(syntheticVariants[_id].totalRawCollateral)).wmul( lpAmount.wdiv(syntheticVariants[_id].totalRawCollateral) );
+            uint256 lpAmountWithOffset = lpAmount.sub(offset);
+
+            baseTokenAmount = baseTokenAmount.wmul( lpAmountWithOffset.wdiv(lpAmount) );
+            pairTokenAmount = pairTokenAmount.wmul( lpAmountWithOffset.wdiv(lpAmount) );
+            lpAmount = lpAmountWithOffset;
+        }
+    }
+
+    function _estimateMint(uint8 _id, uint256 _tokenAmount)
+        internal
+        view
+        returns (
+            uint256 baseTokenAmount,
+            uint256 pairTokenAmount,
+            uint256 lpAmount,
+            uint256 discount
+        )
+    {
+        (baseTokenAmount, pairTokenAmount, lpAmount) = _estimateInputs(
+            _id,
+            _tokenAmount
+        );
+
+        int256 targetCR = _calculateTargetCRDiscount(_id);
+
+        // adjusting minted amount when target CR > current CR > 1
+        if (targetCR > 1 ether && discountDisabled == false) {
+
+            uint256 newTotalCollateral = syntheticVariants[_id].totalRawCollateral.add(lpAmount);
+            uint256 newCR = _calculateCollateralizationRatio(
+                newTotalCollateral,
+                syntheticVariants[_id].totalOutstanding.add(
+                    syntheticVariants[_id].tokenValue.mul(_tokenAmount)
+                )
+            );
+
+            // uint256 adjustedTotalCollateral = ((targetCR.toUint256()).wmul(newTotalCollateral)).wdiv(newCR);
+            // discount = syntheticVariants[_id].totalRawCollateral.sub(adjustedTotalCollateral).wmul( lpAmount.wdiv(syntheticVariants[_id].totalRawCollateral) );
+            // uint256 lpAmountWithDiscount = lpAmount.sub(discount);
+
+            // baseTokenAmount = baseTokenAmount.wmul( lpAmountWithDiscount.wdiv(lpAmount) );
+            // pairTokenAmount = pairTokenAmount.wmul( lpAmountWithDiscount.wdiv(lpAmount) );
+            // lpAmount = lpAmountWithDiscount;
+        }
+
+    }
+
+    // when cr is between 0 -> 1
+    function _calculateTargetCROffset(uint8 _id)
+        internal
+        view
+        returns (int256)
+    {
+        int256 cr = variantCollatelizationRatio(_id).toInt256();
+        int256 result = _calculateTargetCR(cr);
+        if (cr > 0 && 1 ether >= result) {
+            return result;
+        } else {
+            return 1 ether;
+        }
+    }
+
+    // when cr is between 1 -> infinity
+    function _calculateTargetCRDiscount(uint8 _id)
+        internal
+        view
+        returns (int256)
+    {
+        int256 cr = variantCollatelizationRatio(_id).toInt256();
+        int256 result = _calculateTargetCR(cr);
+        if (cr > 1 ether && cr > result) {
+            return _calculateTargetCR(cr);
+        } else {
+            return 1 ether;
+        }
+    }
+
+    // log^b(kx+1)
+    function _calculateTargetCR(int256 _cr) internal pure returns (int256) {
+        return BASE.logBase((K.wmul(_cr)).add(1 ether));
+    }
 }
