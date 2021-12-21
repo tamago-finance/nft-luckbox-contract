@@ -646,7 +646,10 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
             );
 
             uint256 adjustedTotalCollateral = ((targetCR.toUint256()).wmul(newTotalCollateral)).wdiv(newCR);
-            offset = (adjustedTotalCollateral.sub(syntheticVariants[_id].totalRawCollateral)).wmul( lpAmount.wdiv(syntheticVariants[_id].totalRawCollateral) );
+            if (adjustedTotalCollateral > newTotalCollateral) {
+                offset = (adjustedTotalCollateral.sub( newTotalCollateral )).wmul( lpAmount.wdiv(syntheticVariants[_id].totalRawCollateral) );
+            }
+            
             uint256 lpAmountWithOffset = lpAmount.sub(offset);
 
             baseTokenAmount = baseTokenAmount.wmul( lpAmountWithOffset.wdiv(lpAmount) );
@@ -683,13 +686,17 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
                 )
             );
 
-            // uint256 adjustedTotalCollateral = ((targetCR.toUint256()).wmul(newTotalCollateral)).wdiv(newCR);
+            uint256 adjustedTotalCollateral = ((targetCR.toUint256()).wmul(newTotalCollateral)).wdiv(newCR);
+            
+            if (newTotalCollateral > adjustedTotalCollateral) {
+                discount = newTotalCollateral.sub(adjustedTotalCollateral).wmul( lpAmount.wdiv(syntheticVariants[_id].totalRawCollateral) );
+            }
             // discount = syntheticVariants[_id].totalRawCollateral.sub(adjustedTotalCollateral).wmul( lpAmount.wdiv(syntheticVariants[_id].totalRawCollateral) );
-            // uint256 lpAmountWithDiscount = lpAmount.sub(discount);
+            uint256 lpAmountWithDiscount = lpAmount.sub(discount);
 
-            // baseTokenAmount = baseTokenAmount.wmul( lpAmountWithDiscount.wdiv(lpAmount) );
-            // pairTokenAmount = pairTokenAmount.wmul( lpAmountWithDiscount.wdiv(lpAmount) );
-            // lpAmount = lpAmountWithDiscount;
+            baseTokenAmount = baseTokenAmount.wmul( lpAmountWithDiscount.wdiv(lpAmount) );
+            pairTokenAmount = pairTokenAmount.wmul( lpAmountWithDiscount.wdiv(lpAmount) );
+            lpAmount = lpAmountWithDiscount;
         }
 
     }

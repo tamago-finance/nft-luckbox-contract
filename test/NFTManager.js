@@ -296,13 +296,13 @@ describe("NFTManager contract on forked Polygon chain", () => {
             // mint x1 NFT without collaterals to bring down the CR
             await nftManager.forceMint(1, 0, 2)
 
-            expect( 0.8 > Number(fromEther(await nftManager.variantCollatelizationRatio(1)))).to.true
+            expect(0.8 > Number(fromEther(await nftManager.variantCollatelizationRatio(1)))).to.true
 
             await syntheticNft.setApprovalForAll(nftManager.address, true)
 
-            await nftManager.redeem( 1, 2 )
+            await nftManager.redeem(1, 2)
 
-            expect((await syntheticNft.balanceOf(admin.address, 2))).to.equal(4)
+            expect((await syntheticNft.balanceOf(admin.address, 2))).to.equal(3)
         } catch (e) {
             console.log(e)
         }
@@ -317,27 +317,27 @@ describe("NFTManager contract on forked Polygon chain", () => {
             await tamgToken.approve(router.address, ethers.constants.MaxUint256)
             await usdcToken.approve(router.address, ethers.constants.MaxUint256)
             await shareToken.approve(nftManager.address, ethers.constants.MaxUint256)
-            
+
             // estimate USDC, TAMG tokens needed to mint 5 NFTs
             const inputs = await nftManager.estimateMint(1, 5)
             const baseAmount = Number(ethers.utils.formatUnits(inputs[0], 6))
             const pairAmount = Number(ethers.utils.formatUnits(inputs[1], 18))
 
-            await router.addLiquidity(usdcToken.address, tamgToken.address, ethers.utils.parseUnits( `${baseAmount}` , 6 ), ethers.utils.parseUnits( `${pairAmount}` , 18 ) , ethers.utils.parseUnits( `${(baseAmount * 0.97).toFixed(6)}`, 6 ), ethers.utils.parseUnits( `${ (pairAmount * 0.97).toFixed(18)}` , 18), admin.address, 9999999999999)
+            await router.addLiquidity(usdcToken.address, tamgToken.address, ethers.utils.parseUnits(`${baseAmount}`, 6), ethers.utils.parseUnits(`${pairAmount}`, 18), ethers.utils.parseUnits(`${(baseAmount * 0.97).toFixed(6)}`, 6), ethers.utils.parseUnits(`${(pairAmount * 0.97).toFixed(18)}`, 18), admin.address, 9999999999999)
 
             // mint x1 NFT with 5x collaterals to bring up the CR
-            await nftManager.forceMint(1,  await shareToken.balanceOf(admin.address) , 1)
+            await nftManager.forceMint(1, await shareToken.balanceOf(admin.address), 1)
 
             const beforeMintRatio = await nftManager.variantCollatelizationRatio(1)
-                
-            expect(Number(fromEther(beforeMintRatio)) > 1.1).to.true
 
-            console.log(Number(fromEther(await nftManager.variantCollatelizationRatio(1))))
+            expect(Number(fromEther(beforeMintRatio)) > 1.1).to.true
 
             // mint x2 Ang Bao NFTs
             await nftManager.mint(1, 2)
 
-            console.log(Number(fromEther(await nftManager.variantCollatelizationRatio(1))))
+            const afterMintRatio = await nftManager.variantCollatelizationRatio(1)
+
+            expect( Number(fromEther(beforeMintRatio)) > Number(fromEther(afterMintRatio)) ).to.true
 
         } catch (e) {
             console.log(e)
