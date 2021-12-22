@@ -130,7 +130,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         redeemFee = 300; // 3.0%
 
         // Deploy the synthetic NFT contract
-        SyntheticNFT deployedContract = new SyntheticNFT(_nftUri);
+        SyntheticNFT deployedContract = new SyntheticNFT(_name, _nftUri);
         syntheticNFT = ISyntheticNFT(address(deployedContract));
 
         devAddress = _devAddress;
