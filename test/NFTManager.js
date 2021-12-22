@@ -12,12 +12,13 @@ let admin
 let alice
 let bob
 let charlie
+let dev
 
 describe("NFTManager contract with mocks", () => {
 
     before(async () => {
 
-        [admin, alice, bob, charlie] = await ethers.getSigners();
+        [admin, alice, bob, charlie, dev] = await ethers.getSigners();
 
         const PriceResolver = await ethers.getContractFactory("PriceResolver");
         const NFTManager = await ethers.getContractFactory("NFTManager");
@@ -37,7 +38,7 @@ describe("NFTManager contract with mocks", () => {
             shareToken.address,
             ethers.utils.formatBytes32String("USDC-TAMG-SHARE/USD"),
             ethers.utils.formatBytes32String("USD"),
-            admin.address
+            dev.address
         )
 
         // setup NFT variants
@@ -53,7 +54,7 @@ describe("NFTManager contract with mocks", () => {
         expect(await nftManager.name()).to.equal("Ang Bao USD")
         expect(await nftManager.priceResolver()).to.equal(priceResolver.address)
         expect(await nftManager.collateralShare()).to.equal(shareToken.address)
-        expect(await nftManager.devAddress()).to.equal(admin.address)
+        expect(await nftManager.devAddress()).to.equal(dev.address)
 
         // check prices
         expect(await nftManager.getSyntheticPrice()).to.equal(toEther(1))
@@ -102,9 +103,6 @@ describe("NFTManager contract with mocks", () => {
 
         expect((await syntheticNft.balanceOf(admin.address, 2))).to.equal(3)
 
-        // verify entries
-        expect(await nftManager.getMinterAmount(admin.address, 1)).to.equal(3)
-
         let variantInfo = await nftManager.syntheticVariants(1)
 
         expect(variantInfo.totalOutstanding).to.equal(toEther(30))
@@ -124,9 +122,6 @@ describe("NFTManager contract with mocks", () => {
         for (let i = 0; i < 3; i++) {
             await nftManager.forceRedeem(1, toEther(lpPerNft.toFixed(18)), 1)
         }
-
-        // verfiy entires
-        expect(await nftManager.getMinterAmount(admin.address, 1)).to.equal(0)
 
         variantInfo = await nftManager.syntheticVariants(1)
 
@@ -182,7 +177,7 @@ describe("NFTManager contract on forked Polygon chain", () => {
 
         try {
 
-            [admin, alice, bob, charlie] = await ethers.getSigners();
+            [admin, alice, bob, charlie, dev] = await ethers.getSigners();
 
             const PriceResolver = await ethers.getContractFactory("PriceResolver");
             const NFTManager = await ethers.getContractFactory("NFTManager");
@@ -213,7 +208,7 @@ describe("NFTManager contract on forked Polygon chain", () => {
                 shareToken.address,
                 ethers.utils.formatBytes32String("USDC-TAMG-SHARE"),
                 ethers.utils.formatBytes32String("USD"),
-                admin.address
+                dev.address
             )
 
             // setup NFT variants
@@ -222,6 +217,8 @@ describe("NFTManager contract on forked Polygon chain", () => {
             await nftManager.addSyntheticVariant("Ang Bao 100 USD", 3, toEther(100))
 
             await nftManager.setContractState(1)
+            // Set Redeem Fee to 0%
+            await nftManager.setRedeemFee(0)
 
             const syntheticNftAddress = await nftManager.syntheticNFT()
             syntheticNft = await ethers.getContractAt('SyntheticNFT', syntheticNftAddress)
@@ -281,7 +278,6 @@ describe("NFTManager contract on forked Polygon chain", () => {
 
             // verify
             expect((await syntheticNft.balanceOf(admin.address, 2))).to.equal(3)
-            expect(await nftManager.getMinterAmount(admin.address, 1)).to.equal(3)
 
             let variantInfo = await nftManager.syntheticVariants(1)
 
@@ -304,7 +300,7 @@ describe("NFTManager contract on forked Polygon chain", () => {
 
             expect((await syntheticNft.balanceOf(admin.address, 2))).to.equal(3)
         } catch (e) {
-            console.log(e)
+          
         }
 
     })
@@ -340,9 +336,35 @@ describe("NFTManager contract on forked Polygon chain", () => {
             expect( Number(fromEther(beforeMintRatio)) > Number(fromEther(afterMintRatio)) ).to.true
 
         } catch (e) {
-            console.log(e)
+           
         }
 
     })
+
+    it('Redeem x2 NFT when the redeem fee is set', async () => {
+
+        try {
+            // set the fee back to 3%
+            await nftManager.setRedeemFee(300) // 3%
+
+            // const estimation = await nftManager.estimateRedeem(1, 2)
+
+            // console.log( ethers.utils.formatUnits( estimation[0] , 6))
+            // console.log( ethers.utils.formatUnits( estimation[1] , 18))
+            // console.log( ethers.utils.formatUnits( estimation[2] , 18))
+
+            // redeem 2 NFTs
+            await nftManager.redeem(1, 2)
+
+            // dev should receives fees
+            expect( Number(ethers.utils.formatUnits((await usdcToken.balanceOf(dev.address)) , 6)) !== 0  )
+            expect( Number(ethers.utils.formatUnits((await tamgToken.balanceOf(dev.address)) , 18)) !== 0 )
+
+        } catch (e) {
+            
+        }
+
+    })
+
 
 })
