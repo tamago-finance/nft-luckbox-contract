@@ -85,7 +85,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     // cooldown period before the minter can mint again
     uint256 COOLDOWN_PERIOD = 1 minutes;
     // max NFT that can be minted per time
-    uint256 MAX_NFT = 20;
+    uint256 constant MAX_NFT = 100;
 
     uint256 constant ONE = 1 ether; // 1
     uint256 constant MAX_UINT256 = uint256(-1);
@@ -187,7 +187,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         );
     }
 
-    function mint(uint8 _id, uint256 _tokenAmount)
+    function mint(uint8 _id, uint256 _tokenAmount, uint256 _maxBaseAmount, uint256 _maxPairAmount)
         public
         nonReentrant
         isReady
@@ -197,6 +197,9 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
             _id,
             _tokenAmount
         );
+
+        require( _maxBaseAmount >= baseAmount , "Exceeding _maxBaseAmount" );
+        require( _maxPairAmount >= pairAmount , "Exceeding _maxPairAmount" );
 
         // takes ERC-20 tokens
         IERC20(collateralShare.token0()).safeTransferFrom(
@@ -234,7 +237,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
 
     
 
-    function redeem(uint8 _id, uint256 _tokenAmount)
+    function redeem(uint8 _id, uint256 _tokenAmount, uint256 _minBaseAmount, uint256 _minPairAmount)
         public
         nonReentrant
         isReady
@@ -264,11 +267,14 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
                 collateralShare.token0(),
                 collateralShare.token1(),
                 lpAmount,
-                0,
-                0,
+                _minBaseAmount,
+                _minPairAmount,
                 address(this),
                 now + 86400
             );
+
+        require( baseTokenAmount >= _minBaseAmount , "_minBaseAmount is not reached");
+        require( pairTokenAmount >= _minPairAmount, "_minPairAmount is not reached");
 
         // return tokens back
         if (redeemFee != 0) {

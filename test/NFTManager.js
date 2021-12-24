@@ -226,7 +226,7 @@ describe("NFTManager contract on forked Polygon chain", () => {
             // trade TAMG
             router = await ethers.getContractAt('IPancakeRouter02', ROUTER_ADDRESS)
         } catch (e) {
-
+            console.log(e)
         }
 
 
@@ -243,10 +243,10 @@ describe("NFTManager contract on forked Polygon chain", () => {
             expect(await nftManager.name()).to.equal("Ang Bao USD")
             expect(await nftManager.priceResolver()).to.equal(priceResolver.address)
             expect(await nftManager.collateralShare()).to.equal(shareToken.address)
-            expect(await nftManager.devAddress()).to.equal(admin.address)
+            expect(await nftManager.devAddress()).to.equal(dev.address)
 
         } catch (e) {
-
+            console.log(e)
         }
 
     })
@@ -273,8 +273,10 @@ describe("NFTManager contract on forked Polygon chain", () => {
             await tamgToken.approve(nftManager.address, ethers.constants.MaxUint256)
             await usdcToken.approve(nftManager.address, ethers.constants.MaxUint256)
 
+            const inputs = await nftManager.estimateMint(1, 3)
+
             // mint x3 Ang Bao NFTs
-            await nftManager.mint(1, 3)
+            await nftManager.mint(1, 3, inputs[0], inputs[1])
 
             // verify
             expect((await syntheticNft.balanceOf(admin.address, 2))).to.equal(3)
@@ -296,11 +298,11 @@ describe("NFTManager contract on forked Polygon chain", () => {
 
             await syntheticNft.setApprovalForAll(nftManager.address, true)
 
-            await nftManager.redeem(1, 2)
+            await nftManager.redeem(1, 2, 0, 0)
 
             expect((await syntheticNft.balanceOf(admin.address, 2))).to.equal(3)
         } catch (e) {
-          
+            console.log(e)
         }
 
     })
@@ -329,14 +331,14 @@ describe("NFTManager contract on forked Polygon chain", () => {
             expect(Number(fromEther(beforeMintRatio)) > 1.1).to.true
 
             // mint x2 Ang Bao NFTs
-            await nftManager.mint(1, 2)
+            await nftManager.mint(1, 2, inputs[0], inputs[1])
 
             const afterMintRatio = await nftManager.variantCollatelizationRatio(1)
 
-            expect( Number(fromEther(beforeMintRatio)) > Number(fromEther(afterMintRatio)) ).to.true
+            expect(Number(fromEther(beforeMintRatio)) > Number(fromEther(afterMintRatio))).to.true
 
         } catch (e) {
-           
+            console.log(e)
         }
 
     })
@@ -347,21 +349,21 @@ describe("NFTManager contract on forked Polygon chain", () => {
             // set the fee back to 3%
             await nftManager.setRedeemFee(300) // 3%
 
-            // const estimation = await nftManager.estimateRedeem(1, 2)
+            const output = await nftManager.estimateRedeem(1, 2)
 
             // console.log( ethers.utils.formatUnits( estimation[0] , 6))
             // console.log( ethers.utils.formatUnits( estimation[1] , 18))
             // console.log( ethers.utils.formatUnits( estimation[2] , 18))
 
             // redeem 2 NFTs
-            await nftManager.redeem(1, 2)
+            await nftManager.redeem(1, 2, output[0], output[1])
 
             // dev should receives fees
-            expect( Number(ethers.utils.formatUnits((await usdcToken.balanceOf(dev.address)) , 6)) !== 0  )
-            expect( Number(ethers.utils.formatUnits((await tamgToken.balanceOf(dev.address)) , 18)) !== 0 )
+            expect(Number(ethers.utils.formatUnits((await usdcToken.balanceOf(dev.address)), 6)) !== 0)
+            expect(Number(ethers.utils.formatUnits((await tamgToken.balanceOf(dev.address)), 18)) !== 0)
 
         } catch (e) {
-            
+            console.log(e)
         }
 
     })
