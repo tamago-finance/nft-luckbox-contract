@@ -1,0 +1,611 @@
+{
+  "contractName": "ITokenManager",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "syntheticToken",
+      "outputs": [
+        {
+          "internalType": "contract IExpandedIERC20",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "supportCollateralToken",
+      "outputs": [
+        {
+          "internalType": "contract IToken",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "baseCollateralToken",
+      "outputs": [
+        {
+          "internalType": "contract IToken",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.6.12+commit.27d51765\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"baseCollateralToken\",\"outputs\":[{\"internalType\":\"contract IToken\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"supportCollateralToken\",\"outputs\":[{\"internalType\":\"contract IToken\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"syntheticToken\",\"outputs\":[{\"internalType\":\"contract IExpandedIERC20\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/interfaces/ITokenManager.sol\":\"ITokenManager\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/interfaces/IERC20.sol\":{\"keccak256\":\"0x7521d73c0b2001a87ce17fdc3ff40191c0b7893b0c48a695011d615d8fda254f\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://a8e2574c57b1cd86bb792748ad24bc1d7d62cce413f18d029a0217456926b067\",\"dweb:/ipfs/QmUuF5cqnokP3MAQtu4VKnewB8F5tycbvmAqbgEuQu7tTt\"]},\"/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/interfaces/IExpandedIERC20.sol\":{\"keccak256\":\"0x3e25a4d5d61b8321a4b6861ee077fdcd68d94f33f8fc30255320bec6a0c77256\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://6763adf2f085c0aefc22d095c6fa214af29289f730e6ad84a6900ff5b78f42ff\",\"dweb:/ipfs/QmSq25Eeb1916m9zymeMR9yrUxnnUjirAhJeGZ7QS5hyRf\"]},\"/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/interfaces/IToken.sol\":{\"keccak256\":\"0xa139777e7de2889eaa135600c11be1236ea61b32a8df3a5ac9277037e53fc739\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://3c03aaf989b7525be8a7fae774be47b0bc5858ad83e76f3045855494cdcfee76\",\"dweb:/ipfs/QmbkTQrMPiFSs6WhigExh2QVvGyo2z5XSg7XobzSofdXwq\"]},\"/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/interfaces/ITokenManager.sol\":{\"keccak256\":\"0xc6f94ec08c8fbcad2ce268724bf56e3754ba489b95326857d6d1bfde51c72e69\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://1ca086bae1d75dc8e9c54d9a8fe7375190988e0542c6233630958bd2f730f4d9\",\"dweb:/ipfs/QmXcjQf1ACFhjpUDfSgzo4FtrfqSjuSRMf3L3PuENLonkJ\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity 0.6.12;\n\nimport \"./IExpandedIERC20.sol\";\nimport \"./IToken.sol\";\n\ninterface ITokenManager {\n\n    function syntheticToken() external view returns (IExpandedIERC20);\n\n    function supportCollateralToken() external view returns (IToken);\n\n    function baseCollateralToken() external view returns (IToken);\n\n}",
+  "sourcePath": "/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/interfaces/ITokenManager.sol",
+  "ast": {
+    "absolutePath": "/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/interfaces/ITokenManager.sol",
+    "exportedSymbols": {
+      "ITokenManager": [
+        5561
+      ]
+    },
+    "id": 5562,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 5543,
+        "literals": [
+          "solidity",
+          "0.6",
+          ".12"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:23:16"
+      },
+      {
+        "absolutePath": "/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/interfaces/IExpandedIERC20.sol",
+        "file": "./IExpandedIERC20.sol",
+        "id": 5544,
+        "nodeType": "ImportDirective",
+        "scope": 5562,
+        "sourceUnit": 4779,
+        "src": "58:31:16",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/interfaces/IToken.sol",
+        "file": "./IToken.sol",
+        "id": 5545,
+        "nodeType": "ImportDirective",
+        "scope": 5562,
+        "sourceUnit": 5542,
+        "src": "90:22:16",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": null,
+        "fullyImplemented": false,
+        "id": 5561,
+        "linearizedBaseContracts": [
+          5561
+        ],
+        "name": "ITokenManager",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "8230ecd6",
+            "id": 5550,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "syntheticToken",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 5546,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "168:2:16"
+            },
+            "returnParameters": {
+              "id": 5549,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5548,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5550,
+                  "src": "194:15:16",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IExpandedIERC20_$4778",
+                    "typeString": "contract IExpandedIERC20"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 5547,
+                    "name": "IExpandedIERC20",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 4778,
+                    "src": "194:15:16",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IExpandedIERC20_$4778",
+                      "typeString": "contract IExpandedIERC20"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "193:17:16"
+            },
+            "scope": 5561,
+            "src": "145:66:16",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "acaefa15",
+            "id": 5555,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "supportCollateralToken",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 5551,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "248:2:16"
+            },
+            "returnParameters": {
+              "id": 5554,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5553,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5555,
+                  "src": "274:6:16",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IToken_$5541",
+                    "typeString": "contract IToken"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 5552,
+                    "name": "IToken",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 5541,
+                    "src": "274:6:16",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IToken_$5541",
+                      "typeString": "contract IToken"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "273:8:16"
+            },
+            "scope": 5561,
+            "src": "217:65:16",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "20d0d069",
+            "id": 5560,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "baseCollateralToken",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 5556,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "316:2:16"
+            },
+            "returnParameters": {
+              "id": 5559,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5558,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5560,
+                  "src": "342:6:16",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IToken_$5541",
+                    "typeString": "contract IToken"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 5557,
+                    "name": "IToken",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 5541,
+                    "src": "342:6:16",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IToken_$5541",
+                      "typeString": "contract IToken"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "341:8:16"
+            },
+            "scope": 5561,
+            "src": "288:62:16",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 5562,
+        "src": "114:239:16"
+      }
+    ],
+    "src": "33:320:16"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/interfaces/ITokenManager.sol",
+      "exportedSymbols": {
+        "ITokenManager": [
+          5561
+        ]
+      },
+      "license": "MIT"
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "0.6",
+            ".12"
+          ]
+        },
+        "id": 5543,
+        "name": "PragmaDirective",
+        "src": "33:23:16"
+      },
+      {
+        "attributes": {
+          "SourceUnit": 4779,
+          "absolutePath": "/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/interfaces/IExpandedIERC20.sol",
+          "file": "./IExpandedIERC20.sol",
+          "scope": 5562,
+          "symbolAliases": [
+            null
+          ],
+          "unitAlias": ""
+        },
+        "id": 5544,
+        "name": "ImportDirective",
+        "src": "58:31:16"
+      },
+      {
+        "attributes": {
+          "SourceUnit": 5542,
+          "absolutePath": "/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/interfaces/IToken.sol",
+          "file": "./IToken.sol",
+          "scope": 5562,
+          "symbolAliases": [
+            null
+          ],
+          "unitAlias": ""
+        },
+        "id": 5545,
+        "name": "ImportDirective",
+        "src": "90:22:16"
+      },
+      {
+        "attributes": {
+          "abstract": false,
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "interface",
+          "documentation": null,
+          "fullyImplemented": false,
+          "linearizedBaseContracts": [
+            5561
+          ],
+          "name": "ITokenManager",
+          "scope": 5562
+        },
+        "children": [
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "8230ecd6",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "syntheticToken",
+              "overrides": null,
+              "scope": 5561,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 5546,
+                "name": "ParameterList",
+                "src": "168:2:16"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "overrides": null,
+                      "scope": 5550,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "contract IExpandedIERC20",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "contractScope": null,
+                          "name": "IExpandedIERC20",
+                          "referencedDeclaration": 4778,
+                          "type": "contract IExpandedIERC20"
+                        },
+                        "id": 5547,
+                        "name": "UserDefinedTypeName",
+                        "src": "194:15:16"
+                      }
+                    ],
+                    "id": 5548,
+                    "name": "VariableDeclaration",
+                    "src": "194:15:16"
+                  }
+                ],
+                "id": 5549,
+                "name": "ParameterList",
+                "src": "193:17:16"
+              }
+            ],
+            "id": 5550,
+            "name": "FunctionDefinition",
+            "src": "145:66:16"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "acaefa15",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "supportCollateralToken",
+              "overrides": null,
+              "scope": 5561,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 5551,
+                "name": "ParameterList",
+                "src": "248:2:16"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "overrides": null,
+                      "scope": 5555,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "contract IToken",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "contractScope": null,
+                          "name": "IToken",
+                          "referencedDeclaration": 5541,
+                          "type": "contract IToken"
+                        },
+                        "id": 5552,
+                        "name": "UserDefinedTypeName",
+                        "src": "274:6:16"
+                      }
+                    ],
+                    "id": 5553,
+                    "name": "VariableDeclaration",
+                    "src": "274:6:16"
+                  }
+                ],
+                "id": 5554,
+                "name": "ParameterList",
+                "src": "273:8:16"
+              }
+            ],
+            "id": 5555,
+            "name": "FunctionDefinition",
+            "src": "217:65:16"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "20d0d069",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "baseCollateralToken",
+              "overrides": null,
+              "scope": 5561,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 5556,
+                "name": "ParameterList",
+                "src": "316:2:16"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "overrides": null,
+                      "scope": 5560,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "contract IToken",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "contractScope": null,
+                          "name": "IToken",
+                          "referencedDeclaration": 5541,
+                          "type": "contract IToken"
+                        },
+                        "id": 5557,
+                        "name": "UserDefinedTypeName",
+                        "src": "342:6:16"
+                      }
+                    ],
+                    "id": 5558,
+                    "name": "VariableDeclaration",
+                    "src": "342:6:16"
+                  }
+                ],
+                "id": 5559,
+                "name": "ParameterList",
+                "src": "341:8:16"
+              }
+            ],
+            "id": 5560,
+            "name": "FunctionDefinition",
+            "src": "288:62:16"
+          }
+        ],
+        "id": 5561,
+        "name": "ContractDefinition",
+        "src": "114:239:16"
+      }
+    ],
+    "id": 5562,
+    "name": "SourceUnit",
+    "src": "33:320:16"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.6.12+commit.27d51765.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.3.4",
+  "updatedAt": "2021-11-11T08:48:33.260Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}
