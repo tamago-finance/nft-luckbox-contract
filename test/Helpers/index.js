@@ -77,6 +77,13 @@ exports.deployPriceResolver = async ({
         "0x2791bca1f2de4661ed88a30c99a7a9449aa84174", // USDC
         6 // USDC decimals
     );
+
+    const feederWmatic = await ChainlinkPriceFeeder.deploy(
+        "WMATIC/USD",
+        "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0",
+        8
+    )
+
     const feederUsd = await MockPriceFeeder.deploy("USD");
     const feederUsdcTamgShare = await QuickswapLPFeeder.deploy(
         "USDC-TAMG-SHARE",
@@ -85,6 +92,15 @@ exports.deployPriceResolver = async ({
         6,
         feederTamg.address,
         18
+    );
+
+    const feederWmaticUsdcShare = await QuickswapLPFeeder.deploy(
+        "WMATIC-USDC-SHARE",
+        "0x6e7a5fafcec6bb1e78bae2a1f0b612012bf14827",
+        feederWmatic.address,
+        18,
+        feederUsdc.address,
+        6
     );
 
     await feederUsd.updateValue(this.toEther(1));
@@ -113,6 +129,20 @@ exports.deployPriceResolver = async ({
         feederUsdcTamgShare.address,
         false,
         this.toEther(1380000)
+    )
+
+    await priceResolver.registerPriceFeeder(
+        ethers.utils.formatBytes32String("WMATIC/USD"),
+        feederWmatic.address,
+        false,
+        this.toEther(1.5)
+    )
+    
+    await priceResolver.registerPriceFeeder(
+        ethers.utils.formatBytes32String("WMATIC-USDC-SHARE"),
+        feederWmaticUsdcShare.address,
+        false,
+        this.toEther(4706278)
     )
 
     return priceResolver
