@@ -19,4 +19,12 @@ contract MockERC20 is ERC20 {
         _mint(msg.sender, 10000 * (10 ** 18));
     }
 
+    function deposit(uint256 _amount) public payable {
+        
+    }   
+
+    function withdraw(uint256 _amount) public {
+
+    }
+
 }
