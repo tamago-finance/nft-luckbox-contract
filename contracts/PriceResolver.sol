@@ -43,6 +43,9 @@ contract PriceResolver is ReentrancyGuard, Whitelist, IPriceResolver {
         }
     }
 
+    /// @notice get the latest price of the given symbol, return the fallback value if the symbol has been disabled
+    /// @param _symbol the currency symbol that has registered to the contract
+    /// @return the price in Wei unit
     function getCurrentPrice(bytes32 _symbol) external override view returns (uint256) {
         require(priceFeeders[_symbol].priceFeederAddress != address(0) , "Given symbol is invalid" );
 
@@ -110,6 +113,7 @@ contract PriceResolver is ReentrancyGuard, Whitelist, IPriceResolver {
         priceFeeders[_symbol].fallbackValue = _fallbackValue;
     }
 
+    // Validate the given symbol
     function isValid(bytes32 _symbol) external override view returns (bool) {
         return (priceFeeders[_symbol].priceFeederAddress != address(0));
     }
