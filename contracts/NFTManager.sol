@@ -252,8 +252,8 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
             collateralShare.token1(),
             baseAmount,
             pairAmount,
-            baseAmount.mul(9700).div(10000),
-            pairAmount.mul(9700).div(10000),
+            0,
+            0,
             address(this),
             now + 86400
         );
