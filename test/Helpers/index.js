@@ -230,3 +230,70 @@ exports.deployPriceResolver2 = async ({
 
     return priceResolver
 }
+
+exports.deployPriceResolverMainnet = async ({
+    PriceResolver,
+    MockPriceFeeder,
+    ChainlinkPriceFeeder,
+    QuickswapTokenFeeder,
+    QuickswapLPFeeder,
+    Admin,
+    lpWEthUsdcAddress
+}) => {
+
+    const priceResolver = await PriceResolver.deploy(Admin.address);
+
+    const feederUsdc = await ChainlinkPriceFeeder.deploy(
+        "USDC/USD",
+        "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        8
+    );
+
+    const feederWEth = await ChainlinkPriceFeeder.deploy(
+        "WETH/USD",
+        "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        8
+    )
+
+    const feederUsd = await MockPriceFeeder.deploy("USD");
+
+    const feederWEthUsdcShare = await QuickswapLPFeeder.deploy(
+        "WETH-USDC-SHARE",
+        lpWEthUsdcAddress,
+        feederWEth.address,
+        18,
+        feederUsdc.address, // Mock
+        18
+    );
+
+    await feederUsd.updateValue(this.toEther(1));
+
+    // register them all
+    await priceResolver.registerPriceFeeder(
+        ethers.utils.formatBytes32String("USDC/USD"),
+        feederUsdc.address,
+        false,
+        this.toEther(0.9998)
+    )
+
+    await priceResolver.registerPriceFeeder(
+        ethers.utils.formatBytes32String("USD"),
+        feederUsd.address,
+        false,
+        this.toEther(1)
+    )
+    await priceResolver.registerPriceFeeder(
+        ethers.utils.formatBytes32String("WETH/USD"),
+        feederWEth.address,
+        false,
+        this.toEther(2)
+    )
+    await priceResolver.registerPriceFeeder(
+        ethers.utils.formatBytes32String("WETH-USDC-SHARE"),
+        feederWEthUsdcShare.address,
+        false,
+        this.toEther(168814574)
+    )
+
+    return priceResolver
+}

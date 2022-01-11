@@ -1,4 +1,5 @@
 const { expect } = require("chai");
+const { ethers, network } = require("hardhat")
 const { fromEther, toEther, deployPriceResolverMock, deployPriceResolver, deployPriceResolver2 } = require("./Helpers")
 
 let priceResolver
@@ -73,8 +74,8 @@ describe("Full Deployment Ang Pow USD", () => {
             })
 
             nftManager = await NFTManager.deploy(
-                "Ang Pow USD",
-                "https://api.tamago.finance/angpow/{id}",
+                "Lucky Red Envelope on Polygon",
+                "https://api.tamago.finance/lucky-red-envelope/polygon/{id}",
                 priceResolver.address,
                 shareToken.address,
                 ethers.utils.formatBytes32String("WMATIC-USDC-SHARE"),
@@ -83,9 +84,9 @@ describe("Full Deployment Ang Pow USD", () => {
             )
 
             // setup NFT variants
-            await nftManager.addSyntheticVariant("Ang Pow 1 USD", 1, toEther(1))
-            await nftManager.addSyntheticVariant("Ang Pow 10 USD", 2, toEther(10))
-            await nftManager.addSyntheticVariant("Ang Pow 100 USD", 3, toEther(100))
+            await nftManager.addSyntheticVariant("Ang Bao 100 USD", 1, toEther(100))
+            await nftManager.addSyntheticVariant("Ang Bao 10 USD", 2, toEther(10))
+            await nftManager.addSyntheticVariant("Ang Bao 1 USD", 3, toEther(1))
 
             await nftManager.setContractState(1)
 
