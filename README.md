@@ -1,3 +1,4 @@
+# Tamago Finance
 
-TBD
+> A value-backed NFT issuance protocol on Ethereum Mainnet & Polygon
 
