@@ -3,10 +3,9 @@ module.exports = async ({ getNamedAccounts, deployments, network }) => {
 
   const { deployer, dev } = await getNamedAccounts()
 
-  const WMATIC_ADDRESS = "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"
-  const USDC_ADDRESS = "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
-  const WMATIC_USDC_LP_ADDRESS = "0x6e7a5fafcec6bb1e78bae2a1f0b612012bf14827"
-  const ROUTER_ADDRESS = "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff"
+  // Chainlink Feeder Address
+  const FeederUsdcAddress = "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6"
+  const FeederEthAddress = "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419"
 
   await deploy("PriceResolver", {
     from: deployer,
@@ -17,7 +16,7 @@ module.exports = async ({ getNamedAccounts, deployments, network }) => {
   const PriceResolver = await hre.ethers.getContractFactory("PriceResolver")
   const shareToken = await hre.ethers.getContractAt(
     "IPancakePair",
-    WMATIC_USDC_LP_ADDRESS
+    WETH_USDC_LP_ADDRESS
   )
 
   const priceResolver = PriceResolver.attach(
@@ -31,7 +30,7 @@ module.exports = async ({ getNamedAccounts, deployments, network }) => {
       "https://api.tamago.finance/lucky-red-envelope/polygon/{id}",
       priceResolver.address,
       shareToken.address,
-      hre.ethers.utils.formatBytes32String("WMATIC-USDC-SHARE"),
+      hre.ethers.utils.formatBytes32String("WETH-USDC-SHARE"),
       hre.ethers.utils.formatBytes32String("USD"),
       dev,
     ],
@@ -40,14 +39,12 @@ module.exports = async ({ getNamedAccounts, deployments, network }) => {
 
   await deploy("ChainlinkPriceFeeder", {
     from: deployer,
-    args: ["WMATIC/USD", "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0", 8],
+    args: ["WETH/USD", FeederEthAddress, 8],
     log: true,
   })
 
-  const FeederWmatic = await hre.ethers.getContractFactory(
-    "ChainlinkPriceFeeder"
-  )
-  const feederWmatic = await FeederWmatic.attach(
+  const FeederWEth = await hre.ethers.getContractFactory("ChainlinkPriceFeeder")
+  const feederWEth = await FeederWEth.attach(
     (
       await deployments.get("ChainlinkPriceFeeder")
     ).address
@@ -55,7 +52,7 @@ module.exports = async ({ getNamedAccounts, deployments, network }) => {
 
   await deploy("ChainlinkPriceFeeder", {
     from: deployer,
-    args: ["USDC/USD", "0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7", 8],
+    args: ["USDC/USD", FeederUsdcAddress, 8],
     log: true,
   })
 
@@ -72,24 +69,12 @@ module.exports = async ({ getNamedAccounts, deployments, network }) => {
     log: true,
   })
 
-  // await deploy("QuickswapTokenFeeder", {
-  //   from: deployer,
-  //   args: [
-  //     "TAMG/USDC",
-  //     TAMG_ADDRESS,
-  //     18, //TAMG decimals
-  //     USDC_ADDRESS,
-  //     6, // USDC decimals
-  //   ],
-  //   log: true,
-  // })
-
   await deploy("QuickswapLPFeeder", {
     from: deployer,
     args: [
-      "WMATIC-USDC-SHARE",
-      WMATIC_USDC_LP_ADDRESS,
-      feederWmatic.address,
+      "WETH-USDC-SHARE",
+      WETH_USDC_LP_ADDRESS,
+      feederWEth.address,
       18,
       feederUsdc.address,
       6,
@@ -134,26 +119,6 @@ module.exports = async ({ getNamedAccounts, deployments, network }) => {
   )
   console.log("✅ Done on => ", updateTx.hash)
 
-  // console.log(">> Update TAMG/USDC")
-  // estimateGas = await priceResolver.estimateGas.registerPriceFeeder(
-  //   hre.ethers.utils.formatBytes32String("TAMG/USDC"),
-  //   (
-  //     await deployments.get("QuickswapTokenFeeder")
-  //   ).address,
-  //   false,
-  //   hre.ethers.utils.parseEther("0.4")
-  // )
-  // updateTx = await priceResolver.registerPriceFeeder(
-  //   hre.ethers.utils.formatBytes32String("TAMG/USDC"),
-  //   (
-  //     await deployments.get("QuickswapTokenFeeder")
-  //   ).address,
-  //   false,
-  //   hre.ethers.utils.parseEther("0.4"),
-  //   { gasLimit: estimateGas.add(100000) }
-  // )
-  // console.log("✅ Done on => ", updateTx.hash)
-
   console.log(">> Update USD")
   estimateGas = await priceResolver.estimateGas.registerPriceFeeder(
     hre.ethers.utils.formatBytes32String("USD"),
@@ -170,38 +135,38 @@ module.exports = async ({ getNamedAccounts, deployments, network }) => {
   )
   console.log("✅ Done on => ", updateTx.hash)
 
-  console.log(">> Update WMATIC-USDC-SHARE")
+  console.log(">> Update WETH-USDC-SHARE")
   estimateGas = await priceResolver.estimateGas.registerPriceFeeder(
-    hre.ethers.utils.formatBytes32String("WMATIC-USDC-SHARE"),
+    hre.ethers.utils.formatBytes32String("WETH-USDC-SHARE"),
     (
       await deployments.get("QuickswapLPFeeder")
     ).address,
     false,
-    hre.ethers.utils.parseEther("4706278")
+    hre.ethers.utils.parseEther("168814574")
   )
   updateTx = await priceResolver.registerPriceFeeder(
-    hre.ethers.utils.formatBytes32String("WMATIC-USDC-SHARE"),
+    hre.ethers.utils.formatBytes32String("WETH-USDC-SHARE"),
     (
       await deployments.get("QuickswapLPFeeder")
     ).address,
     false,
-    hre.ethers.utils.parseEther("4706278"),
+    hre.ethers.utils.parseEther("168814574"),
     { gasLimit: estimateGas.add(100000) }
   )
   console.log("✅ Done on => ", updateTx.hash)
 
-  console.log(">> Update WMATIC/USD")
+  console.log(">> Update WETH/USD")
   estimateGas = await priceResolver.estimateGas.registerPriceFeeder(
-    hre.ethers.utils.formatBytes32String("WMATIC/USD"),
-    feederWmatic.address,
+    hre.ethers.utils.formatBytes32String("WETH/USD"),
+    feederWEth.address,
     false,
-    hre.ethers.utils.parseEther("1.5")
+    hre.ethers.utils.parseEther("3000")
   )
   updateTx = await priceResolver.registerPriceFeeder(
-    hre.ethers.utils.formatBytes32String("WMATIC/USD"),
-    feederWmatic.address,
+    hre.ethers.utils.formatBytes32String("WETH/USD"),
+    feederWEth.address,
     false,
-    hre.ethers.utils.parseEther("1.5"),
+    hre.ethers.utils.parseEther("3000"),
     { gasLimit: estimateGas.add(100000) }
   )
   console.log("✅ Done on => ", updateTx.hash)

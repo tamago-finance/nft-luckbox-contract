@@ -47,14 +47,21 @@ module.exports = {
       //   blockNumber: 20480699,
       // },
       forking: {
-        url: process.env.MAINNET_URL,
-        blockNumber: 13975629,
+        chainId: 1337,
+        url: process.env.MAINNET_ARCHIVE_RPC,
+        accounts: [process.env.PRIVATEKEY_DEPLOYER, process.env.PRIVATEKEY_DEV],
+        // blockNumber: 13975629,
       },
     },
     polygon: {
       allowUnlimitedContractSize: true,
       url: process.env.POLYGON_URL,
       accounts: [process.env.PRIVATEKEY_DEPLOYER, process.env.PRIVATEKEY_DEV],
+    },
+    mainnetfork: {
+      url: "http://127.0.0.1:8545",
+      accounts: [process.env.PRIVATEKEY_DEPLOYER, process.env.PRIVATEKEY_DEV],
+      timeout: 500000,
     },
   },
   namedAccounts: {

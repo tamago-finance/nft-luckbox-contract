@@ -3,7 +3,10 @@
   "version": "0.3.0",
   "license": "MIT",
   "scripts": {
-    "deploy:polygon:NFTManager": "hardhat --network polygon deploy --no-compile --reset --tags NFTManager"
+    "mainnetfork": "source ./start_mainnet_fork_node.sh",
+    "deploy:polygon:NFTManager": "hardhat --network polygon deploy --no-compile --reset --tags NFTManager",
+    "deploy:mainnet:NFTManager": "hardhat --network mainnet deploy --no-compile --reset --tags NFTManager",
+    "deploy:mainnetfork:NFTManager": "hardhat --network mainnetfork deploy --no-compile --reset --tags NFTManager"
   },
   "dependencies": {
     "@chainlink/contracts": "^0.2.2",

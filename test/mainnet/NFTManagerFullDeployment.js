@@ -17,7 +17,7 @@ let bob
 let charlie
 let dev
 
-describe("Full Deployment Ang Pow USD", () => {
+describe("Full Deployment Ang Bao USD", () => {
   const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
   const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
   const WETH_USDC_LP_ADDRESS = "0x397FF1542f962076d0BFE58eA045FfA2d347ACa0"
@@ -92,7 +92,7 @@ describe("Full Deployment Ang Pow USD", () => {
     })
 
     nftManager = await NFTManager.deploy(
-      "Ang Pow USD",
+      "Ang Bao USD",
       "https://api.tamago.finance/angpow/{id}",
       priceResolver.address,
       shareToken.address,
@@ -102,9 +102,9 @@ describe("Full Deployment Ang Pow USD", () => {
     )
 
     // setup NFT variants
-    await nftManager.addSyntheticVariant("Ang Pow 1 USD", 1, toEther(1))
-    await nftManager.addSyntheticVariant("Ang Pow 10 USD", 2, toEther(10))
-    await nftManager.addSyntheticVariant("Ang Pow 100 USD", 3, toEther(100))
+    await nftManager.addSyntheticVariant("Ang Bao 1 USD", 1, toEther(1))
+    await nftManager.addSyntheticVariant("Ang Bao 10 USD", 2, toEther(10))
+    await nftManager.addSyntheticVariant("Ang Bao 100 USD", 3, toEther(100))
 
     await nftManager.setContractState(1)
 
