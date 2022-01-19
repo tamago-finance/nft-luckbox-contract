@@ -8,6 +8,7 @@ core-old-2/
 client
 client-old
 acala-old
+deployments-old
 scheduler-old
 node_modules
 .env
