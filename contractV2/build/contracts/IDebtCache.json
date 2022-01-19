@@ -1,0 +1,2933 @@
+{
+  "contractName": "IDebtCache",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "cachedDebt",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "currencyKey",
+          "type": "bytes32"
+        }
+      ],
+      "name": "cachedSynthDebt",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "cacheTimestamp",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "cacheInvalid",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "cacheStale",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32[]",
+          "name": "currencyKeys",
+          "type": "bytes32[]"
+        }
+      ],
+      "name": "currentSynthDebts",
+      "outputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "debtValues",
+          "type": "uint256[]"
+        },
+        {
+          "internalType": "bool",
+          "name": "anyRateIsInvalid",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32[]",
+          "name": "currencyKeys",
+          "type": "bytes32[]"
+        }
+      ],
+      "name": "cachedSynthDebts",
+      "outputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "debtValues",
+          "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "currentDebt",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "debt",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "anyRateIsInvalid",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "cacheInfo",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "debt",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "isInvalid",
+          "type": "bool"
+        },
+        {
+          "internalType": "bool",
+          "name": "isStale",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32[]",
+          "name": "currencyKeys",
+          "type": "bytes32[]"
+        }
+      ],
+      "name": "updateCachedSynthDebts",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "currencyKey",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "currencyRate",
+          "type": "uint256"
+        }
+      ],
+      "name": "updateCachedSynthDebtWithRate",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32[]",
+          "name": "currencyKeys",
+          "type": "bytes32[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "currencyRates",
+          "type": "uint256[]"
+        }
+      ],
+      "name": "updateCachedSynthDebtsWithRates",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bool",
+          "name": "currentlyInvalid",
+          "type": "bool"
+        }
+      ],
+      "name": "updateDebtCacheValidity",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "currencyKey",
+          "type": "bytes32"
+        }
+      ],
+      "name": "purgeCachedSynthDebt",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "takeDebtSnapshot",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.6.12+commit.27d51765\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"cacheInfo\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"debt\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"isInvalid\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"isStale\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"cacheInvalid\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"cacheStale\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"cacheTimestamp\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"cachedDebt\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"currencyKey\",\"type\":\"bytes32\"}],\"name\":\"cachedSynthDebt\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"currencyKeys\",\"type\":\"bytes32[]\"}],\"name\":\"cachedSynthDebts\",\"outputs\":[{\"internalType\":\"uint256[]\",\"name\":\"debtValues\",\"type\":\"uint256[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"currentDebt\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"debt\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"anyRateIsInvalid\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"currencyKeys\",\"type\":\"bytes32[]\"}],\"name\":\"currentSynthDebts\",\"outputs\":[{\"internalType\":\"uint256[]\",\"name\":\"debtValues\",\"type\":\"uint256[]\"},{\"internalType\":\"bool\",\"name\":\"anyRateIsInvalid\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"currencyKey\",\"type\":\"bytes32\"}],\"name\":\"purgeCachedSynthDebt\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"takeDebtSnapshot\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"currencyKey\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"currencyRate\",\"type\":\"uint256\"}],\"name\":\"updateCachedSynthDebtWithRate\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"currencyKeys\",\"type\":\"bytes32[]\"}],\"name\":\"updateCachedSynthDebts\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"currencyKeys\",\"type\":\"bytes32[]\"},{\"internalType\":\"uint256[]\",\"name\":\"currencyRates\",\"type\":\"uint256[]\"}],\"name\":\"updateCachedSynthDebtsWithRates\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bool\",\"name\":\"currentlyInvalid\",\"type\":\"bool\"}],\"name\":\"updateDebtCacheValidity\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/utility/synthetix/interfaces/IDebtCache.sol\":\"IDebtCache\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/utility/synthetix/interfaces/IDebtCache.sol\":{\"keccak256\":\"0x8d7e0270b87cc1eea402d0bbf056ece11b76a6c017d7ddf0d1365b7b601c4441\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://8b721e1e03920bef7fe2fb49b7641dfb486a923aac9ced27eda94bf94ab20a51\",\"dweb:/ipfs/QmYHAJFjyyuCPxvp3jy5ZmNmSfkQNDE6wucnV9dsPziSsX\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity >=0.4.24;\n\ninterface IDebtCache {\n    // Views\n\n    function cachedDebt() external view returns (uint);\n\n    function cachedSynthDebt(bytes32 currencyKey) external view returns (uint);\n\n    function cacheTimestamp() external view returns (uint);\n\n    function cacheInvalid() external view returns (bool);\n\n    function cacheStale() external view returns (bool);\n\n    function currentSynthDebts(bytes32[] calldata currencyKeys)\n        external\n        view\n        returns (uint[] memory debtValues, bool anyRateIsInvalid);\n\n    function cachedSynthDebts(bytes32[] calldata currencyKeys) external view returns (uint[] memory debtValues);\n\n    function currentDebt() external view returns (uint debt, bool anyRateIsInvalid);\n\n    function cacheInfo()\n        external\n        view\n        returns (\n            uint debt,\n            uint timestamp,\n            bool isInvalid,\n            bool isStale\n        );\n\n    // Mutative functions\n\n    function updateCachedSynthDebts(bytes32[] calldata currencyKeys) external;\n\n    function updateCachedSynthDebtWithRate(bytes32 currencyKey, uint currencyRate) external;\n\n    function updateCachedSynthDebtsWithRates(bytes32[] calldata currencyKeys, uint[] calldata currencyRates) external;\n\n    function updateDebtCacheValidity(bool currentlyInvalid) external;\n\n    function purgeCachedSynthDebt(bytes32 currencyKey) external;\n\n    function takeDebtSnapshot() external;\n}\n",
+  "sourcePath": "/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/utility/synthetix/interfaces/IDebtCache.sol",
+  "ast": {
+    "absolutePath": "/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/utility/synthetix/interfaces/IDebtCache.sol",
+    "exportedSymbols": {
+      "IDebtCache": [
+        12482
+      ]
+    },
+    "id": 12483,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 12381,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.4",
+          ".24"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:25:50"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": null,
+        "fullyImplemented": false,
+        "id": 12482,
+        "linearizedBaseContracts": [
+          12482
+        ],
+        "name": "IDebtCache",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "05393262",
+            "id": 12386,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "cachedDebt",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 12382,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "120:2:50"
+            },
+            "returnParameters": {
+              "id": 12385,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12384,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12386,
+                  "src": "146:4:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12383,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "146:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "145:6:50"
+            },
+            "scope": 12482,
+            "src": "101:51:50",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "0fb38465",
+            "id": 12393,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "cachedSynthDebt",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 12389,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12388,
+                  "mutability": "mutable",
+                  "name": "currencyKey",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12393,
+                  "src": "183:19:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 12387,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "183:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "182:21:50"
+            },
+            "returnParameters": {
+              "id": 12392,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12391,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12393,
+                  "src": "227:4:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12390,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "227:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "226:6:50"
+            },
+            "scope": 12482,
+            "src": "158:75:50",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "d0fffafd",
+            "id": 12398,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "cacheTimestamp",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 12394,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "262:2:50"
+            },
+            "returnParameters": {
+              "id": 12397,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12396,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12398,
+                  "src": "288:4:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12395,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "288:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "287:6:50"
+            },
+            "scope": 12482,
+            "src": "239:55:50",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "a5f27edb",
+            "id": 12403,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "cacheInvalid",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 12399,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "321:2:50"
+            },
+            "returnParameters": {
+              "id": 12402,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12401,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12403,
+                  "src": "347:4:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 12400,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "347:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "346:6:50"
+            },
+            "scope": 12482,
+            "src": "300:53:50",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "fc524773",
+            "id": 12408,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "cacheStale",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 12404,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "378:2:50"
+            },
+            "returnParameters": {
+              "id": 12407,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12406,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12408,
+                  "src": "404:4:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 12405,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "404:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "403:6:50"
+            },
+            "scope": 12482,
+            "src": "359:51:50",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "6bf7c435",
+            "id": 12419,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "currentSynthDebts",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 12412,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12411,
+                  "mutability": "mutable",
+                  "name": "currencyKeys",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12419,
+                  "src": "443:31:50",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_bytes32_$dyn_calldata_ptr",
+                    "typeString": "bytes32[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 12409,
+                      "name": "bytes32",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "443:7:50",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "id": 12410,
+                    "length": null,
+                    "nodeType": "ArrayTypeName",
+                    "src": "443:9:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_bytes32_$dyn_storage_ptr",
+                      "typeString": "bytes32[]"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "442:33:50"
+            },
+            "returnParameters": {
+              "id": 12418,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12415,
+                  "mutability": "mutable",
+                  "name": "debtValues",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12419,
+                  "src": "523:24:50",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_uint256_$dyn_memory_ptr",
+                    "typeString": "uint256[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 12413,
+                      "name": "uint",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "523:4:50",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 12414,
+                    "length": null,
+                    "nodeType": "ArrayTypeName",
+                    "src": "523:6:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
+                      "typeString": "uint256[]"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12417,
+                  "mutability": "mutable",
+                  "name": "anyRateIsInvalid",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12419,
+                  "src": "549:21:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 12416,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "549:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "522:49:50"
+            },
+            "scope": 12482,
+            "src": "416:156:50",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "b13cd785",
+            "id": 12428,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "cachedSynthDebts",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 12423,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12422,
+                  "mutability": "mutable",
+                  "name": "currencyKeys",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12428,
+                  "src": "604:31:50",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_bytes32_$dyn_calldata_ptr",
+                    "typeString": "bytes32[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 12420,
+                      "name": "bytes32",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "604:7:50",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "id": 12421,
+                    "length": null,
+                    "nodeType": "ArrayTypeName",
+                    "src": "604:9:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_bytes32_$dyn_storage_ptr",
+                      "typeString": "bytes32[]"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "603:33:50"
+            },
+            "returnParameters": {
+              "id": 12427,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12426,
+                  "mutability": "mutable",
+                  "name": "debtValues",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12428,
+                  "src": "660:24:50",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_uint256_$dyn_memory_ptr",
+                    "typeString": "uint256[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 12424,
+                      "name": "uint",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "660:4:50",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 12425,
+                    "length": null,
+                    "nodeType": "ArrayTypeName",
+                    "src": "660:6:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
+                      "typeString": "uint256[]"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "659:26:50"
+            },
+            "scope": 12482,
+            "src": "578:108:50",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "759076e5",
+            "id": 12435,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "currentDebt",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 12429,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "712:2:50"
+            },
+            "returnParameters": {
+              "id": 12434,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12431,
+                  "mutability": "mutable",
+                  "name": "debt",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12435,
+                  "src": "738:9:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12430,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "738:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12433,
+                  "mutability": "mutable",
+                  "name": "anyRateIsInvalid",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12435,
+                  "src": "749:21:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 12432,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "749:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "737:34:50"
+            },
+            "scope": 12482,
+            "src": "692:80:50",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "3a900a2e",
+            "id": 12446,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "cacheInfo",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 12436,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "796:2:50"
+            },
+            "returnParameters": {
+              "id": 12445,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12438,
+                  "mutability": "mutable",
+                  "name": "debt",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12446,
+                  "src": "859:9:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12437,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "859:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12440,
+                  "mutability": "mutable",
+                  "name": "timestamp",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12446,
+                  "src": "882:14:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12439,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "882:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12442,
+                  "mutability": "mutable",
+                  "name": "isInvalid",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12446,
+                  "src": "910:14:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 12441,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "910:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12444,
+                  "mutability": "mutable",
+                  "name": "isStale",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12446,
+                  "src": "938:12:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 12443,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "938:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "845:115:50"
+            },
+            "scope": 12482,
+            "src": "778:183:50",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "cda218c7",
+            "id": 12452,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "updateCachedSynthDebts",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 12450,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12449,
+                  "mutability": "mutable",
+                  "name": "currencyKeys",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12452,
+                  "src": "1026:31:50",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_bytes32_$dyn_calldata_ptr",
+                    "typeString": "bytes32[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 12447,
+                      "name": "bytes32",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "1026:7:50",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "id": 12448,
+                    "length": null,
+                    "nodeType": "ArrayTypeName",
+                    "src": "1026:9:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_bytes32_$dyn_storage_ptr",
+                      "typeString": "bytes32[]"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1025:33:50"
+            },
+            "returnParameters": {
+              "id": 12451,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1067:0:50"
+            },
+            "scope": 12482,
+            "src": "994:74:50",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "d685743a",
+            "id": 12459,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "updateCachedSynthDebtWithRate",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 12457,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12454,
+                  "mutability": "mutable",
+                  "name": "currencyKey",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12459,
+                  "src": "1113:19:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 12453,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1113:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12456,
+                  "mutability": "mutable",
+                  "name": "currencyRate",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12459,
+                  "src": "1134:17:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 12455,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1134:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1112:40:50"
+            },
+            "returnParameters": {
+              "id": 12458,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1161:0:50"
+            },
+            "scope": 12482,
+            "src": "1074:88:50",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "17b38db4",
+            "id": 12468,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "updateCachedSynthDebtsWithRates",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 12466,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12462,
+                  "mutability": "mutable",
+                  "name": "currencyKeys",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12468,
+                  "src": "1209:31:50",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_bytes32_$dyn_calldata_ptr",
+                    "typeString": "bytes32[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 12460,
+                      "name": "bytes32",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "1209:7:50",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "id": 12461,
+                    "length": null,
+                    "nodeType": "ArrayTypeName",
+                    "src": "1209:9:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_bytes32_$dyn_storage_ptr",
+                      "typeString": "bytes32[]"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 12465,
+                  "mutability": "mutable",
+                  "name": "currencyRates",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12468,
+                  "src": "1242:29:50",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_uint256_$dyn_calldata_ptr",
+                    "typeString": "uint256[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 12463,
+                      "name": "uint",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "1242:4:50",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 12464,
+                    "length": null,
+                    "nodeType": "ArrayTypeName",
+                    "src": "1242:6:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
+                      "typeString": "uint256[]"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1208:64:50"
+            },
+            "returnParameters": {
+              "id": 12467,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1281:0:50"
+            },
+            "scope": 12482,
+            "src": "1168:114:50",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "04bd11e5",
+            "id": 12473,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "updateDebtCacheValidity",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 12471,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12470,
+                  "mutability": "mutable",
+                  "name": "currentlyInvalid",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12473,
+                  "src": "1321:21:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 12469,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1321:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1320:23:50"
+            },
+            "returnParameters": {
+              "id": 12472,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1352:0:50"
+            },
+            "scope": 12482,
+            "src": "1288:65:50",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "8dd5bfbc",
+            "id": 12478,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "purgeCachedSynthDebt",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 12476,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 12475,
+                  "mutability": "mutable",
+                  "name": "currencyKey",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 12478,
+                  "src": "1389:19:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 12474,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1389:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1388:21:50"
+            },
+            "returnParameters": {
+              "id": 12477,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1418:0:50"
+            },
+            "scope": 12482,
+            "src": "1359:60:50",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "e3476cd4",
+            "id": 12481,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "takeDebtSnapshot",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 12479,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1450:2:50"
+            },
+            "returnParameters": {
+              "id": 12480,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1461:0:50"
+            },
+            "scope": 12482,
+            "src": "1425:37:50",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 12483,
+        "src": "60:1404:50"
+      }
+    ],
+    "src": "33:1432:50"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/utility/synthetix/interfaces/IDebtCache.sol",
+      "exportedSymbols": {
+        "IDebtCache": [
+          12482
+        ]
+      },
+      "license": "MIT"
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            ">=",
+            "0.4",
+            ".24"
+          ]
+        },
+        "id": 12381,
+        "name": "PragmaDirective",
+        "src": "33:25:50"
+      },
+      {
+        "attributes": {
+          "abstract": false,
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "interface",
+          "documentation": null,
+          "fullyImplemented": false,
+          "linearizedBaseContracts": [
+            12482
+          ],
+          "name": "IDebtCache",
+          "scope": 12483
+        },
+        "children": [
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "05393262",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "cachedDebt",
+              "overrides": null,
+              "scope": 12482,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 12382,
+                "name": "ParameterList",
+                "src": "120:2:50"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "overrides": null,
+                      "scope": 12386,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 12383,
+                        "name": "ElementaryTypeName",
+                        "src": "146:4:50"
+                      }
+                    ],
+                    "id": 12384,
+                    "name": "VariableDeclaration",
+                    "src": "146:4:50"
+                  }
+                ],
+                "id": 12385,
+                "name": "ParameterList",
+                "src": "145:6:50"
+              }
+            ],
+            "id": 12386,
+            "name": "FunctionDefinition",
+            "src": "101:51:50"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "0fb38465",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "cachedSynthDebt",
+              "overrides": null,
+              "scope": 12482,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "currencyKey",
+                      "overrides": null,
+                      "scope": 12393,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bytes32",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bytes32",
+                          "type": "bytes32"
+                        },
+                        "id": 12387,
+                        "name": "ElementaryTypeName",
+                        "src": "183:7:50"
+                      }
+                    ],
+                    "id": 12388,
+                    "name": "VariableDeclaration",
+                    "src": "183:19:50"
+                  }
+                ],
+                "id": 12389,
+                "name": "ParameterList",
+                "src": "182:21:50"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "overrides": null,
+                      "scope": 12393,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 12390,
+                        "name": "ElementaryTypeName",
+                        "src": "227:4:50"
+                      }
+                    ],
+                    "id": 12391,
+                    "name": "VariableDeclaration",
+                    "src": "227:4:50"
+                  }
+                ],
+                "id": 12392,
+                "name": "ParameterList",
+                "src": "226:6:50"
+              }
+            ],
+            "id": 12393,
+            "name": "FunctionDefinition",
+            "src": "158:75:50"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "d0fffafd",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "cacheTimestamp",
+              "overrides": null,
+              "scope": 12482,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 12394,
+                "name": "ParameterList",
+                "src": "262:2:50"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "overrides": null,
+                      "scope": 12398,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 12395,
+                        "name": "ElementaryTypeName",
+                        "src": "288:4:50"
+                      }
+                    ],
+                    "id": 12396,
+                    "name": "VariableDeclaration",
+                    "src": "288:4:50"
+                  }
+                ],
+                "id": 12397,
+                "name": "ParameterList",
+                "src": "287:6:50"
+              }
+            ],
+            "id": 12398,
+            "name": "FunctionDefinition",
+            "src": "239:55:50"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "a5f27edb",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "cacheInvalid",
+              "overrides": null,
+              "scope": 12482,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 12399,
+                "name": "ParameterList",
+                "src": "321:2:50"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "overrides": null,
+                      "scope": 12403,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bool",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bool",
+                          "type": "bool"
+                        },
+                        "id": 12400,
+                        "name": "ElementaryTypeName",
+                        "src": "347:4:50"
+                      }
+                    ],
+                    "id": 12401,
+                    "name": "VariableDeclaration",
+                    "src": "347:4:50"
+                  }
+                ],
+                "id": 12402,
+                "name": "ParameterList",
+                "src": "346:6:50"
+              }
+            ],
+            "id": 12403,
+            "name": "FunctionDefinition",
+            "src": "300:53:50"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "fc524773",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "cacheStale",
+              "overrides": null,
+              "scope": 12482,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 12404,
+                "name": "ParameterList",
+                "src": "378:2:50"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "overrides": null,
+                      "scope": 12408,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bool",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bool",
+                          "type": "bool"
+                        },
+                        "id": 12405,
+                        "name": "ElementaryTypeName",
+                        "src": "404:4:50"
+                      }
+                    ],
+                    "id": 12406,
+                    "name": "VariableDeclaration",
+                    "src": "404:4:50"
+                  }
+                ],
+                "id": 12407,
+                "name": "ParameterList",
+                "src": "403:6:50"
+              }
+            ],
+            "id": 12408,
+            "name": "FunctionDefinition",
+            "src": "359:51:50"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "6bf7c435",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "currentSynthDebts",
+              "overrides": null,
+              "scope": 12482,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "currencyKeys",
+                      "overrides": null,
+                      "scope": 12419,
+                      "stateVariable": false,
+                      "storageLocation": "calldata",
+                      "type": "bytes32[]",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "bytes32[]"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "bytes32",
+                              "type": "bytes32"
+                            },
+                            "id": 12409,
+                            "name": "ElementaryTypeName",
+                            "src": "443:7:50"
+                          }
+                        ],
+                        "id": 12410,
+                        "name": "ArrayTypeName",
+                        "src": "443:9:50"
+                      }
+                    ],
+                    "id": 12411,
+                    "name": "VariableDeclaration",
+                    "src": "443:31:50"
+                  }
+                ],
+                "id": 12412,
+                "name": "ParameterList",
+                "src": "442:33:50"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "debtValues",
+                      "overrides": null,
+                      "scope": 12419,
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "type": "uint256[]",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "uint256[]"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "uint",
+                              "type": "uint256"
+                            },
+                            "id": 12413,
+                            "name": "ElementaryTypeName",
+                            "src": "523:4:50"
+                          }
+                        ],
+                        "id": 12414,
+                        "name": "ArrayTypeName",
+                        "src": "523:6:50"
+                      }
+                    ],
+                    "id": 12415,
+                    "name": "VariableDeclaration",
+                    "src": "523:24:50"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "anyRateIsInvalid",
+                      "overrides": null,
+                      "scope": 12419,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bool",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bool",
+                          "type": "bool"
+                        },
+                        "id": 12416,
+                        "name": "ElementaryTypeName",
+                        "src": "549:4:50"
+                      }
+                    ],
+                    "id": 12417,
+                    "name": "VariableDeclaration",
+                    "src": "549:21:50"
+                  }
+                ],
+                "id": 12418,
+                "name": "ParameterList",
+                "src": "522:49:50"
+              }
+            ],
+            "id": 12419,
+            "name": "FunctionDefinition",
+            "src": "416:156:50"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "b13cd785",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "cachedSynthDebts",
+              "overrides": null,
+              "scope": 12482,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "currencyKeys",
+                      "overrides": null,
+                      "scope": 12428,
+                      "stateVariable": false,
+                      "storageLocation": "calldata",
+                      "type": "bytes32[]",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "bytes32[]"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "bytes32",
+                              "type": "bytes32"
+                            },
+                            "id": 12420,
+                            "name": "ElementaryTypeName",
+                            "src": "604:7:50"
+                          }
+                        ],
+                        "id": 12421,
+                        "name": "ArrayTypeName",
+                        "src": "604:9:50"
+                      }
+                    ],
+                    "id": 12422,
+                    "name": "VariableDeclaration",
+                    "src": "604:31:50"
+                  }
+                ],
+                "id": 12423,
+                "name": "ParameterList",
+                "src": "603:33:50"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "debtValues",
+                      "overrides": null,
+                      "scope": 12428,
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "type": "uint256[]",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "uint256[]"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "uint",
+                              "type": "uint256"
+                            },
+                            "id": 12424,
+                            "name": "ElementaryTypeName",
+                            "src": "660:4:50"
+                          }
+                        ],
+                        "id": 12425,
+                        "name": "ArrayTypeName",
+                        "src": "660:6:50"
+                      }
+                    ],
+                    "id": 12426,
+                    "name": "VariableDeclaration",
+                    "src": "660:24:50"
+                  }
+                ],
+                "id": 12427,
+                "name": "ParameterList",
+                "src": "659:26:50"
+              }
+            ],
+            "id": 12428,
+            "name": "FunctionDefinition",
+            "src": "578:108:50"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "759076e5",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "currentDebt",
+              "overrides": null,
+              "scope": 12482,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 12429,
+                "name": "ParameterList",
+                "src": "712:2:50"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "debt",
+                      "overrides": null,
+                      "scope": 12435,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 12430,
+                        "name": "ElementaryTypeName",
+                        "src": "738:4:50"
+                      }
+                    ],
+                    "id": 12431,
+                    "name": "VariableDeclaration",
+                    "src": "738:9:50"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "anyRateIsInvalid",
+                      "overrides": null,
+                      "scope": 12435,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bool",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bool",
+                          "type": "bool"
+                        },
+                        "id": 12432,
+                        "name": "ElementaryTypeName",
+                        "src": "749:4:50"
+                      }
+                    ],
+                    "id": 12433,
+                    "name": "VariableDeclaration",
+                    "src": "749:21:50"
+                  }
+                ],
+                "id": 12434,
+                "name": "ParameterList",
+                "src": "737:34:50"
+              }
+            ],
+            "id": 12435,
+            "name": "FunctionDefinition",
+            "src": "692:80:50"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "3a900a2e",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "cacheInfo",
+              "overrides": null,
+              "scope": 12482,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 12436,
+                "name": "ParameterList",
+                "src": "796:2:50"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "debt",
+                      "overrides": null,
+                      "scope": 12446,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 12437,
+                        "name": "ElementaryTypeName",
+                        "src": "859:4:50"
+                      }
+                    ],
+                    "id": 12438,
+                    "name": "VariableDeclaration",
+                    "src": "859:9:50"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "timestamp",
+                      "overrides": null,
+                      "scope": 12446,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 12439,
+                        "name": "ElementaryTypeName",
+                        "src": "882:4:50"
+                      }
+                    ],
+                    "id": 12440,
+                    "name": "VariableDeclaration",
+                    "src": "882:14:50"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "isInvalid",
+                      "overrides": null,
+                      "scope": 12446,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bool",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bool",
+                          "type": "bool"
+                        },
+                        "id": 12441,
+                        "name": "ElementaryTypeName",
+                        "src": "910:4:50"
+                      }
+                    ],
+                    "id": 12442,
+                    "name": "VariableDeclaration",
+                    "src": "910:14:50"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "isStale",
+                      "overrides": null,
+                      "scope": 12446,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bool",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bool",
+                          "type": "bool"
+                        },
+                        "id": 12443,
+                        "name": "ElementaryTypeName",
+                        "src": "938:4:50"
+                      }
+                    ],
+                    "id": 12444,
+                    "name": "VariableDeclaration",
+                    "src": "938:12:50"
+                  }
+                ],
+                "id": 12445,
+                "name": "ParameterList",
+                "src": "845:115:50"
+              }
+            ],
+            "id": 12446,
+            "name": "FunctionDefinition",
+            "src": "778:183:50"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "cda218c7",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "updateCachedSynthDebts",
+              "overrides": null,
+              "scope": 12482,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "currencyKeys",
+                      "overrides": null,
+                      "scope": 12452,
+                      "stateVariable": false,
+                      "storageLocation": "calldata",
+                      "type": "bytes32[]",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "bytes32[]"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "bytes32",
+                              "type": "bytes32"
+                            },
+                            "id": 12447,
+                            "name": "ElementaryTypeName",
+                            "src": "1026:7:50"
+                          }
+                        ],
+                        "id": 12448,
+                        "name": "ArrayTypeName",
+                        "src": "1026:9:50"
+                      }
+                    ],
+                    "id": 12449,
+                    "name": "VariableDeclaration",
+                    "src": "1026:31:50"
+                  }
+                ],
+                "id": 12450,
+                "name": "ParameterList",
+                "src": "1025:33:50"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 12451,
+                "name": "ParameterList",
+                "src": "1067:0:50"
+              }
+            ],
+            "id": 12452,
+            "name": "FunctionDefinition",
+            "src": "994:74:50"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "d685743a",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "updateCachedSynthDebtWithRate",
+              "overrides": null,
+              "scope": 12482,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "currencyKey",
+                      "overrides": null,
+                      "scope": 12459,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bytes32",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bytes32",
+                          "type": "bytes32"
+                        },
+                        "id": 12453,
+                        "name": "ElementaryTypeName",
+                        "src": "1113:7:50"
+                      }
+                    ],
+                    "id": 12454,
+                    "name": "VariableDeclaration",
+                    "src": "1113:19:50"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "currencyRate",
+                      "overrides": null,
+                      "scope": 12459,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 12455,
+                        "name": "ElementaryTypeName",
+                        "src": "1134:4:50"
+                      }
+                    ],
+                    "id": 12456,
+                    "name": "VariableDeclaration",
+                    "src": "1134:17:50"
+                  }
+                ],
+                "id": 12457,
+                "name": "ParameterList",
+                "src": "1112:40:50"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 12458,
+                "name": "ParameterList",
+                "src": "1161:0:50"
+              }
+            ],
+            "id": 12459,
+            "name": "FunctionDefinition",
+            "src": "1074:88:50"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "17b38db4",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "updateCachedSynthDebtsWithRates",
+              "overrides": null,
+              "scope": 12482,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "currencyKeys",
+                      "overrides": null,
+                      "scope": 12468,
+                      "stateVariable": false,
+                      "storageLocation": "calldata",
+                      "type": "bytes32[]",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "bytes32[]"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "bytes32",
+                              "type": "bytes32"
+                            },
+                            "id": 12460,
+                            "name": "ElementaryTypeName",
+                            "src": "1209:7:50"
+                          }
+                        ],
+                        "id": 12461,
+                        "name": "ArrayTypeName",
+                        "src": "1209:9:50"
+                      }
+                    ],
+                    "id": 12462,
+                    "name": "VariableDeclaration",
+                    "src": "1209:31:50"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "currencyRates",
+                      "overrides": null,
+                      "scope": 12468,
+                      "stateVariable": false,
+                      "storageLocation": "calldata",
+                      "type": "uint256[]",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "uint256[]"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "uint",
+                              "type": "uint256"
+                            },
+                            "id": 12463,
+                            "name": "ElementaryTypeName",
+                            "src": "1242:4:50"
+                          }
+                        ],
+                        "id": 12464,
+                        "name": "ArrayTypeName",
+                        "src": "1242:6:50"
+                      }
+                    ],
+                    "id": 12465,
+                    "name": "VariableDeclaration",
+                    "src": "1242:29:50"
+                  }
+                ],
+                "id": 12466,
+                "name": "ParameterList",
+                "src": "1208:64:50"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 12467,
+                "name": "ParameterList",
+                "src": "1281:0:50"
+              }
+            ],
+            "id": 12468,
+            "name": "FunctionDefinition",
+            "src": "1168:114:50"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "04bd11e5",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "updateDebtCacheValidity",
+              "overrides": null,
+              "scope": 12482,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "currentlyInvalid",
+                      "overrides": null,
+                      "scope": 12473,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bool",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bool",
+                          "type": "bool"
+                        },
+                        "id": 12469,
+                        "name": "ElementaryTypeName",
+                        "src": "1321:4:50"
+                      }
+                    ],
+                    "id": 12470,
+                    "name": "VariableDeclaration",
+                    "src": "1321:21:50"
+                  }
+                ],
+                "id": 12471,
+                "name": "ParameterList",
+                "src": "1320:23:50"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 12472,
+                "name": "ParameterList",
+                "src": "1352:0:50"
+              }
+            ],
+            "id": 12473,
+            "name": "FunctionDefinition",
+            "src": "1288:65:50"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "8dd5bfbc",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "purgeCachedSynthDebt",
+              "overrides": null,
+              "scope": 12482,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "currencyKey",
+                      "overrides": null,
+                      "scope": 12478,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bytes32",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bytes32",
+                          "type": "bytes32"
+                        },
+                        "id": 12474,
+                        "name": "ElementaryTypeName",
+                        "src": "1389:7:50"
+                      }
+                    ],
+                    "id": 12475,
+                    "name": "VariableDeclaration",
+                    "src": "1389:19:50"
+                  }
+                ],
+                "id": 12476,
+                "name": "ParameterList",
+                "src": "1388:21:50"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 12477,
+                "name": "ParameterList",
+                "src": "1418:0:50"
+              }
+            ],
+            "id": 12478,
+            "name": "FunctionDefinition",
+            "src": "1359:60:50"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "e3476cd4",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "takeDebtSnapshot",
+              "overrides": null,
+              "scope": 12482,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 12479,
+                "name": "ParameterList",
+                "src": "1450:2:50"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 12480,
+                "name": "ParameterList",
+                "src": "1461:0:50"
+              }
+            ],
+            "id": 12481,
+            "name": "FunctionDefinition",
+            "src": "1425:37:50"
+          }
+        ],
+        "id": 12482,
+        "name": "ContractDefinition",
+        "src": "60:1404:50"
+      }
+    ],
+    "id": 12483,
+    "name": "SourceUnit",
+    "src": "33:1432:50"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.6.12+commit.27d51765.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.3.4",
+  "updatedAt": "2021-11-11T08:48:33.477Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

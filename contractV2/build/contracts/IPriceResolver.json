@@ -1,0 +1,1111 @@
+{
+  "contractName": "IPriceResolver",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "getCurrentPrice",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getCurrentPriceCollateral",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getCurrentRatio",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getRawRatio",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getAvg30Price",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getAvg60Price",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "isBullMarket",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.6.12+commit.27d51765\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"getAvg30Price\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getAvg60Price\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCurrentPrice\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCurrentPriceCollateral\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCurrentRatio\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getRawRatio\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"isBullMarket\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/interfaces/IPriceResolver.sol\":\"IPriceResolver\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/interfaces/IPriceResolver.sol\":{\"keccak256\":\"0xc31a9d95cb69b8df72d784bd027eee79ded3eb2046ffeeab4e2f2ab975a932a9\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://6d9c3d2d96a9c3e1e2fb33289623056516b51eb84c4b0fb7ed69af5cfc3dab58\",\"dweb:/ipfs/QmRaGFkiuPUx3E38JYEnzXHbqcpUa4hJStHfuiAYFkAXjQ\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity 0.6.12;\n\ninterface IPriceResolver {\n\n    function getCurrentPrice() external view returns (uint256);\n\n    function getCurrentPriceCollateral() external view returns (uint256);\n\n    function getCurrentRatio() external view returns (uint256);\n\n    function getRawRatio() external view returns (uint256);\n\n    function getAvg30Price() external view returns (uint256);\n\n    function getAvg60Price() external view returns (uint256);\n\n    function isBullMarket() external view returns (bool);\n\n}",
+  "sourcePath": "/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/interfaces/IPriceResolver.sol",
+  "ast": {
+    "absolutePath": "/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/interfaces/IPriceResolver.sol",
+    "exportedSymbols": {
+      "IPriceResolver": [
+        5530
+      ]
+    },
+    "id": 5531,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 5494,
+        "literals": [
+          "solidity",
+          "0.6",
+          ".12"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:23:14"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": null,
+        "fullyImplemented": false,
+        "id": 5530,
+        "linearizedBaseContracts": [
+          5530
+        ],
+        "name": "IPriceResolver",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "eb91d37e",
+            "id": 5499,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getCurrentPrice",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 5495,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "114:2:14"
+            },
+            "returnParameters": {
+              "id": 5498,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5497,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5499,
+                  "src": "140:7:14",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 5496,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "140:7:14",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "139:9:14"
+            },
+            "scope": 5530,
+            "src": "90:59:14",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "637af912",
+            "id": 5504,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getCurrentPriceCollateral",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 5500,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "189:2:14"
+            },
+            "returnParameters": {
+              "id": 5503,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5502,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5504,
+                  "src": "215:7:14",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 5501,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "215:7:14",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "214:9:14"
+            },
+            "scope": 5530,
+            "src": "155:69:14",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "bd3b379b",
+            "id": 5509,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getCurrentRatio",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 5505,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "254:2:14"
+            },
+            "returnParameters": {
+              "id": 5508,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5507,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5509,
+                  "src": "280:7:14",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 5506,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "280:7:14",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "279:9:14"
+            },
+            "scope": 5530,
+            "src": "230:59:14",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "af7abb98",
+            "id": 5514,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getRawRatio",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 5510,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "315:2:14"
+            },
+            "returnParameters": {
+              "id": 5513,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5512,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5514,
+                  "src": "341:7:14",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 5511,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "341:7:14",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "340:9:14"
+            },
+            "scope": 5530,
+            "src": "295:55:14",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "5a294bc0",
+            "id": 5519,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getAvg30Price",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 5515,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "378:2:14"
+            },
+            "returnParameters": {
+              "id": 5518,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5517,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5519,
+                  "src": "404:7:14",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 5516,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "404:7:14",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "403:9:14"
+            },
+            "scope": 5530,
+            "src": "356:57:14",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "ce58a717",
+            "id": 5524,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getAvg60Price",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 5520,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "441:2:14"
+            },
+            "returnParameters": {
+              "id": 5523,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5522,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5524,
+                  "src": "467:7:14",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 5521,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "467:7:14",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "466:9:14"
+            },
+            "scope": 5530,
+            "src": "419:57:14",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "ca17c14f",
+            "id": 5529,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "isBullMarket",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 5525,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "503:2:14"
+            },
+            "returnParameters": {
+              "id": 5528,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5527,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5529,
+                  "src": "529:4:14",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 5526,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "529:4:14",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "528:6:14"
+            },
+            "scope": 5530,
+            "src": "482:53:14",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 5531,
+        "src": "58:480:14"
+      }
+    ],
+    "src": "33:505:14"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "/Users/kantapatchankasem/Work/tamago/tamago-finance/contractV2/contracts/interfaces/IPriceResolver.sol",
+      "exportedSymbols": {
+        "IPriceResolver": [
+          5530
+        ]
+      },
+      "license": "MIT"
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "0.6",
+            ".12"
+          ]
+        },
+        "id": 5494,
+        "name": "PragmaDirective",
+        "src": "33:23:14"
+      },
+      {
+        "attributes": {
+          "abstract": false,
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "interface",
+          "documentation": null,
+          "fullyImplemented": false,
+          "linearizedBaseContracts": [
+            5530
+          ],
+          "name": "IPriceResolver",
+          "scope": 5531
+        },
+        "children": [
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "eb91d37e",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "getCurrentPrice",
+              "overrides": null,
+              "scope": 5530,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 5495,
+                "name": "ParameterList",
+                "src": "114:2:14"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "overrides": null,
+                      "scope": 5499,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 5496,
+                        "name": "ElementaryTypeName",
+                        "src": "140:7:14"
+                      }
+                    ],
+                    "id": 5497,
+                    "name": "VariableDeclaration",
+                    "src": "140:7:14"
+                  }
+                ],
+                "id": 5498,
+                "name": "ParameterList",
+                "src": "139:9:14"
+              }
+            ],
+            "id": 5499,
+            "name": "FunctionDefinition",
+            "src": "90:59:14"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "637af912",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "getCurrentPriceCollateral",
+              "overrides": null,
+              "scope": 5530,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 5500,
+                "name": "ParameterList",
+                "src": "189:2:14"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "overrides": null,
+                      "scope": 5504,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 5501,
+                        "name": "ElementaryTypeName",
+                        "src": "215:7:14"
+                      }
+                    ],
+                    "id": 5502,
+                    "name": "VariableDeclaration",
+                    "src": "215:7:14"
+                  }
+                ],
+                "id": 5503,
+                "name": "ParameterList",
+                "src": "214:9:14"
+              }
+            ],
+            "id": 5504,
+            "name": "FunctionDefinition",
+            "src": "155:69:14"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "bd3b379b",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "getCurrentRatio",
+              "overrides": null,
+              "scope": 5530,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 5505,
+                "name": "ParameterList",
+                "src": "254:2:14"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "overrides": null,
+                      "scope": 5509,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 5506,
+                        "name": "ElementaryTypeName",
+                        "src": "280:7:14"
+                      }
+                    ],
+                    "id": 5507,
+                    "name": "VariableDeclaration",
+                    "src": "280:7:14"
+                  }
+                ],
+                "id": 5508,
+                "name": "ParameterList",
+                "src": "279:9:14"
+              }
+            ],
+            "id": 5509,
+            "name": "FunctionDefinition",
+            "src": "230:59:14"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "af7abb98",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "getRawRatio",
+              "overrides": null,
+              "scope": 5530,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 5510,
+                "name": "ParameterList",
+                "src": "315:2:14"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "overrides": null,
+                      "scope": 5514,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 5511,
+                        "name": "ElementaryTypeName",
+                        "src": "341:7:14"
+                      }
+                    ],
+                    "id": 5512,
+                    "name": "VariableDeclaration",
+                    "src": "341:7:14"
+                  }
+                ],
+                "id": 5513,
+                "name": "ParameterList",
+                "src": "340:9:14"
+              }
+            ],
+            "id": 5514,
+            "name": "FunctionDefinition",
+            "src": "295:55:14"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "5a294bc0",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "getAvg30Price",
+              "overrides": null,
+              "scope": 5530,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 5515,
+                "name": "ParameterList",
+                "src": "378:2:14"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "overrides": null,
+                      "scope": 5519,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 5516,
+                        "name": "ElementaryTypeName",
+                        "src": "404:7:14"
+                      }
+                    ],
+                    "id": 5517,
+                    "name": "VariableDeclaration",
+                    "src": "404:7:14"
+                  }
+                ],
+                "id": 5518,
+                "name": "ParameterList",
+                "src": "403:9:14"
+              }
+            ],
+            "id": 5519,
+            "name": "FunctionDefinition",
+            "src": "356:57:14"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "ce58a717",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "getAvg60Price",
+              "overrides": null,
+              "scope": 5530,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 5520,
+                "name": "ParameterList",
+                "src": "441:2:14"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "overrides": null,
+                      "scope": 5524,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 5521,
+                        "name": "ElementaryTypeName",
+                        "src": "467:7:14"
+                      }
+                    ],
+                    "id": 5522,
+                    "name": "VariableDeclaration",
+                    "src": "467:7:14"
+                  }
+                ],
+                "id": 5523,
+                "name": "ParameterList",
+                "src": "466:9:14"
+              }
+            ],
+            "id": 5524,
+            "name": "FunctionDefinition",
+            "src": "419:57:14"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "ca17c14f",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "isBullMarket",
+              "overrides": null,
+              "scope": 5530,
+              "stateMutability": "view",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 5525,
+                "name": "ParameterList",
+                "src": "503:2:14"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "overrides": null,
+                      "scope": 5529,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bool",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bool",
+                          "type": "bool"
+                        },
+                        "id": 5526,
+                        "name": "ElementaryTypeName",
+                        "src": "529:4:14"
+                      }
+                    ],
+                    "id": 5527,
+                    "name": "VariableDeclaration",
+                    "src": "529:4:14"
+                  }
+                ],
+                "id": 5528,
+                "name": "ParameterList",
+                "src": "528:6:14"
+              }
+            ],
+            "id": 5529,
+            "name": "FunctionDefinition",
+            "src": "482:53:14"
+          }
+        ],
+        "id": 5530,
+        "name": "ContractDefinition",
+        "src": "58:480:14"
+      }
+    ],
+    "id": 5531,
+    "name": "SourceUnit",
+    "src": "33:505:14"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.6.12+commit.27d51765.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.3.4",
+  "updatedAt": "2021-11-11T08:48:33.258Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

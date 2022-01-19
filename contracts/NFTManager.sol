@@ -93,6 +93,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     uint256 constant MAX_UINT256 = uint256(-1);
     address constant ROUTER_ADDRESS =
         0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff; // Quickswap Router
+        // 0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F; // SushiV2 Router
     int256 constant BASE = 10 ether;
     int256 constant K = 9.3 ether;
 

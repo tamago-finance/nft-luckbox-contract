@@ -1,0 +1,358 @@
+{
+  "contractName": "IMigratorChef",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "contract IERC20",
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "migrate",
+      "outputs": [
+        {
+          "internalType": "contract IERC20",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.6.12+commit.27d51765\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"contract IERC20\",\"name\":\"token\",\"type\":\"address\"}],\"name\":\"migrate\",\"outputs\":[{\"internalType\":\"contract IERC20\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/interfaces/IMasterChef.sol\":\"IMigratorChef\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/token/ERC20/IERC20.sol\":{\"keccak256\":\"0x5f02220344881ce43204ae4a6281145a67bc52c2bb1290a791857df3d19d78f5\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://24427744bd3e6cb73c17010119af12a318289c0253a4d9acb8576c9fb3797b08\",\"dweb:/ipfs/QmTLDqpKRBuxGxRAmjgXt9AkXyACW3MtKzi7PYjm5iMfGC\"]},\"project:/contracts/interfaces/IMasterChef.sol\":{\"keccak256\":\"0x7d48e33830f342b0f097ff1b4b50105dcac79b2ef084503bcb9d243548231139\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://34db27a49bc08063ea3698633871013c3c6baf66ad47354729d89065904fa94f\",\"dweb:/ipfs/QmPz7urH5LVcucduQB434P2xSf3BuihXJXsjmnDBcJgHsQ\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\n\npragma solidity 0.6.12;\nimport '@openzeppelin/contracts/token/ERC20/IERC20.sol';\n\ninterface IMigratorChef {\n    // Perform LP token migration from legacy Elunium to newElunium.\n    // Take the current LP token address and return the new LP token address.\n    // Migrator should have full access to the caller's LP token.\n    // Return the new LP token address.\n    //\n    // XXX Migrator must have allowance access to Elunium LP tokens.\n    // Elunium must mint EXACTLY the same amount of Elunium LP tokens or\n    // else something bad will happen. Traditional Elunium does not\n    // do that so be careful!\n    function migrate(IERC20 token) external returns (IERC20);\n}",
+  "sourcePath": "/home/pisuthd/Desktop/elliptix/tamago-finance/contractV2/contracts/interfaces/IMasterChef.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/interfaces/IMasterChef.sol",
+    "exportedSymbols": {
+      "IMigratorChef": [
+        5442
+      ]
+    },
+    "id": 5443,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 5433,
+        "literals": [
+          "solidity",
+          "0.6",
+          ".12"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "34:23:15"
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "file": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "id": 5434,
+        "nodeType": "ImportDirective",
+        "scope": 5443,
+        "sourceUnit": 1046,
+        "src": "58:56:15",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": null,
+        "fullyImplemented": false,
+        "id": 5442,
+        "linearizedBaseContracts": [
+          5442
+        ],
+        "name": "IMigratorChef",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "ce5494bb",
+            "id": 5441,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "migrate",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 5437,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5436,
+                  "mutability": "mutable",
+                  "name": "token",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5441,
+                  "src": "663:12:15",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IERC20_$1045",
+                    "typeString": "contract IERC20"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 5435,
+                    "name": "IERC20",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 1045,
+                    "src": "663:6:15",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IERC20_$1045",
+                      "typeString": "contract IERC20"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "662:14:15"
+            },
+            "returnParameters": {
+              "id": 5440,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5439,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5441,
+                  "src": "695:6:15",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IERC20_$1045",
+                    "typeString": "contract IERC20"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 5438,
+                    "name": "IERC20",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 1045,
+                    "src": "695:6:15",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IERC20_$1045",
+                      "typeString": "contract IERC20"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "694:8:15"
+            },
+            "scope": 5442,
+            "src": "646:57:15",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 5443,
+        "src": "116:589:15"
+      }
+    ],
+    "src": "34:671:15"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "project:/contracts/interfaces/IMasterChef.sol",
+      "exportedSymbols": {
+        "IMigratorChef": [
+          5442
+        ]
+      },
+      "license": "MIT"
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "0.6",
+            ".12"
+          ]
+        },
+        "id": 5433,
+        "name": "PragmaDirective",
+        "src": "34:23:15"
+      },
+      {
+        "attributes": {
+          "SourceUnit": 1046,
+          "absolutePath": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+          "file": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+          "scope": 5443,
+          "symbolAliases": [
+            null
+          ],
+          "unitAlias": ""
+        },
+        "id": 5434,
+        "name": "ImportDirective",
+        "src": "58:56:15"
+      },
+      {
+        "attributes": {
+          "abstract": false,
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "interface",
+          "documentation": null,
+          "fullyImplemented": false,
+          "linearizedBaseContracts": [
+            5442
+          ],
+          "name": "IMigratorChef",
+          "scope": 5443
+        },
+        "children": [
+          {
+            "attributes": {
+              "body": null,
+              "documentation": null,
+              "functionSelector": "ce5494bb",
+              "implemented": false,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "migrate",
+              "overrides": null,
+              "scope": 5442,
+              "stateMutability": "nonpayable",
+              "virtual": false,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "token",
+                      "overrides": null,
+                      "scope": 5441,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "contract IERC20",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "contractScope": null,
+                          "name": "IERC20",
+                          "referencedDeclaration": 1045,
+                          "type": "contract IERC20"
+                        },
+                        "id": 5435,
+                        "name": "UserDefinedTypeName",
+                        "src": "663:6:15"
+                      }
+                    ],
+                    "id": 5436,
+                    "name": "VariableDeclaration",
+                    "src": "663:12:15"
+                  }
+                ],
+                "id": 5437,
+                "name": "ParameterList",
+                "src": "662:14:15"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "mutability": "mutable",
+                      "name": "",
+                      "overrides": null,
+                      "scope": 5441,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "contract IERC20",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "contractScope": null,
+                          "name": "IERC20",
+                          "referencedDeclaration": 1045,
+                          "type": "contract IERC20"
+                        },
+                        "id": 5438,
+                        "name": "UserDefinedTypeName",
+                        "src": "695:6:15"
+                      }
+                    ],
+                    "id": 5439,
+                    "name": "VariableDeclaration",
+                    "src": "695:6:15"
+                  }
+                ],
+                "id": 5440,
+                "name": "ParameterList",
+                "src": "694:8:15"
+              }
+            ],
+            "id": 5441,
+            "name": "FunctionDefinition",
+            "src": "646:57:15"
+          }
+        ],
+        "id": 5442,
+        "name": "ContractDefinition",
+        "src": "116:589:15"
+      }
+    ],
+    "id": 5443,
+    "name": "SourceUnit",
+    "src": "34:671:15"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.6.12+commit.27d51765.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.1",
+  "updatedAt": "2021-08-17T12:49:44.952Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}
