@@ -26,8 +26,8 @@ module.exports = async ({ getNamedAccounts, deployments, network }) => {
   await deploy("NFTManager", {
     from: deployer,
     args: [
-      "Lucky Red Envelope on Polygon",
-      "https://api.tamago.finance/lucky-red-envelope/polygon/{id}",
+      "Lucky Red Envelope",
+      "https://api.tamago.finance/lucky-red-envelope/{id}",
       priceResolver.address,
       shareToken.address,
       hre.ethers.utils.formatBytes32String("WETH-USDC-SHARE"),
