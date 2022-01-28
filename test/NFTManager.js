@@ -224,7 +224,7 @@ describe("NFTManager contract on forked Polygon chain", () => {
             // trade TAMG
             router = await ethers.getContractAt('IPancakeRouter02', ROUTER_ADDRESS)
         } catch (e) {
-            console.log(e)
+            // console.log(e)
         }
 
 
@@ -282,7 +282,7 @@ describe("NFTManager contract on forked Polygon chain", () => {
             expect((await syntheticNft.balanceOf(admin.address, 3))).to.equal(3)
 
         } catch (e) {
-            console.log(e)
+            // console.log(e)
         }
 
     })
@@ -318,7 +318,7 @@ describe("NFTManager contract on forked Polygon chain", () => {
             expect(Number(fromEther(beforeMintRatio)) > Number(fromEther(afterMintRatio))).to.true
 
         } catch (e) {
-            console.log(e)
+            // console.log(e)
         }
 
     })
@@ -339,7 +339,7 @@ describe("NFTManager contract on forked Polygon chain", () => {
             expect(Number(ethers.utils.formatUnits((await wmaticToken.balanceOf(dev.address)), 18)) !== 0)
 
         } catch (e) {
-            console.log(e)
+            // console.log(e)
         }
 
     })

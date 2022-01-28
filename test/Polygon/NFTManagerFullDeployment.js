@@ -1,6 +1,6 @@
 const { expect } = require("chai");
 const { ethers, network } = require("hardhat")
-const { fromEther, toEther, deployPriceResolverMock, deployPriceResolver, deployPriceResolver2 } = require("./Helpers")
+const { fromEther, toEther, deployPriceResolverMock, deployPriceResolver, deployPriceResolver2 } = require("../Helpers")
 
 let priceResolver
 let nftManager
@@ -18,7 +18,7 @@ let charlie
 let dev
 
 
-describe("Full Deployment Ang Pow USD", () => {
+describe("Full Deployment Ang Pow USD - Polygon", () => {
 
     const WMATIC_ADDRESS = "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"
     const USDC_ADDRESS = "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
@@ -94,7 +94,7 @@ describe("Full Deployment Ang Pow USD", () => {
             syntheticNft = await ethers.getContractAt('SyntheticNFT', syntheticNftAddress)
 
         } catch (e) {
-            console.log(e)
+            // console.log(e)
         }
 
 
@@ -142,7 +142,7 @@ describe("Full Deployment Ang Pow USD", () => {
             // await nftManager.connect(alice).redeem(2, 100, 0, 0)
 
         } catch (e) {
-            console.log(e)
+            // console.log(e)
         }
 
     })
@@ -245,7 +245,7 @@ describe("Full Deployment Ang Pow USD", () => {
             expect( Number((await nftManager.syntheticVariants(2))[7]) ).to.equal(600)
 
         } catch (e) {
-            console.log(e)
+            // console.log(e)
         }
 
     })

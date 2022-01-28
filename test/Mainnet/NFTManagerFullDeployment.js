@@ -17,7 +17,7 @@ let bob
 let charlie
 let dev
 
-describe("Full Deployment Ang Bao USD", () => {
+describe("Full Deployment Ang Pow USD - Mainnet", () => {
   const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
   const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
   const WETH_USDC_LP_ADDRESS = "0x397FF1542f962076d0BFE58eA045FfA2d347ACa0"
@@ -31,91 +31,91 @@ describe("Full Deployment Ang Bao USD", () => {
   let router
 
   beforeEach(async () => {
-    // try {
-    ;[admin, alice, bob, charlie, dev] = await ethers.getSigners()
+    try {
+      ;[admin, alice, bob, charlie, dev] = await ethers.getSigners()
 
-    // Setup LP on Quickswap
-    wEthToken = await ethers.getContractAt("MockERC20", WETH_ADDRESS)
-    usdcToken = await ethers.getContractAt("MockERC20", USDC_ADDRESS)
+      // Setup LP on Quickswap
+      wEthToken = await ethers.getContractAt("MockERC20", WETH_ADDRESS)
+      usdcToken = await ethers.getContractAt("MockERC20", USDC_ADDRESS)
 
-    factory = await ethers.getContractAt("IPancakeFactory", FACTORY_ADDRESS)
-    router = await ethers.getContractAt("IPancakeRouter02", ROUTER_ADDRESS)
+      factory = await ethers.getContractAt("IPancakeFactory", FACTORY_ADDRESS)
+      router = await ethers.getContractAt("IPancakeRouter02", ROUTER_ADDRESS)
 
-    const pairAddress = await factory.getPair(
-      wEthToken.address,
-      usdcToken.address
-    )
-    shareToken = await ethers.getContractAt("IPancakePair", pairAddress)
+      const pairAddress = await factory.getPair(
+        wEthToken.address,
+        usdcToken.address
+      )
+      shareToken = await ethers.getContractAt("IPancakePair", pairAddress)
 
-    whales.forEach(async (account) => {
-      await network.provider.request({
-        method: "hardhat_impersonateAccount",
-        params: [account],
+      whales.forEach(async (account) => {
+        await network.provider.request({
+          method: "hardhat_impersonateAccount",
+          params: [account],
+        })
       })
-    })
-    const wEthWhale = ethers.provider.getSigner(WETH_WHALE)
-    const usdcWhale = ethers.provider.getSigner(USDC_WHALE)
+      const wEthWhale = ethers.provider.getSigner(WETH_WHALE)
+      const usdcWhale = ethers.provider.getSigner(USDC_WHALE)
 
-    // Transfer to token deployer
+      // Transfer to token deployer
 
-    await admin.sendTransaction({ to: USDC_WHALE, value: toEther("10") })
+      await admin.sendTransaction({ to: USDC_WHALE, value: toEther("10") })
 
-    await wEthToken
-      .connect(wEthWhale)
-      .transfer(await admin.getAddress(), await wEthToken.balanceOf(WETH_WHALE))
-    await usdcToken
-      .connect(usdcWhale)
-      .transfer(await admin.getAddress(), await usdcToken.balanceOf(USDC_WHALE))
+      await wEthToken
+        .connect(wEthWhale)
+        .transfer(await admin.getAddress(), await wEthToken.balanceOf(WETH_WHALE))
+      await usdcToken
+        .connect(usdcWhale)
+        .transfer(await admin.getAddress(), await usdcToken.balanceOf(USDC_WHALE))
 
-    const PriceResolver = await ethers.getContractFactory("PriceResolver")
-    const NFTManager = await ethers.getContractFactory("NFTManager")
+      const PriceResolver = await ethers.getContractFactory("PriceResolver")
+      const NFTManager = await ethers.getContractFactory("NFTManager")
 
-    const MockPriceFeeder = await ethers.getContractFactory("MockPriceFeeder")
-    const ChainlinkPriceFeeder = await ethers.getContractFactory(
-      "ChainlinkPriceFeeder"
-    )
-    const QuickswapTokenFeeder = await ethers.getContractFactory(
-      "QuickswapTokenFeeder"
-    )
-    const QuickswapLPFeeder = await ethers.getContractFactory(
-      "QuickswapLPFeeder"
-    )
+      const MockPriceFeeder = await ethers.getContractFactory("MockPriceFeeder")
+      const ChainlinkPriceFeeder = await ethers.getContractFactory(
+        "ChainlinkPriceFeeder"
+      )
+      const QuickswapTokenFeeder = await ethers.getContractFactory(
+        "QuickswapTokenFeeder"
+      )
+      const QuickswapLPFeeder = await ethers.getContractFactory(
+        "QuickswapLPFeeder"
+      )
 
-    priceResolver = await deployPriceResolverMainnet({
-      PriceResolver,
-      MockPriceFeeder,
-      ChainlinkPriceFeeder,
-      QuickswapTokenFeeder,
-      QuickswapLPFeeder,
-      Admin: admin,
-      lpWEthUsdcAddress: shareToken.address,
-    })
+      priceResolver = await deployPriceResolverMainnet({
+        PriceResolver,
+        MockPriceFeeder,
+        ChainlinkPriceFeeder,
+        QuickswapTokenFeeder,
+        QuickswapLPFeeder,
+        Admin: admin,
+        lpWEthUsdcAddress: shareToken.address,
+      })
 
-    nftManager = await NFTManager.deploy(
-      "Ang Bao USD",
-      "https://api.tamago.finance/angpow/{id}",
-      priceResolver.address,
-      shareToken.address,
-      ethers.utils.formatBytes32String("WETH-USDC-SHARE"),
-      ethers.utils.formatBytes32String("USD"),
-      dev.address
-    )
+      nftManager = await NFTManager.deploy(
+        "Ang Bao USD",
+        "https://api.tamago.finance/angpow/{id}",
+        priceResolver.address,
+        shareToken.address,
+        ethers.utils.formatBytes32String("WETH-USDC-SHARE"),
+        ethers.utils.formatBytes32String("USD"),
+        dev.address
+      )
 
-    // setup NFT variants
-    await nftManager.addSyntheticVariant("Ang Bao 1 USD", 1, toEther(1))
-    await nftManager.addSyntheticVariant("Ang Bao 10 USD", 2, toEther(10))
-    await nftManager.addSyntheticVariant("Ang Bao 100 USD", 3, toEther(100))
+      // setup NFT variants
+      await nftManager.addSyntheticVariant("Ang Bao 1 USD", 1, toEther(1))
+      await nftManager.addSyntheticVariant("Ang Bao 10 USD", 2, toEther(10))
+      await nftManager.addSyntheticVariant("Ang Bao 100 USD", 3, toEther(100))
 
-    await nftManager.setContractState(1)
+      await nftManager.setContractState(1)
 
-    const syntheticNftAddress = await nftManager.syntheticNFT()
-    syntheticNft = await ethers.getContractAt(
-      "SyntheticNFT",
-      syntheticNftAddress
-    )
-    // } catch (e) {
-    //   console.log(e)
-    // }
+      const syntheticNftAddress = await nftManager.syntheticNFT()
+      syntheticNft = await ethers.getContractAt(
+        "SyntheticNFT",
+        syntheticNftAddress
+      )
+    } catch (e) {
+      // console.log(e)
+    }
   })
 
   it("Mint 100x NFTs on all variant when LP is ~$30k", async () => {
@@ -172,7 +172,7 @@ describe("Full Deployment Ang Bao USD", () => {
       await nftManager.connect(alice).redeem(1, 10, 0, 0)
       // await nftManager.connect(alice).redeem(2, 10, 0, 0)
     } catch (e) {
-      console.log(e)
+      // console.log(e)
     }
   })
 
