@@ -20,7 +20,6 @@ let dev
 describe("Full Deployment Ang Pow USD - Mainnet", () => {
   const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
   const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
-  const WETH_USDC_LP_ADDRESS = "0x397FF1542f962076d0BFE58eA045FfA2d347ACa0"
   const ROUTER_ADDRESS = "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F"
   const FACTORY_ADDRESS = "0xc0aee478e3658e2610c5f7a4a2e1777ce9e4f2ac"
   const WETH_WHALE = "0xe78388b4ce79068e89bf8aa7f218ef6b9ab0e9d0"

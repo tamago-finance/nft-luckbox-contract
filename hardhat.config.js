@@ -47,7 +47,6 @@ module.exports = {
       //   blockNumber: 20480699,
       // },
       forking: {
-        chainId: 1337,
         url: process.env.MAINNET_ARCHIVE_RPC,
         accounts: [process.env.PRIVATEKEY_DEPLOYER, process.env.PRIVATEKEY_DEV],
         // blockNumber: 13975629,
@@ -56,6 +55,16 @@ module.exports = {
     polygon: {
       allowUnlimitedContractSize: true,
       url: process.env.POLYGON_URL,
+      accounts: [process.env.PRIVATEKEY_DEPLOYER, process.env.PRIVATEKEY_DEV],
+    },
+    bsc: {
+      allowUnlimitedContractSize: true,
+      url: "https://bsc-dataseed.binance.org/",
+      accounts: [process.env.PRIVATEKEY_DEPLOYER, process.env.PRIVATEKEY_DEV],
+    },
+    bscTestnet: {
+      allowUnlimitedContractSize: true,
+      url: "https://data-seed-prebsc-2-s2.binance.org:8545/",
       accounts: [process.env.PRIVATEKEY_DEPLOYER, process.env.PRIVATEKEY_DEV],
     },
     mainnetfork: {
