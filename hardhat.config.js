@@ -57,6 +57,11 @@ module.exports = {
       url: process.env.POLYGON_URL,
       accounts: [process.env.PRIVATEKEY_DEPLOYER, process.env.PRIVATEKEY_DEV],
     },
+    harmony: {
+      allowUnlimitedContractSize: true,
+      url: "https://rpc.s1.t.hmny.io",
+      accounts: [process.env.PRIVATEKEY_DEPLOYER, process.env.PRIVATEKEY_DEV],
+    },
     bsc: {
       allowUnlimitedContractSize: true,
       url: "https://bsc-dataseed.binance.org/",
