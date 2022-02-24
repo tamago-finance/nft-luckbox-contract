@@ -86,9 +86,9 @@ module.exports = async ({ getNamedAccounts, deployments, network }) => {
     args: [
       config.token.lp.name,
       config.token.lp.address,
-      config.token.base.address,
+      basePriceFeederResult.address,
       config.token.base.decimals,
-      config.token.quote.address,
+      quotePriceFeederResult.address,
       config.token.quote.decimals,
     ],
     log: true,
@@ -171,7 +171,7 @@ module.exports = async ({ getNamedAccounts, deployments, network }) => {
     config.priceFeed.lp.fallback
   )
   updateTx = await priceResolver.registerPriceFeeder(
-    hre.ethers.utils.formatBytes32String(config.token.lp.name),
+    hre.ethers.utils.formatBytes32String(config.priceFeed.lp.name),
     lpFeederResult.address,
     false,
     config.priceFeed.lp.fallback,

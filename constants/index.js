@@ -91,14 +91,14 @@ const config = {
         fallback: ethers.utils.parseEther("1"),
       },
       lp: {
-        name: "WETH-USDC-SHARE",
+        name: "WBNB-BUSD-SHARE",
         fallback: ethers.utils.parseEther("1"),
       },
     },
     nft: {
       name: "Lucky Red Envelope",
       tokenURI: "https://api.tamago.finance/lucky-red-envelope/bsc/{id}",
-      lpSymbol: "WETH-USDC-SHARE",
+      lpSymbol: "WBNB-BUSD-SHARE",
       syntheticSymbol: "USD",
       list: [
         {
