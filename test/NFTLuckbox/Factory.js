@@ -11,13 +11,13 @@ let charlie
 
 const DEV_ADDRESS = "0x91C65f404714Ac389b38335CccA4A876a8669d32"
 
-describe("NFTLuckBoxFactory", () => {
+describe("Factory", () => {
 
     before(async () => {
 
         [admin, alice, bob, charlie] = await ethers.getSigners();
 
-        const Factory = await ethers.getContractFactory("NFTLuckBoxFactory");
+        const Factory = await ethers.getContractFactory("Factory");
         const MockERC721 = await ethers.getContractFactory("MockERC721")
 
         factory = await Factory.deploy(DEV_ADDRESS)
