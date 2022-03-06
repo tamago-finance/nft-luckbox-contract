@@ -15,7 +15,7 @@ import "./NFTLuckBox.sol";
  * @title Factory for creating new luckbox contract.
  */
 
-contract NFTLuckBoxFactory is VRFConsumerBase, ReentrancyGuard, Ownable {
+contract Factory is VRFConsumerBase, ReentrancyGuard, Ownable {
   using SafeERC20 for IERC20;
 
   struct Box {
