@@ -202,4 +202,21 @@ describe("NFTSwapPair", () => {
         await pair.connect(bob).swap(bob.address, nft1155.address, 2, true)
     })
 
+    it("Force swaps", async () => {
+
+        // prepare liquidity
+        await pair.connect(admin).mint(admin.address, nft1155.address, 1, true)
+        await pair.connect(alice).mint(alice.address, nft1155.address, 1, true)
+
+        await pair.connect(admin).mint(admin.address, nft721.address, 1, false)
+        await pair.connect(alice).mint(alice.address, nft721.address, 2, false)
+
+        expect(Number(await pair.totalSupply())).to.equal(4)
+
+        // perform swaps
+        await pair.connect(admin).forceSwap( 3 , admin.address, nft1155.address, 1, true)
+
+        expect(Number(await nft721.balanceOf(admin.address))).to.equal(1)
+    })  
+
 })
