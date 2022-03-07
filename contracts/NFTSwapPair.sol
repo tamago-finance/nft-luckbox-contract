@@ -194,61 +194,23 @@ contract NFTSwapPair is
         uint256 _token1Id,
         bool _token1Is1155
     ) public nonReentrant {
-        require(
-            token1.length > 0,
-            "No. NFTs deposited less than MINIMUM_LIQUIDITY"
-        );
-        require(
-            block.timestamp >= timestamps[_to] + COOLDOWN,
-            "Given recipient address still in cooldown period"
-        );
-
-        // verify the user has a settlement
-        require( IERC1155(token0.assetAddress).balanceOf(msg.sender, token0.tokenId) > 0 , "The caller has no any settlement NFT" );
-
-        // taking
-        if (_token1Is1155) {
-            IERC1155(_token1Address).safeTransferFrom(
-                msg.sender,
-                address(this),
-                _token1Id,
-                1,
-                "0x00"
-            );
-        } else {
-            IERC721(_token1Address).safeTransferFrom(
-                msg.sender,
-                address(this),
-                _token1Id
-            );
-        }
-
+               
         uint256 idToRemoved = _propose();
 
-        // returning
-        if (token1[idToRemoved].is1155) {
-            IERC1155(token1[idToRemoved].assetAddress).safeTransferFrom(
-                address(this),
-                _to,
-                token1[idToRemoved].tokenId,
-                1,
-                "0x00"
-            );
-        } else {
-            IERC721(token1[idToRemoved].assetAddress).safeTransferFrom(
-                address(this),
-                _to,
-                token1[idToRemoved].tokenId
-            );
-        }
+        _swap(idToRemoved, _to, _token1Address, _token1Id, _token1Is1155);
+    }
 
-        emit Swapped(_to, _token1Address, _token1Id, _token1Is1155, token1[idToRemoved].assetAddress, token1[idToRemoved].tokenId, token1[idToRemoved].is1155);  
+    // can be executed by gateway contract
+    function forceSwap(
+        uint256 _id,
+        address _to,
+        address _token1Address,
+        uint256 _token1Id,
+        bool _token1Is1155
+    ) public nonReentrant onlyOwner {
+        require( token1.length > _id , "Given id is invalid");
 
-        token1[idToRemoved].assetAddress = _token1Address;
-        token1[idToRemoved].tokenId = _token1Id;
-        token1[idToRemoved].is1155 = _token1Is1155;
-
-        timestamps[_to] = block.timestamp;        
+        _swap(_id, _to, _token1Address, _token1Id, _token1Is1155);
     }
 
     function increaseNonce() public nonReentrant onlyOwner {
@@ -283,6 +245,68 @@ contract NFTSwapPair is
         );
 
         return randomNumber.mod(token1.length);
+    }
+
+    function _swap(
+        uint256 _idToRemoved,
+        address _to,
+        address _token1Address,
+        uint256 _token1Id,
+        bool _token1Is1155
+    ) internal {
+        require(
+            token1.length > 0,
+            "No. NFTs deposited less than MINIMUM_LIQUIDITY"
+        );
+        require(
+            block.timestamp >= timestamps[_to] + COOLDOWN,
+            "Given recipient address still in cooldown period"
+        );
+
+        // verify the user has a settlement
+        require( IERC1155(token0.assetAddress).balanceOf(msg.sender, token0.tokenId) > 0 , "The caller has no any settlement NFT" );
+
+        // taking
+        if (_token1Is1155) {
+            IERC1155(_token1Address).safeTransferFrom(
+                msg.sender,
+                address(this),
+                _token1Id,
+                1,
+                "0x00"
+            );
+        } else {
+            IERC721(_token1Address).safeTransferFrom(
+                msg.sender,
+                address(this),
+                _token1Id
+            );
+        }
+
+        // returning
+        if (token1[_idToRemoved].is1155) {
+            IERC1155(token1[_idToRemoved].assetAddress).safeTransferFrom(
+                address(this),
+                _to,
+                token1[_idToRemoved].tokenId,
+                1,
+                "0x00"
+            );
+        } else {
+            IERC721(token1[_idToRemoved].assetAddress).safeTransferFrom(
+                address(this),
+                _to,
+                token1[_idToRemoved].tokenId
+            );
+        }
+
+        emit Swapped(_to, _token1Address, _token1Id, _token1Is1155, token1[_idToRemoved].assetAddress, token1[_idToRemoved].tokenId, token1[_idToRemoved].is1155);  
+
+        token1[_idToRemoved].assetAddress = _token1Address;
+        token1[_idToRemoved].tokenId = _token1Id;
+        token1[_idToRemoved].is1155 = _token1Is1155;
+
+        timestamps[_to] = block.timestamp; 
     }
 
     function _createPosition(address _address) internal {
