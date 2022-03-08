@@ -194,7 +194,7 @@ contract NFTSwapPair is
         uint256 _token1Id,
         bool _token1Is1155
     ) public nonReentrant {
-               
+
         uint256 idToRemoved = _propose();
 
         _swap(idToRemoved, _to, _token1Address, _token1Id, _token1Is1155);
@@ -263,10 +263,16 @@ contract NFTSwapPair is
             "Given recipient address still in cooldown period"
         );
 
-        // verify the user has a settlement
-        require( IERC1155(token0.assetAddress).balanceOf(msg.sender, token0.tokenId) > 0 , "The caller has no any settlement NFT" );
+        // taking the token0's NFT
+        IERC1155(token0.assetAddress).safeTransferFrom(
+            msg.sender,
+            address(this),
+            token0.tokenId,
+            1,
+            "0x00"
+        );
 
-        // taking
+        // taking the token1's NFT
         if (_token1Is1155) {
             IERC1155(_token1Address).safeTransferFrom(
                 msg.sender,

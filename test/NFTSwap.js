@@ -160,11 +160,12 @@ describe("NFTSwapPair", () => {
 
         // perform swaps
         await nft1155.connect(bob).mint(bob.address, 2, 1, "0x00")
+        await nft1155.connect(bob).setApprovalForAll(pair.address, true)
 
         try {
             await pair.connect(bob).swap(bob.address, nft1155.address, 2, true)
         } catch (e) {
-            expect(e.message.indexOf("The caller has no any settlement NFT") !== -1).to.true
+            expect(e.message.indexOf("ERC1155: caller is not owner nor approved") !== -1).to.true
         }
 
     })
@@ -178,7 +179,7 @@ describe("NFTSwapPair", () => {
         await pair.connect(alice).mint(alice.address, nft1155.address, 1, true)
 
         // mint a settlement NFT
-        await settlementNft.connect(bob).mint(bob.address, 1, 1, "0x00")
+        await settlementNft.connect(bob).mint(bob.address, 1, 2, "0x00")
         // mint NFT to be swapped
         await nft1155.connect(bob).mint(bob.address, 2, 2, "0x00")
 
