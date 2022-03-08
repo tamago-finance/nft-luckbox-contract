@@ -10,9 +10,10 @@ let bob;
 let charlie;
 
 const DEV_ADDRESS = "0x91C65f404714Ac389b38335CccA4A876a8669d32";
+const ADDRESS_ZERO = ethers.constants.AddressZero;
 
 describe("NFTBroker", () => {
-  before(async () => {
+  beforeEach(async () => {
     [admin, alice, bob, charlie] = await ethers.getSigners();
 
     const NFTBroker = await ethers.getContractFactory("NFTBroker");
@@ -30,10 +31,73 @@ describe("NFTBroker", () => {
     await erc1155.setApprovalForAll(nftBroker.address, true);
   });
 
+  /**
+   * @Test
+   */
+  //Deposit test 1
   it("Should deposit successfully", async () => {
     await nftBroker.deposit(erc1155.address, 1, 0);
 
     expect(await erc1155.balanceOf(admin.address, 0)).to.equal(9);
     expect(await erc1155.balanceOf(nftBroker.address, 0)).to.equal(1);
+  });
+
+  //Deposit test 2
+  it("Should error when there's 0 amount of NFTs (Deposit func)", async () => {
+    await expect(nftBroker.deposit(erc1155.address, 0, 0)).to.revertedWith(
+      "Can not be zero"
+    );
+  });
+
+  //Withdraw test 1
+  it("Should withdraw successfully", async () => {
+    //deposit before withdraw
+    await nftBroker.deposit(erc1155.address, 1, 0);
+
+    await nftBroker.withdraw(erc1155.address, 1, 0);
+
+    expect(await erc1155.balanceOf(admin.address, 0)).to.equal(10);
+    expect(await erc1155.balanceOf(nftBroker.address, 0)).to.equal(0);
+  });
+
+  //Withdraw test 2
+  it("Should error when there's 0 amount of NFTs (Withdraw func)", async () => {
+    await expect(nftBroker.withdraw(erc1155.address, 0, 0)).to.revertedWith(
+      "Can not be zero"
+    );
+  });
+
+  //SetRate test 1
+  it("Should error when address 0", async () => {
+    await expect(nftBroker.setRate(ADDRESS_ZERO, 0, 0, 1)).to.revertedWith(
+      "Can not be address 0"
+    );
+  });
+
+  //SetRate test 2
+  it("Should error when rate less than 0", async () => {
+    await expect(nftBroker.setRate(erc1155.address, 0, 0, 0)).to.revertedWith(
+      "Rate can not be less than 0"
+    );
+  });
+
+  //SetRate test 3
+  it("Should set rate to mapping", async () => {
+    await nftBroker.setRate(erc1155.address, 0, 1, 2);
+
+    let rate = await nftBroker.getRate(erc1155.address, 0, 1);
+
+    expect(rate).to.equal(2);
+  });
+
+  //SwapRate test 1
+  it("Should swap successfully", async () => {
+    await nftBroker.setRate(erc1155.address, 0, 1, 5);
+    await nftBroker.deposit(erc1155.address, 10, 1);
+
+    await nftBroker.swap(erc1155.address, 0, 1, 1);
+
+    expect(await erc1155.balanceOf(admin.address, 0)).to.equal(9);
+    expect(await erc1155.balanceOf(admin.address, 1)).to.equal(5);
   });
 });
