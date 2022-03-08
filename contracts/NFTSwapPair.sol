@@ -49,6 +49,14 @@ contract NFTSwapPair is
     Token public token0; // always ERC1155
     Token[] public token1;
 
+    mapping(uint256 => address) public traders;
+    uint256 public traderCount;
+    uint256 public traderPaidCount;
+
+    mapping(uint256 => address) public minters;
+    uint256 public minterCount;
+    uint256 public minterPaidCount;
+
     mapping(address => uint256) public balanceOf;
     uint256 public totalSupply;
     uint8 public constant decimals = 1;
@@ -117,6 +125,9 @@ contract NFTSwapPair is
             "0x00"
         );
 
+        minters[minterCount] = _to;
+        minterCount += 1;
+
         // take the token1's NFT
         if (_token1Is1155) {
             IERC1155(_token1Address).safeTransferFrom(
@@ -148,19 +159,14 @@ contract NFTSwapPair is
         emit Minted(_to, _token1Address, _token1Id, _token1Is1155);
     }
 
+    // burn will return only token1's NFT
     function burn(address _to) public nonReentrant isReady {
         require(token1.length > 0, "No any NFT locked in the contract");
 
         uint256 idToRemoved = _propose();
 
-        // return token0's NFT
-        IERC1155(token0.assetAddress).safeTransferFrom(
-            address(this),
-            _to,
-            token0.tokenId,
-            1,
-            "0x00"
-        );
+        // return token0's NFT to the earliest trader
+        _releaseToTrader();
 
         // return token1's NFT
         if (token1[idToRemoved].is1155) {
@@ -188,7 +194,6 @@ contract NFTSwapPair is
 
         // if the number generated not equals the last
         if (idToRemoved != (token1.length - 1)) {
-            delete token1[idToRemoved];
             token1[idToRemoved] = token1[token1.length - 1];
         }
 
@@ -295,6 +300,12 @@ contract NFTSwapPair is
             "0x00"
         );
 
+        traders[traderCount] = _to;
+        traderCount += 1;
+
+        // return token0's NFT to the earliest minter
+        _releaseToMinter();
+
         // taking the token1's NFT
         if (_token1Is1155) {
             IERC1155(_token1Address).safeTransferFrom(
@@ -344,6 +355,32 @@ contract NFTSwapPair is
         token1[_idToRemoved].is1155 = _token1Is1155;
 
         timestamps[_to] = block.timestamp;
+    }
+
+    function _releaseToMinter() internal {
+        if (minterCount.sub(minterPaidCount) > 0) {
+            IERC1155(token0.assetAddress).safeTransferFrom(
+                address(this),
+                minters[minterPaidCount],
+                token0.tokenId,
+                1,
+                "0x00"
+            );
+            minterPaidCount += 1;
+        }
+    }
+
+    function _releaseToTrader() internal {
+        if (traderCount.sub(traderPaidCount) > 0) {
+            IERC1155(token0.assetAddress).safeTransferFrom(
+                address(this),
+                traders[traderPaidCount],
+                token0.tokenId,
+                1,
+                "0x00"
+            );
+            traderPaidCount += 1;
+        }
     }
 
     function _createPosition(address _address) internal {
