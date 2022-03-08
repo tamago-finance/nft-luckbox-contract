@@ -68,7 +68,7 @@ describe("NFTBroker", () => {
   });
 
   //SetRate test 1
-  it("Should error when address 0", async () => {
+  it("Should error when address 0 (SetRate)", async () => {
     await expect(nftBroker.setRate(ADDRESS_ZERO, 0, 0, 1)).to.revertedWith(
       "Can not be address 0"
     );
@@ -83,6 +83,32 @@ describe("NFTBroker", () => {
 
   //SetRate test 3
   it("Should set rate to mapping", async () => {
+    await nftBroker.setRate(erc1155.address, 0, 1, 2);
+
+    let rate = await nftBroker.getRate(erc1155.address, 0, 1);
+
+    expect(rate).to.equal(2);
+  });
+
+  //RemoveRate test 1
+  it("Should error when address 0 (RemoveRate)", async () => {
+    await expect(nftBroker.removeRate(ADDRESS_ZERO, 0, 1)).to.revertedWith(
+      "Can not be address 0"
+    );
+  });
+
+  //RemoveRate test 2
+  it("Should remove rate in mapping", async () => {
+    await nftBroker.setRate(erc1155.address, 0, 1, 2);
+    await nftBroker.removeRate(erc1155.address, 0, 1);
+
+    let rate = await nftBroker.getRate(erc1155.address, 0, 1);
+
+    expect(rate).to.equal(0);
+  });
+
+  //GetRate test1
+  it("Should get rate in mapping", async () => {
     await nftBroker.setRate(erc1155.address, 0, 1, 2);
 
     let rate = await nftBroker.getRate(erc1155.address, 0, 1);
