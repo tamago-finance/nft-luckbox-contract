@@ -112,8 +112,10 @@ describe("NFTBroker", () => {
     await nftBroker.setRate(erc1155.address, 0, 1, 2);
 
     let rate = await nftBroker.getRate(erc1155.address, 0, 1);
+    let initialRate = await nftBroker.getRate(erc1155.address, 2, 3);
 
     expect(rate).to.equal(2);
+    expect(initialRate).to.equal(0);
   });
 
   //SwapRate test 1
