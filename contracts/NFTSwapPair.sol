@@ -26,6 +26,15 @@ contract NFTSwapPair is
 {
     using SafeMath for uint256;
 
+    enum ContractState {
+        INITIAL,
+        NORMAL,
+        EMERGENCY,
+        EXPIRED
+    }
+
+    // Contract state
+    ContractState public state;
     string public name;
     string public symbol;
 
@@ -81,6 +90,7 @@ contract NFTSwapPair is
     ) public {
         name = _name;
         symbol = _symbol;
+        state = ContractState.NORMAL;
 
         // setup token0
         token0.assetAddress = _token0Address;
@@ -97,7 +107,7 @@ contract NFTSwapPair is
         address _token1Address,
         uint256 _token1Id,
         bool _token1Is1155
-    ) public nonReentrant {
+    ) public nonReentrant isReady {
         // take the token0's NFT
         IERC1155(token0.assetAddress).safeTransferFrom(
             msg.sender,
@@ -138,7 +148,7 @@ contract NFTSwapPair is
         emit Minted(_to, _token1Address, _token1Id, _token1Is1155);
     }
 
-    function burn(address _to) public nonReentrant {
+    function burn(address _to) public nonReentrant isReady {
         require(token1.length > 0, "No any NFT locked in the contract");
 
         uint256 idToRemoved = _propose();
@@ -193,11 +203,14 @@ contract NFTSwapPair is
         address _token1Address,
         uint256 _token1Id,
         bool _token1Is1155
-    ) public nonReentrant {
-
+    ) public nonReentrant isReady {
         uint256 idToRemoved = _propose();
 
         _swap(idToRemoved, _to, _token1Address, _token1Id, _token1Is1155);
+    }
+
+    function token1Length() public view returns (uint256) {
+        return token1.length;
     }
 
     // can be executed by gateway contract
@@ -207,8 +220,8 @@ contract NFTSwapPair is
         address _token1Address,
         uint256 _token1Id,
         bool _token1Is1155
-    ) public nonReentrant onlyOwner {
-        require( token1.length > _id , "Given id is invalid");
+    ) public nonReentrant isReady onlyOwner {
+        require(token1.length > _id, "Given id is invalid");
 
         _swap(_id, _to, _token1Address, _token1Id, _token1Is1155);
     }
@@ -226,8 +239,18 @@ contract NFTSwapPair is
         COOLDOWN = _value;
     }
 
-    function token1Length() public view returns (uint256) {
-        return token1.length;
+    // update the contract state
+    function setContractState(ContractState _state)
+        public
+        nonReentrant
+        onlyOwner
+    {
+        state = _state;
+    }
+
+    modifier isReady() {
+        require((state) == ContractState.NORMAL, "Contract state is not ready");
+        _;
     }
 
     function _propose() internal view returns (uint256) {
@@ -306,13 +329,21 @@ contract NFTSwapPair is
             );
         }
 
-        emit Swapped(_to, _token1Address, _token1Id, _token1Is1155, token1[_idToRemoved].assetAddress, token1[_idToRemoved].tokenId, token1[_idToRemoved].is1155);  
+        emit Swapped(
+            _to,
+            _token1Address,
+            _token1Id,
+            _token1Is1155,
+            token1[_idToRemoved].assetAddress,
+            token1[_idToRemoved].tokenId,
+            token1[_idToRemoved].is1155
+        );
 
         token1[_idToRemoved].assetAddress = _token1Address;
         token1[_idToRemoved].tokenId = _token1Id;
         token1[_idToRemoved].is1155 = _token1Is1155;
 
-        timestamps[_to] = block.timestamp; 
+        timestamps[_to] = block.timestamp;
     }
 
     function _createPosition(address _address) internal {
