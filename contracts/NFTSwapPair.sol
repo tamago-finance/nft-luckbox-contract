@@ -26,6 +26,15 @@ contract NFTSwapPair is
 {
     using SafeMath for uint256;
 
+    enum ContractState {
+        INITIAL,
+        NORMAL,
+        EMERGENCY,
+        EXPIRED
+    }
+
+    // Contract state
+    ContractState public state;
     string public name;
     string public symbol;
 
@@ -39,6 +48,14 @@ contract NFTSwapPair is
 
     Token public token0; // always ERC1155
     Token[] public token1;
+
+    mapping(uint256 => address) public traders;
+    uint256 public traderCount;
+    uint256 public traderPaidCount;
+
+    mapping(uint256 => address) public minters;
+    uint256 public minterCount;
+    uint256 public minterPaidCount;
 
     mapping(address => uint256) public balanceOf;
     uint256 public totalSupply;
@@ -81,6 +98,7 @@ contract NFTSwapPair is
     ) public {
         name = _name;
         symbol = _symbol;
+        state = ContractState.NORMAL;
 
         // setup token0
         token0.assetAddress = _token0Address;
@@ -97,7 +115,7 @@ contract NFTSwapPair is
         address _token1Address,
         uint256 _token1Id,
         bool _token1Is1155
-    ) public nonReentrant {
+    ) public nonReentrant isReady {
         // take the token0's NFT
         IERC1155(token0.assetAddress).safeTransferFrom(
             msg.sender,
@@ -106,6 +124,9 @@ contract NFTSwapPair is
             1,
             "0x00"
         );
+
+        minters[minterCount] = _to;
+        minterCount += 1;
 
         // take the token1's NFT
         if (_token1Is1155) {
@@ -138,19 +159,14 @@ contract NFTSwapPair is
         emit Minted(_to, _token1Address, _token1Id, _token1Is1155);
     }
 
-    function burn(address _to) public nonReentrant {
+    // burn will return only token1's NFT
+    function burn(address _to) public nonReentrant isReady {
         require(token1.length > 0, "No any NFT locked in the contract");
 
         uint256 idToRemoved = _propose();
 
-        // return token0's NFT
-        IERC1155(token0.assetAddress).safeTransferFrom(
-            address(this),
-            _to,
-            token0.tokenId,
-            1,
-            "0x00"
-        );
+        // return token0's NFT to the earliest trader
+        _releaseToTrader();
 
         // return token1's NFT
         if (token1[idToRemoved].is1155) {
@@ -178,7 +194,6 @@ contract NFTSwapPair is
 
         // if the number generated not equals the last
         if (idToRemoved != (token1.length - 1)) {
-            delete token1[idToRemoved];
             token1[idToRemoved] = token1[token1.length - 1];
         }
 
@@ -193,11 +208,14 @@ contract NFTSwapPair is
         address _token1Address,
         uint256 _token1Id,
         bool _token1Is1155
-    ) public nonReentrant {
-               
+    ) public nonReentrant isReady {
         uint256 idToRemoved = _propose();
 
         _swap(idToRemoved, _to, _token1Address, _token1Id, _token1Is1155);
+    }
+
+    function token1Length() public view returns (uint256) {
+        return token1.length;
     }
 
     // can be executed by gateway contract
@@ -207,8 +225,8 @@ contract NFTSwapPair is
         address _token1Address,
         uint256 _token1Id,
         bool _token1Is1155
-    ) public nonReentrant onlyOwner {
-        require( token1.length > _id , "Given id is invalid");
+    ) public nonReentrant isReady onlyOwner {
+        require(token1.length > _id, "Given id is invalid");
 
         _swap(_id, _to, _token1Address, _token1Id, _token1Is1155);
     }
@@ -226,8 +244,18 @@ contract NFTSwapPair is
         COOLDOWN = _value;
     }
 
-    function token1Length() public view returns (uint256) {
-        return token1.length;
+    // update the contract state
+    function setContractState(ContractState _state)
+        public
+        nonReentrant
+        onlyOwner
+    {
+        state = _state;
+    }
+
+    modifier isReady() {
+        require((state) == ContractState.NORMAL, "Contract state is not ready");
+        _;
     }
 
     function _propose() internal view returns (uint256) {
@@ -263,10 +291,22 @@ contract NFTSwapPair is
             "Given recipient address still in cooldown period"
         );
 
-        // verify the user has a settlement
-        require( IERC1155(token0.assetAddress).balanceOf(msg.sender, token0.tokenId) > 0 , "The caller has no any settlement NFT" );
+        // taking the token0's NFT
+        IERC1155(token0.assetAddress).safeTransferFrom(
+            msg.sender,
+            address(this),
+            token0.tokenId,
+            1,
+            "0x00"
+        );
 
-        // taking
+        traders[traderCount] = _to;
+        traderCount += 1;
+
+        // return token0's NFT to the earliest minter
+        _releaseToMinter();
+
+        // taking the token1's NFT
         if (_token1Is1155) {
             IERC1155(_token1Address).safeTransferFrom(
                 msg.sender,
@@ -300,13 +340,47 @@ contract NFTSwapPair is
             );
         }
 
-        emit Swapped(_to, _token1Address, _token1Id, _token1Is1155, token1[_idToRemoved].assetAddress, token1[_idToRemoved].tokenId, token1[_idToRemoved].is1155);  
+        emit Swapped(
+            _to,
+            _token1Address,
+            _token1Id,
+            _token1Is1155,
+            token1[_idToRemoved].assetAddress,
+            token1[_idToRemoved].tokenId,
+            token1[_idToRemoved].is1155
+        );
 
         token1[_idToRemoved].assetAddress = _token1Address;
         token1[_idToRemoved].tokenId = _token1Id;
         token1[_idToRemoved].is1155 = _token1Is1155;
 
-        timestamps[_to] = block.timestamp; 
+        timestamps[_to] = block.timestamp;
+    }
+
+    function _releaseToMinter() internal {
+        if (minterCount.sub(minterPaidCount) > 0) {
+            IERC1155(token0.assetAddress).safeTransferFrom(
+                address(this),
+                minters[minterPaidCount],
+                token0.tokenId,
+                1,
+                "0x00"
+            );
+            minterPaidCount += 1;
+        }
+    }
+
+    function _releaseToTrader() internal {
+        if (traderCount.sub(traderPaidCount) > 0) {
+            IERC1155(token0.assetAddress).safeTransferFrom(
+                address(this),
+                traders[traderPaidCount],
+                token0.tokenId,
+                1,
+                "0x00"
+            );
+            traderPaidCount += 1;
+        }
     }
 
     function _createPosition(address _address) internal {
