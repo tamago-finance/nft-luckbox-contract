@@ -2,54 +2,9 @@
 
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-import "./Whitelist.sol";
-// import "../interfaces/ISyntheticNFT.sol";
-
-/**
- * @title An ERC-1155 with permissioned burning and minting. The contract deployer will initially
- * be the owner who is capable of adding new roles.
- */
-
-
- /**
- * https://github.com/maticnetwork/pos-portal/blob/master/contracts/common/ContextMixin.sol
- */
-abstract contract ContextMixin {
-    function msgSender()
-        internal
-        view
-        returns (address payable sender)
-    {
-        if (msg.sender == address(this)) {
-            bytes memory array = msg.data;
-            uint256 index = msg.data.length;
-            assembly {
-                // Load the 32 bytes word from memory with the address on the lower 20 bytes, and mask those.
-                sender := and(
-                    mload(add(array, index)),
-                    0xffffffffffffffffffffffffffffffffffffffff
-                )
-            }
-        } else {
-            sender = payable(msg.sender);
-        }
-        return sender;
-    }
-}
-
-/**
- * https://github.com/maticnetwork/pos-portal/blob/master/contracts/common/Initializable.sol
- */
-contract Initializable {
-    bool inited = false;
-
-    modifier initializer() {
-        require(!inited, "already inited");
-        _;
-        inited = true;
-    }
-}
+import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
+import "./WhitelistUpgradeable.sol";
 
 /**
  * https://github.com/maticnetwork/pos-portal/blob/master/contracts/common/EIP712Base.sol
@@ -228,13 +183,15 @@ contract NativeMetaTransaction is EIP712Base {
     }
 }
 
-contract SyntheticNFT is ERC1155, Whitelist, ContextMixin, NativeMetaTransaction {
+contract SyntheticNFT is ERC1155Upgradeable, WhitelistUpgradeable, NativeMetaTransaction {
 
     // Contract name
     string public name;
 
-    constructor(string memory name_, string memory uri) public ERC1155(uri) {
-        addAddress(msg.sender);
+    function initialize(string memory name_, string memory uri, address _nftManager) external initializer {
+        WhitelistUpgradeable.__Whitelist_init();
+        ERC1155Upgradeable.__ERC1155_init(uri);
+        addAddress(_nftManager);
         name = name_;
         _initializeEIP712(name);
     }
@@ -284,18 +241,6 @@ contract SyntheticNFT is ERC1155, Whitelist, ContextMixin, NativeMetaTransaction
         _setURI(uri);
     }
 
-    /**
-     * This is used instead of msg.sender as transactions won't be sent by the original token owner, but by OpenSea.
-     */
-    function _msgSender()
-        internal
-        override
-        view
-        returns (address payable sender)
-    {
-        return ContextMixin.msgSender();
-    }
-
      function isApprovedForAll(
         address _owner,
         address _operator
@@ -304,7 +249,7 @@ contract SyntheticNFT is ERC1155, Whitelist, ContextMixin, NativeMetaTransaction
             return true;
         }
         
-        return ERC1155.isApprovedForAll(_owner, _operator);
+        return ERC1155Upgradeable.isApprovedForAll(_owner, _operator);
     }
 
 }

@@ -2,17 +2,14 @@
 
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/token/ERC1155/ERC1155Holder.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import "./utility/LibMath.sol";
-import "./utility/Whitelist.sol";
+import "./utility/WhitelistUpgradeable.sol";
 import "./utility/SyntheticNFT.sol";
 import "./interfaces/IPriceResolver.sol";
-import "./interfaces/ISyntheticNFT.sol";
 import "./interfaces/INFTManager.sol";
-import "./interfaces/IPancakePair.sol";
 import "./interfaces/IPancakeRouter02.sol";
 import "./interfaces/IPancakeFactory.sol";
 
@@ -21,11 +18,11 @@ import "./interfaces/IPancakeFactory.sol";
  * @dev The contract heavily depends on 3rd party modules from QuickSwap, Chainlink to running. Check out docs.tamago.finance for more details
  */
 
-contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
+contract NFTManager is ReentrancyGuardUpgradeable, WhitelistUpgradeable, INFTManager {
     using LibMathSigned for int256;
     using LibMathUnsigned for uint256;
 
-    using SafeERC20 for IERC20;
+    using SafeERC20Upgradeable for IERC20Upgradeable;
 
     enum ContractState {
         INITIAL,
@@ -86,14 +83,14 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     bool public discountDisabled;
     // Multiplier for discount/redeem fees
     uint256 public multiplier = 1 ether;
+    // Router
+    address public ROUTER_ADDRESS;
     // max NFT that can be minted per time
     uint256 constant MAX_NFT = 100;
 
     uint256 constant ONE = 1 ether; // 1
     uint256 constant MAX_UINT256 = uint256(-1);
-    address constant ROUTER_ADDRESS =
-        0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff; // Quickswap Router
-        // 0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F; // SushiV2 Router
+        // 0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff; // Quickswap Router
     int256 constant BASE = 10 ether;
     int256 constant K = 9.3 ether;
 
@@ -121,15 +118,18 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     /// @param _collateralShareSymbol the symbol of LP token that defined on the price registry
     /// @param _syntheticSymbol the symbol of value-backed NFT that defined on the price registry
     /// @param _devAddress dev address
-    constructor(
+    function initialize(
         string memory _name,
         string memory _nftUri,
         address _priceResolverAddress,
         address _collateralShareAddress,
         bytes32 _collateralShareSymbol,
         bytes32 _syntheticSymbol,
+        address _routerAddress,
         address _devAddress
-    ) public nonReentrant {
+    ) external initializer {
+        ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
+        WhitelistUpgradeable.__Whitelist_init();
         name = _name;
         syntheticSymbol = _syntheticSymbol;
         state = ContractState.INITIAL;
@@ -138,11 +138,9 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
 
         priceResolver = IPriceResolver(_priceResolverAddress);
 
-        redeemFee = 300; // 3.0%
+        ROUTER_ADDRESS = _routerAddress;
 
-        // Deploy the synthetic NFT contract
-        SyntheticNFT deployedContract = new SyntheticNFT(_name, _nftUri);
-        syntheticNFT = ISyntheticNFT(address(deployedContract));
+        redeemFee = 300; // 3.0%
 
         devAddress = _devAddress;
 
@@ -154,15 +152,15 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         }
 
         if (collateralShare.token0() != address(0)) {
-            IERC20(collateralShare.token0()).approve(
+            IERC20Upgradeable(collateralShare.token0()).approve(
                 ROUTER_ADDRESS,
                 MAX_UINT256
             );
-            IERC20(collateralShare.token1()).approve(
+            IERC20Upgradeable(collateralShare.token1()).approve(
                 ROUTER_ADDRESS,
                 MAX_UINT256
             );
-            IERC20(address(collateralShare)).approve(
+            IERC20Upgradeable(address(collateralShare)).approve(
                 ROUTER_ADDRESS,
                 MAX_UINT256
             );
@@ -237,12 +235,12 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         require(_maxPairAmount >= pairAmount, "Exceeding _maxPairAmount");
 
         // takes ERC-20 tokens
-        IERC20(collateralShare.token0()).safeTransferFrom(
+        IERC20Upgradeable(collateralShare.token0()).safeTransferFrom(
             msg.sender,
             address(this),
             baseAmount
         );
-        IERC20(collateralShare.token1()).safeTransferFrom(
+        IERC20Upgradeable(collateralShare.token1()).safeTransferFrom(
             msg.sender,
             address(this),
             pairAmount
@@ -324,23 +322,23 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         if (redeemFee != 0) {
             uint256 baseFee = baseTokenAmount.mul(redeemFee).div(10000);
             uint256 pairFee = pairTokenAmount.mul(redeemFee).div(10000);
-            IERC20(collateralShare.token0()).transfer(
+            IERC20Upgradeable(collateralShare.token0()).transfer(
                 msg.sender,
                 baseTokenAmount.sub(baseFee)
             );
-            IERC20(collateralShare.token1()).transfer(
+            IERC20Upgradeable(collateralShare.token1()).transfer(
                 msg.sender,
                 pairTokenAmount.sub(pairFee)
             );
             // transfer fees to dev.
-            IERC20(collateralShare.token0()).transfer(devAddress, baseFee);
-            IERC20(collateralShare.token1()).transfer(devAddress, pairFee);
+            IERC20Upgradeable(collateralShare.token0()).transfer(devAddress, baseFee);
+            IERC20Upgradeable(collateralShare.token1()).transfer(devAddress, pairFee);
         } else {
-            IERC20(collateralShare.token0()).transfer(
+            IERC20Upgradeable(collateralShare.token0()).transfer(
                 msg.sender,
                 baseTokenAmount
             );
-            IERC20(collateralShare.token1()).transfer(
+            IERC20Upgradeable(collateralShare.token1()).transfer(
                 msg.sender,
                 pairTokenAmount
             );
@@ -428,6 +426,11 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         syntheticVariantCount += 1;
     }
 
+    function setSyntheticNFT(address _syntheticNFT) public nonReentrant onlyWhitelisted {
+        require(_syntheticNFT != address(0), "!address(0)");
+        syntheticNFT = ISyntheticNFT(_syntheticNFT);
+    }
+
     // enable/disable synthetic NFT variant
     function setSyntheticVariantDisable(uint8 _id, bool _disabled)
         public
@@ -444,7 +447,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         nonReentrant
         onlyWhitelisted
     {
-        IERC20(_tokenAddress).transfer(msg.sender, _amount);
+        IERC20Upgradeable(_tokenAddress).transfer(msg.sender, _amount);
     }
 
     // force mint ERC-1155
@@ -686,10 +689,10 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
 
         lpAmount = lpNeeded;
 
-        uint256 baseInLp = IERC20(collateralShare.token0()).balanceOf(
+        uint256 baseInLp = IERC20Upgradeable(collateralShare.token0()).balanceOf(
             address(collateralShare)
         );
-        uint256 pairInLp = IERC20(collateralShare.token1()).balanceOf(
+        uint256 pairInLp = IERC20Upgradeable(collateralShare.token1()).balanceOf(
             address(collateralShare)
         );
 
