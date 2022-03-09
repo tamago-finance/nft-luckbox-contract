@@ -104,7 +104,7 @@ describe("NFTSwapPair", () => {
         expect(Number(await nft721.balanceOf(pair.address))).to.equal(2)
         expect(Number(await nft1155.balanceOf(pair.address, 1))).to.equal(2)
         expect(Number(await settlementNft.balanceOf(pair.address, 1))).to.equal(4)
-        expect(Number(await pair.minterCount())).to.equal(4)
+        expect(Number(await pair.providerCount())).to.equal(4)
 
         // withdraw 
         for (let user of [admin, alice]) {
@@ -116,8 +116,7 @@ describe("NFTSwapPair", () => {
         expect(Number(await pair.totalSupply())).to.equal(0)
         expect(Number(await nft721.balanceOf(pair.address))).to.equal(0)
         expect(Number(await nft1155.balanceOf(pair.address, 1))).to.equal(0)
-        // still locked in the pair contract
-        expect(Number(await settlementNft.balanceOf(pair.address, 1))).to.equal(4)
+        expect(Number(await settlementNft.balanceOf(pair.address, 1))).to.equal(0)
     })
 
 
@@ -153,7 +152,7 @@ describe("NFTSwapPair", () => {
 
         // the total supply should be remains the same
         expect(Number(await pair.totalSupply())).to.equal(4)
-        expect(Number(await pair.traderCount())).to.equal(1)
+        expect(Number(await pair.providerCount())).to.equal(5)
         expect(Number(await nft1155.balanceOf(bob.address, 2))).to.equal(0)
 
         // bob should receives either mock ERC1155 (1) or ERC721 (1,2) back
@@ -161,10 +160,6 @@ describe("NFTSwapPair", () => {
         const balanceErc721 = await nft721.balanceOf(bob.address)
         expect(Number(balanceErc1155) + Number(balanceErc721)).to.equal(1)
 
-        // bob should receive the settlement back when the minter burns
-        expect( Number(await settlementNft.balanceOf(bob.address, 1)) ).to.equal(0)
-        await pair.connect(admin).burn(admin.address)
-        expect( Number(await settlementNft.balanceOf(bob.address, 1)) ).to.equal(1)
     })
 
     it("Swaps shoud be failed when there's no settlement NFT", async () => {
