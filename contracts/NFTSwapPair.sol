@@ -49,13 +49,9 @@ contract NFTSwapPair is
     Token public token0; // always ERC1155
     Token[] public token1;
 
-    mapping(uint256 => address) public traders;
-    uint256 public traderCount;
-    uint256 public traderPaidCount;
-
-    mapping(uint256 => address) public minters;
-    uint256 public minterCount;
-    uint256 public minterPaidCount;
+    mapping(uint256 => address) public providers;
+    uint256 public providerCount;
+    uint256 public providerPaidCount;
 
     mapping(address => uint256) public balanceOf;
     uint256 public totalSupply;
@@ -125,8 +121,8 @@ contract NFTSwapPair is
             "0x00"
         );
 
-        minters[minterCount] = _to;
-        minterCount += 1;
+        providers[providerCount] = _to;
+        providerCount += 1;
 
         // take the token1's NFT
         if (_token1Is1155) {
@@ -165,8 +161,8 @@ contract NFTSwapPair is
 
         uint256 idToRemoved = _propose();
 
-        // return token0's NFT to the earliest trader
-        _releaseToTrader();
+        // return token0's NFT to the earliest provider
+        _release();
 
         // return token1's NFT
         if (token1[idToRemoved].is1155) {
@@ -234,6 +230,12 @@ contract NFTSwapPair is
     function increaseNonce() public nonReentrant onlyOwner {
         nonce += 1;
     }
+    
+    // owner can skip the queue
+    function skip(uint256 _value) public nonReentrant onlyOwner {
+        require( providerCount >= providerPaidCount.add(_value) ,"Invalid value");
+        providerPaidCount += _value;
+    }
 
     function setMinimumLiquidity(uint8 _value) public nonReentrant onlyOwner {
         require(_value != 0, "Invalid value");
@@ -300,11 +302,11 @@ contract NFTSwapPair is
             "0x00"
         );
 
-        traders[traderCount] = _to;
-        traderCount += 1;
+        providers[providerCount] = _to;
+        providerCount += 1;
 
-        // return token0's NFT to the earliest minter
-        _releaseToMinter();
+        // return token0's NFT to the earliest provider
+        _release();
 
         // taking the token1's NFT
         if (_token1Is1155) {
@@ -357,29 +359,16 @@ contract NFTSwapPair is
         timestamps[_to] = block.timestamp;
     }
 
-    function _releaseToMinter() internal {
-        if (minterCount.sub(minterPaidCount) > 0) {
+    function _release() internal {
+        if (providerCount.sub(providerPaidCount) > 0) {
             IERC1155(token0.assetAddress).safeTransferFrom(
                 address(this),
-                minters[minterPaidCount],
+                providers[providerPaidCount],
                 token0.tokenId,
                 1,
                 "0x00"
             );
-            minterPaidCount += 1;
-        }
-    }
-
-    function _releaseToTrader() internal {
-        if (traderCount.sub(traderPaidCount) > 0) {
-            IERC1155(token0.assetAddress).safeTransferFrom(
-                address(this),
-                traders[traderPaidCount],
-                token0.tokenId,
-                1,
-                "0x00"
-            );
-            traderPaidCount += 1;
+            providerPaidCount += 1;
         }
     }
 
