@@ -10,7 +10,9 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155Holder.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract NFTBroker is Ownable, ReentrancyGuard, ERC1155Holder {
+import "./interfaces/INFTBroker.sol";
+
+contract NFTBroker is Ownable, ReentrancyGuard, ERC1155Holder, INFTBroker {
   using SafeERC20 for IERC20;
 
   //address -> fromId -> toId -> Rate
@@ -112,7 +114,7 @@ contract NFTBroker is Ownable, ReentrancyGuard, ERC1155Holder {
     address _nftAddress,
     uint256 _fromId,
     uint256 _toId
-  ) public view returns (uint8) {
+  ) public view override returns (uint8) {
     return rates[_nftAddress][_fromId][_toId];
   }
 
@@ -121,7 +123,7 @@ contract NFTBroker is Ownable, ReentrancyGuard, ERC1155Holder {
     uint256 _fromId,
     uint256 _toId,
     uint256 _amount
-  ) public nonReentrant {
+  ) public override nonReentrant {
     require(_nftAddress != address(0), "Can not be address 0");
 
     uint8 swapRate = getRate(_nftAddress, _fromId, _toId);
