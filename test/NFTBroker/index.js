@@ -45,7 +45,7 @@ describe("NFTBroker", () => {
   //Deposit test 2
   it("Should error when there's 0 amount of NFTs (Deposit func)", async () => {
     await expect(nftBroker.deposit(erc1155.address, 0, 0)).to.revertedWith(
-      "Can not be zero"
+      "Amount cannot be zero"
     );
   });
 
@@ -63,21 +63,21 @@ describe("NFTBroker", () => {
   //Withdraw test 2
   it("Should error when there's 0 amount of NFTs (Withdraw func)", async () => {
     await expect(nftBroker.withdraw(erc1155.address, 0, 0)).to.revertedWith(
-      "Can not be zero"
+      "Amount cannot be zero"
     );
   });
 
   //SetRate test 1
   it("Should error when address 0 (SetRate)", async () => {
     await expect(nftBroker.setRate(ADDRESS_ZERO, 0, 0, 1)).to.revertedWith(
-      "Can not be address 0"
+      "Cannot be address 0"
     );
   });
 
   //SetRate test 2
   it("Should error when rate less than 0", async () => {
     await expect(nftBroker.setRate(erc1155.address, 0, 0, 0)).to.revertedWith(
-      "Rate can not be less than 0"
+      "Rate cannot be less than 0"
     );
   });
 
@@ -93,7 +93,7 @@ describe("NFTBroker", () => {
   //RemoveRate test 1
   it("Should error when address 0 (RemoveRate)", async () => {
     await expect(nftBroker.removeRate(ADDRESS_ZERO, 0, 1)).to.revertedWith(
-      "Can not be address 0"
+      "Cannot be address 0"
     );
   });
 
@@ -118,7 +118,7 @@ describe("NFTBroker", () => {
     expect(initialRate).to.equal(0);
   });
 
-  //SwapRate test 1
+  //Swap test 1
   it("Should swap successfully", async () => {
     await nftBroker.setRate(erc1155.address, 0, 1, 5);
     await nftBroker.deposit(erc1155.address, 10, 1);
@@ -127,5 +127,18 @@ describe("NFTBroker", () => {
 
     expect(await erc1155.balanceOf(admin.address, 0)).to.equal(9);
     expect(await erc1155.balanceOf(admin.address, 1)).to.equal(5);
+  });
+
+  //Swap test 2
+  it("Should error when swapRate is 0", async () => {
+    await nftBroker.setRate(erc1155.address, 0, 1, 5);
+    await nftBroker.deposit(erc1155.address, 10, 1);
+    await nftBroker.removeRate(erc1155.address, 0, 1);
+
+    //await nftBroker.swap(erc1155.address, 0, 1, 1);
+
+    await expect(nftBroker.swap(erc1155.address, 0, 1, 1)).to.revertedWith(
+      "Cannot swap because swap rate is 0"
+    );
   });
 });

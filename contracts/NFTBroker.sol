@@ -52,7 +52,7 @@ contract NFTBroker is Ownable, ReentrancyGuard, ERC1155Holder, INFTBroker {
     uint256 _amount,
     uint256 _tokenId
   ) public onlyOwner nonReentrant {
-    require(_amount > 0, "Can not be zero");
+    require(_amount > 0, "Amount cannot be zero");
 
     IERC1155(_nftAddress).safeTransferFrom(
       msg.sender,
@@ -70,7 +70,7 @@ contract NFTBroker is Ownable, ReentrancyGuard, ERC1155Holder, INFTBroker {
     uint256 _amount,
     uint256 _tokenId
   ) public onlyOwner nonReentrant {
-    require(_amount > 0, "Can not be zero");
+    require(_amount > 0, "Amount cannot be zero");
 
     IERC1155(_nftAddress).safeTransferFrom(
       address(this),
@@ -89,9 +89,9 @@ contract NFTBroker is Ownable, ReentrancyGuard, ERC1155Holder, INFTBroker {
     uint256 _toId,
     uint8 _rate
   ) public onlyOwner nonReentrant {
-    require(_nftAddress != address(0), "Can not be address 0");
-    require(_rate > 0, "Rate can not be less than 0");
-    require(_fromId != _toId, "Token id can not be the same");
+    require(_nftAddress != address(0), "Cannot be address 0");
+    require(_rate > 0, "Rate cannot be less than 0");
+    require(_fromId != _toId, "Token id cannot be the same");
 
     rates[_nftAddress][_fromId][_toId] = _rate;
 
@@ -103,7 +103,7 @@ contract NFTBroker is Ownable, ReentrancyGuard, ERC1155Holder, INFTBroker {
     uint256 _fromId,
     uint256 _toId
   ) public onlyOwner nonReentrant {
-    require(_nftAddress != address(0), "Can not be address 0");
+    require(_nftAddress != address(0), "Cannot be address 0");
 
     rates[_nftAddress][_fromId][_toId] = 0;
 
@@ -124,9 +124,10 @@ contract NFTBroker is Ownable, ReentrancyGuard, ERC1155Holder, INFTBroker {
     uint256 _toId,
     uint256 _amount
   ) public override nonReentrant {
-    require(_nftAddress != address(0), "Can not be address 0");
+    require(_nftAddress != address(0), "Cannot be address 0");
 
     uint8 swapRate = getRate(_nftAddress, _fromId, _toId);
+    require(swapRate != 0, "Cannot swap because swap rate is 0");
 
     //get nft
     IERC1155(_nftAddress).safeTransferFrom(
