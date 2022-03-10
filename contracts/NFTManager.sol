@@ -90,7 +90,6 @@ contract NFTManager is ReentrancyGuardUpgradeable, WhitelistUpgradeable, INFTMan
 
     uint256 constant ONE = 1 ether; // 1
     uint256 constant MAX_UINT256 = uint256(-1);
-        // 0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff; // Quickswap Router
     int256 constant BASE = 10 ether;
     int256 constant K = 9.3 ether;
 
