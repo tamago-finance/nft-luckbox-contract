@@ -49,6 +49,17 @@ describe("NFTBroker", () => {
     );
   });
 
+  //Deposit test 3 + _addNft
+  it("Should add new nft successfully", async () => {
+    await nftBroker.deposit(erc1155.address, 1, 0);
+
+    const g = await nftBroker.getNft(0);
+    console.log(g);
+
+    expect(await nftBroker.getNft(0)).to.equal([0]);
+    //expect(await nftBroker.nfts(0).assetAddress).to.equal(erc1155.address);
+  });
+
   //Withdraw test 1
   it("Should withdraw successfully", async () => {
     //deposit before withdraw
@@ -134,8 +145,6 @@ describe("NFTBroker", () => {
     await nftBroker.setRate(erc1155.address, 0, 1, 5);
     await nftBroker.deposit(erc1155.address, 10, 1);
     await nftBroker.removeRate(erc1155.address, 0, 1);
-
-    //await nftBroker.swap(erc1155.address, 0, 1, 1);
 
     await expect(nftBroker.swap(erc1155.address, 0, 1, 1)).to.revertedWith(
       "Cannot swap because swap rate is 0"
