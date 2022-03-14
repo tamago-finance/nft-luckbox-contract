@@ -55,26 +55,26 @@ contract NFTBroker is Ownable, ReentrancyGuard, ERC1155Holder, INFTBroker {
 
   constructor() public {}
 
-  // function getNft(uint256 i) public view returns (NFT memory) {
-  //   return nfts[i];
-  // }
-
-  function getNft(uint256 i) public view returns (address, uint256[] memory) {
-    NFT memory nft = nfts[i];
-    return (nft.assetAddress, nft.tokenIds);
+  function getNft(uint256 i) public view returns (NFT memory) {
+    return nfts[i];
   }
 
   function _addNft(address _assetAddress, uint256 _tokenId) private {
     uint256[] memory tokenArr;
 
-    uint256 i = 0;
-    for (i; i < nfts.length; i++) {
-      //exist
+    if (nfts.length == 0) {
+      nfts.push(NFT({ assetAddress: _assetAddress, tokenIds: tokenArr }));
+    }
+
+    for (uint256 i = 0; i < nfts.length; i++) {
+      NFT storage nft = nfts[i];
       if (nfts[i].assetAddress == _assetAddress) {
-        (nfts[i].tokenIds).push(_tokenId);
+        nft.tokenIds.push(_tokenId);
+        return;
       } else {
         tokenArr[0] = _tokenId;
         nfts.push(NFT({ assetAddress: _assetAddress, tokenIds: tokenArr }));
+        return;
       }
     }
   }
