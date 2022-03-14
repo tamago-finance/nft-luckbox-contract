@@ -7,9 +7,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@chainlink/contracts/src/v0.6/VRFConsumerBase.sol";
-import "./NFTLuckBox.sol";
-
-// import "./interfaces/ILuckbox.sol";
 
 /**
  * @title Factory for creating new luckbox contract.
@@ -51,7 +48,6 @@ contract Factory is VRFConsumerBase, ReentrancyGuard, Ownable {
     0xf86195cf7690c55907b2b611ebb7343a6f649bff128701cc542f0569e2c549da;
   uint256 public constant FEE = 100000000000000; // 0.0001 LINK
 
-  event LuckboxCreated(address indexed _address);
   event SetFee(uint256 _fee);
   event SetDevAddr(address _devAddr);
   event RequestedNonce(address user, uint256 timestamp);
@@ -62,35 +58,6 @@ contract Factory is VRFConsumerBase, ReentrancyGuard, Ownable {
   {
     require(_devAddr != address(0), "Address is zero");
     devAddr = _devAddr;
-  }
-
-  function createLuckbox(
-    string calldata name,
-    string calldata symbol,
-    uint256 ticketPrice
-  ) external nonReentrant {
-    LuckBox luckbox = new LuckBox(name, symbol, ticketPrice, address(this));
-
-    luckbox.transferOwnership(msg.sender);
-
-    address newLuckbox = (address(luckbox));
-
-    boxes.push(
-      Box({
-        name: name,
-        symbol: symbol,
-        owner: msg.sender,
-        contractAddress: newLuckbox,
-        banned: false,
-        approved: false
-      })
-    );
-
-    totalBoxes += 1;
-
-    timestamp = block.timestamp;
-
-    emit LuckboxCreated(newLuckbox);
   }
 
   // request a new nonce from Chainlink VRF
