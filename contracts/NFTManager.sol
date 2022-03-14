@@ -734,9 +734,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
                 (targetCR.toUint256()).wmul(newTotalCollateral)
             ).wdiv(newCR);
             if (adjustedTotalCollateral > newTotalCollateral) {
-                offset = (adjustedTotalCollateral.sub(newTotalCollateral)).wmul(
-                        lpAmount.wdiv(syntheticVariants[_id].totalRawCollateral)
-                    );
+                offset = (adjustedTotalCollateral.sub(newTotalCollateral)).wmul(lpAmount).wdiv(syntheticVariants[_id].totalRawCollateral);
                 offset = offset.wmul(multiplier);
             }
 
@@ -786,9 +784,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
             ).wdiv(newCR);
 
             if (newTotalCollateral > adjustedTotalCollateral) {
-                discount = newTotalCollateral.sub(adjustedTotalCollateral).wmul(
-                        lpAmount.wdiv(syntheticVariants[_id].totalRawCollateral)
-                    );
+                discount = newTotalCollateral.sub(adjustedTotalCollateral).wmul(lpAmount).wdiv(syntheticVariants[_id].totalRawCollateral);
                 discount = discount.wmul(multiplier);
             }
 
