@@ -59,27 +59,37 @@ contract NFTBroker is Ownable, ReentrancyGuard, ERC1155Holder, INFTBroker {
     return nfts[i];
   }
 
-  function _addNft(address _assetAddress, uint256 _tokenId) private {
-    uint256[] memory tokenArr;
+  function swap(
+    address _nftAddress,
+    uint256 _fromId,
+    uint256 _toId,
+    uint256 _amount
+  ) public override nonReentrant {
+    require(_nftAddress != address(0), "Cannot be address 0");
 
-    if (nfts.length == 0) {
-      nfts.push(NFT({ assetAddress: _assetAddress, tokenIds: tokenArr }));
-    }
+    uint8 swapRate = getRate(_nftAddress, _fromId, _toId);
+    require(swapRate != 0, "Cannot swap because swap rate is 0");
 
-    for (uint256 i = 0; i < nfts.length; i++) {
-      NFT storage nft = nfts[i];
-      if (nfts[i].assetAddress == _assetAddress) {
-        nft.tokenIds.push(_tokenId);
-        return;
-      } else {
-        tokenArr[0] = _tokenId;
-        nfts.push(NFT({ assetAddress: _assetAddress, tokenIds: tokenArr }));
-        return;
-      }
-    }
+    //get nft
+    IERC1155(_nftAddress).safeTransferFrom(
+      msg.sender,
+      address(this),
+      _fromId,
+      _amount,
+      "0x00"
+    );
+
+    //send nft to nft-sender
+    IERC1155(_nftAddress).safeTransferFrom(
+      address(this),
+      msg.sender,
+      _toId,
+      (swapRate * _amount),
+      "0x00"
+    );
+
+    emit Swap(msg.sender, _nftAddress, _fromId, _toId, _amount);
   }
-
-  //function removeNft(address _assetAdrres, uint256[] _tokenIds) {}
 
   function deposit(
     address _nftAddress,
@@ -154,35 +164,26 @@ contract NFTBroker is Ownable, ReentrancyGuard, ERC1155Holder, INFTBroker {
     return rates[_nftAddress][_fromId][_toId];
   }
 
-  function swap(
-    address _nftAddress,
-    uint256 _fromId,
-    uint256 _toId,
-    uint256 _amount
-  ) public override nonReentrant {
-    require(_nftAddress != address(0), "Cannot be address 0");
+  
 
-    uint8 swapRate = getRate(_nftAddress, _fromId, _toId);
-    require(swapRate != 0, "Cannot swap because swap rate is 0");
+  function _addNft(address _assetAddress, uint256 _tokenId) private {
+    uint256[] memory tokenArr;
 
-    //get nft
-    IERC1155(_nftAddress).safeTransferFrom(
-      msg.sender,
-      address(this),
-      _fromId,
-      _amount,
-      "0x00"
-    );
+    if (nfts.length == 0) {
+      nfts.push(NFT({ assetAddress: _assetAddress, tokenIds: tokenArr }));
+    }
 
-    //send nft to nft-sender
-    IERC1155(_nftAddress).safeTransferFrom(
-      address(this),
-      msg.sender,
-      _toId,
-      (swapRate * _amount),
-      "0x00"
-    );
-
-    emit Swap(msg.sender, _nftAddress, _fromId, _toId, _amount);
+    for (uint256 i = 0; i < nfts.length; i++) {
+      NFT storage nft = nfts[i];
+      if (nfts[i].assetAddress == _assetAddress) {
+        nft.tokenIds.push(_tokenId);
+        return;
+      } else {
+        tokenArr[0] = _tokenId;
+        nfts.push(NFT({ assetAddress: _assetAddress, tokenIds: tokenArr }));
+        return;
+      }
+    }
   }
+
 }
