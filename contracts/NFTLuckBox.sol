@@ -14,9 +14,6 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "./interfaces/IFactory.sol";
-import "./interfaces/IRegistry.sol";
-
 /**
  * @title Luckbox v.2
  * @dev A contract aims to help distribute NFTs for collectors to users who met the conditions
@@ -66,13 +63,6 @@ contract LuckBox is
     // Project Id => Project
     mapping(uint256 => Project) public projects;
 
-    uint256 private nonce;
-
-    IRegistry public registry;
-
-    bytes32 private constant FACTORY =
-        0x464143544f525900000000000000000000000000000000000000000000000000;
-
     event EventCreated(uint256 indexed eventId, string name, uint256[] poaps);
 
     event PoapCreated(
@@ -90,20 +80,62 @@ contract LuckBox is
         bool is1155
     );
 
+    event Claimed(
+        address to,
+        uint256 eventId,
+        address assetAddress,
+        uint256 tokenId,
+        bool is1155
+    );
+
     event ProjectCreated(uint256 indexed projectId, string name);
 
-    constructor(address _registry) public {
-        registry = IRegistry(_registry);
-
+    constructor() public {
         _registerInterface(IERC721Receiver.onERC721Received.selector);
     }
 
     function eligible(
-        uint256 _eventId,
+        uint256 _projectId,
         address _address,
         bytes32[] memory _proof
     ) public view returns (bool) {
-        return _eligible(_eventId, _address, _proof);
+        return _eligible(_projectId, _address, _proof);
+    }
+    
+    function checkClaim(uint256 _eventId, uint256 _poapId, bytes32[] memory _proof) public view returns (bool) {
+        return _checkClaim(_eventId, _poapId, _proof);
+    }
+
+    function claim(
+        uint256 _eventId,
+        uint256 _poapId,
+        bytes32[] memory _proof
+    ) public nonReentrant {
+        require(events[_eventId].active == true, "Given Event ID is invalid");
+        require(events[_eventId].ended == false, "The event is ended");
+        require(events[_eventId].claimed[msg.sender] == false, "The caller is already claimed");
+        require(_checkClaim(_eventId, _poapId, _proof) == true, "The caller is not eligible to claim the given poap");
+
+        if(poaps[_poapId].is1155) {
+            IERC1155(poaps[_poapId].assetAddress).safeTransferFrom(
+                address(this),
+                msg.sender,
+                poaps[_poapId].tokenId,
+                1,
+                "0x00"
+            );
+        } else {
+            IERC721(poaps[_poapId].assetAddress).safeTransferFrom(
+                address(this),
+                msg.sender,
+                poaps[_poapId].tokenId
+            );
+        }
+
+        events[_eventId].claimed[msg.sender] = true;
+        events[_eventId].claimCount += 1;
+
+        emit Claimed(msg.sender, _eventId, poaps[_poapId].assetAddress, poaps[_poapId].tokenId, poaps[_poapId].is1155);
     }
 
     function depositERC1155(
@@ -142,7 +174,7 @@ contract LuckBox is
         bool _is1155
     ) public nonReentrant onlyOwner {
         require(
-            poaps[_poapId].assetAddress != address(0),
+            poaps[_poapId].assetAddress == address(0),
             "Given ID is occupied"
         );
 
@@ -240,10 +272,6 @@ contract LuckBox is
         );
     }
 
-    function increaseNonce() public nonReentrant onlyOwner {
-        nonce += 1;
-    }
-
     function emergencyWithdrawERC721(
         address _to,
         address _tokenAddress,
@@ -254,21 +282,10 @@ contract LuckBox is
 
     // PRIVATE FUNCTIONS
 
-    function _generateRandomNumber() internal view returns (uint256) {
-        uint256 randomNonce = nonce;
-
-        if (registry.getContractAddress(FACTORY) != address(0)) {
-            IFactory factory = IFactory(registry.getContractAddress(FACTORY));
-            randomNonce = factory.randomNonce();
-        }
-
-        uint256 randomNumber = uint256(
-            keccak256(
-                abi.encodePacked(now, msg.sender, randomNonce, address(this))
-            )
-        );
-
-        return randomNumber;
+    function _checkClaim(uint256 _eventId, uint256 _poapId, bytes32[] memory _proof) internal view returns (bool) {
+        uint256 test = 1;
+        bytes32 leaf = keccak256(abi.encodePacked( msg.sender , _poapId));
+        return MerkleProof.verify(_proof, events[_eventId].merkleRoot, leaf);
     }
 
     function _eligible(
@@ -284,5 +301,6 @@ contract LuckBox is
             MerkleProof.verify(_proof, projects[_projectId].merkleRoot, leaf);
     }
 
-    // TODO : CLAIM
+     
+
 }
