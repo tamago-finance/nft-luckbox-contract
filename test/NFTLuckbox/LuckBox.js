@@ -20,7 +20,7 @@ describe("LuckBox V2", () => {
     const LuckBox = await ethers.getContractFactory("LuckBox")
     const MockERC1155 = await ethers.getContractFactory("MockERC1155")
 
-    luckBox = await LuckBox.deploy(ethers.constants.AddressZero)
+    luckBox = await LuckBox.deploy( )
     erc1155 = await MockERC1155.deploy(
       "https://api.cryptokitties.co/kitties/{id}"
     )

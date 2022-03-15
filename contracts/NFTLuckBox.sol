@@ -14,9 +14,6 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "./interfaces/IFactory.sol";
-import "./interfaces/IRegistry.sol";
-
 /**
  * @title Luckbox v.2
  * @dev A contract aims to help distribute NFTs for collectors to users who met the conditions
@@ -66,13 +63,6 @@ contract LuckBox is
     // Project Id => Project
     mapping(uint256 => Project) public projects;
 
-    uint256 private nonce;
-
-    IRegistry public registry;
-
-    bytes32 private constant FACTORY =
-        0x464143544f525900000000000000000000000000000000000000000000000000;
-
     event EventCreated(uint256 indexed eventId, string name, uint256[] poaps);
 
     event PoapCreated(
@@ -100,7 +90,7 @@ contract LuckBox is
 
     event ProjectCreated(uint256 indexed projectId, string name);
 
-    constructor(address _registry) public {
+    constructor() public {
         _registerInterface(IERC721Receiver.onERC721Received.selector);
     }
 
@@ -282,10 +272,6 @@ contract LuckBox is
         );
     }
 
-    function increaseNonce() public nonReentrant onlyOwner {
-        nonce += 1;
-    }
-
     function emergencyWithdrawERC721(
         address _to,
         address _tokenAddress,
@@ -300,23 +286,6 @@ contract LuckBox is
         uint256 test = 1;
         bytes32 leaf = keccak256(abi.encodePacked( msg.sender , _poapId));
         return MerkleProof.verify(_proof, events[_eventId].merkleRoot, leaf);
-    }
-
-    function _generateRandomNumber() internal view returns (uint256) {
-        uint256 randomNonce = nonce;
-
-        if (registry.getContractAddress(FACTORY) != address(0)) {
-            IFactory factory = IFactory(registry.getContractAddress(FACTORY));
-            randomNonce = factory.randomNonce();
-        }
-
-        uint256 randomNumber = uint256(
-            keccak256(
-                abi.encodePacked(now, msg.sender, randomNonce, address(this))
-            )
-        );
-
-        return randomNumber;
     }
 
     function _eligible(
