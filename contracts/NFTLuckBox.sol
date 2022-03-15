@@ -90,20 +90,62 @@ contract LuckBox is
         bool is1155
     );
 
+    event Claimed(
+        address to,
+        uint256 eventId,
+        address assetAddress,
+        uint256 tokenId,
+        bool is1155
+    );
+
     event ProjectCreated(uint256 indexed projectId, string name);
 
     constructor(address _registry) public {
-        registry = IRegistry(_registry);
-
         _registerInterface(IERC721Receiver.onERC721Received.selector);
     }
 
     function eligible(
-        uint256 _eventId,
+        uint256 _projectId,
         address _address,
         bytes32[] memory _proof
     ) public view returns (bool) {
-        return _eligible(_eventId, _address, _proof);
+        return _eligible(_projectId, _address, _proof);
+    }
+    
+    function checkClaim(uint256 _eventId, uint256 _poapId, bytes32[] memory _proof) public view returns (bool) {
+        return _checkClaim(_eventId, _poapId, _proof);
+    }
+
+    function claim(
+        uint256 _eventId,
+        uint256 _poapId,
+        bytes32[] memory _proof
+    ) public nonReentrant {
+        require(events[_eventId].active == true, "Given Event ID is invalid");
+        require(events[_eventId].ended == false, "The event is ended");
+        require(events[_eventId].claimed[msg.sender] == false, "The caller is already claimed");
+        require(_checkClaim(_eventId, _poapId, _proof) == true, "The caller is not eligible to claim the given poap");
+
+        if(poaps[_poapId].is1155) {
+            IERC1155(poaps[_poapId].assetAddress).safeTransferFrom(
+                address(this),
+                msg.sender,
+                poaps[_poapId].tokenId,
+                1,
+                "0x00"
+            );
+        } else {
+            IERC721(poaps[_poapId].assetAddress).safeTransferFrom(
+                address(this),
+                msg.sender,
+                poaps[_poapId].tokenId
+            );
+        }
+
+        events[_eventId].claimed[msg.sender] = true;
+        events[_eventId].claimCount += 1;
+
+        emit Claimed(msg.sender, _eventId, poaps[_poapId].assetAddress, poaps[_poapId].tokenId, poaps[_poapId].is1155);
     }
 
     function depositERC1155(
@@ -142,7 +184,7 @@ contract LuckBox is
         bool _is1155
     ) public nonReentrant onlyOwner {
         require(
-            poaps[_poapId].assetAddress != address(0),
+            poaps[_poapId].assetAddress == address(0),
             "Given ID is occupied"
         );
 
@@ -254,6 +296,12 @@ contract LuckBox is
 
     // PRIVATE FUNCTIONS
 
+    function _checkClaim(uint256 _eventId, uint256 _poapId, bytes32[] memory _proof) internal view returns (bool) {
+        uint256 test = 1;
+        bytes32 leaf = keccak256(abi.encodePacked( msg.sender , _poapId));
+        return MerkleProof.verify(_proof, events[_eventId].merkleRoot, leaf);
+    }
+
     function _generateRandomNumber() internal view returns (uint256) {
         uint256 randomNonce = nonce;
 
@@ -284,5 +332,6 @@ contract LuckBox is
             MerkleProof.verify(_proof, projects[_projectId].merkleRoot, leaf);
     }
 
-    // TODO : CLAIM
+     
+
 }
