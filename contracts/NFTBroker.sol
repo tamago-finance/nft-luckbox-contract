@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.6.12;
+pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
@@ -14,6 +15,13 @@ import "./interfaces/INFTBroker.sol";
 
 contract NFTBroker is Ownable, ReentrancyGuard, ERC1155Holder, INFTBroker {
   using SafeERC20 for IERC20;
+
+  struct NFT {
+    address assetAddress;
+    uint256[] tokenIds;
+  }
+
+  NFT[] private nfts;
 
   //address -> fromId -> toId -> Rate
   mapping(address => mapping(uint256 => mapping(uint256 => uint8)))
@@ -47,6 +55,42 @@ contract NFTBroker is Ownable, ReentrancyGuard, ERC1155Holder, INFTBroker {
 
   constructor() public {}
 
+  function getNft(uint256 i) public view returns (NFT memory) {
+    return nfts[i];
+  }
+
+  function swap(
+    address _nftAddress,
+    uint256 _fromId,
+    uint256 _toId,
+    uint256 _amount
+  ) public override nonReentrant {
+    require(_nftAddress != address(0), "Cannot be address 0");
+
+    uint8 swapRate = getRate(_nftAddress, _fromId, _toId);
+    require(swapRate != 0, "Cannot swap because swap rate is 0");
+
+    //get nft
+    IERC1155(_nftAddress).safeTransferFrom(
+      msg.sender,
+      address(this),
+      _fromId,
+      _amount,
+      "0x00"
+    );
+
+    //send nft to nft-sender
+    IERC1155(_nftAddress).safeTransferFrom(
+      address(this),
+      msg.sender,
+      _toId,
+      (swapRate * _amount),
+      "0x00"
+    );
+
+    emit Swap(msg.sender, _nftAddress, _fromId, _toId, _amount);
+  }
+
   function deposit(
     address _nftAddress,
     uint256 _amount,
@@ -61,6 +105,8 @@ contract NFTBroker is Ownable, ReentrancyGuard, ERC1155Holder, INFTBroker {
       _amount,
       "0x00"
     );
+
+    _addNft(_nftAddress, _tokenId);
 
     emit Deposit(msg.sender, _nftAddress, _tokenId, _amount);
   }
@@ -118,35 +164,26 @@ contract NFTBroker is Ownable, ReentrancyGuard, ERC1155Holder, INFTBroker {
     return rates[_nftAddress][_fromId][_toId];
   }
 
-  function swap(
-    address _nftAddress,
-    uint256 _fromId,
-    uint256 _toId,
-    uint256 _amount
-  ) public override nonReentrant {
-    require(_nftAddress != address(0), "Cannot be address 0");
+  
 
-    uint8 swapRate = getRate(_nftAddress, _fromId, _toId);
-    require(swapRate != 0, "Cannot swap because swap rate is 0");
+  function _addNft(address _assetAddress, uint256 _tokenId) private {
+    uint256[] memory tokenArr;
 
-    //get nft
-    IERC1155(_nftAddress).safeTransferFrom(
-      msg.sender,
-      address(this),
-      _fromId,
-      _amount,
-      "0x00"
-    );
+    if (nfts.length == 0) {
+      nfts.push(NFT({ assetAddress: _assetAddress, tokenIds: tokenArr }));
+    }
 
-    //send nft to nft-sender
-    IERC1155(_nftAddress).safeTransferFrom(
-      address(this),
-      msg.sender,
-      _toId,
-      (swapRate * _amount),
-      "0x00"
-    );
-
-    emit Swap(msg.sender, _nftAddress, _fromId, _toId, _amount);
+    for (uint256 i = 0; i < nfts.length; i++) {
+      NFT storage nft = nfts[i];
+      if (nfts[i].assetAddress == _assetAddress) {
+        nft.tokenIds.push(_tokenId);
+        return;
+      } else {
+        tokenArr[0] = _tokenId;
+        nfts.push(NFT({ assetAddress: _assetAddress, tokenIds: tokenArr }));
+        return;
+      }
+    }
   }
+
 }
