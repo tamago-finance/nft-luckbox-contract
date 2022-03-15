@@ -84,8 +84,6 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     // Ignore offset/discount fees when active
     bool public offsetDisabled;
     bool public discountDisabled;
-    // Multiplier for discount/redeem fees
-    uint256 public multiplier = 1 ether;
     // max NFT that can be minted per time
     uint256 constant MAX_NFT = 100;
 
@@ -497,16 +495,6 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         collateralShare.transfer(msg.sender, _collateralAmount);
     }
 
-    // set the multiplier for redeem fee/discount to help shift the ratio to the target faster
-    function setMultiplier(uint256 _multiplier)
-        public
-        nonReentrant
-        onlyWhitelisted
-    {
-        require(_multiplier >= 0.5 ether, "_multiplier must greater than 0.5");
-        multiplier = _multiplier;
-    }
-
     // update the contract state
     function setContractState(ContractState _state)
         public
@@ -737,7 +725,6 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
                 offset = (adjustedTotalCollateral.sub(newTotalCollateral)).wmul(
                         lpAmount.wdiv(syntheticVariants[_id].totalRawCollateral)
                     );
-                offset = offset.wmul(multiplier);
             }
 
             uint256 lpAmountWithOffset = lpAmount.sub(offset);
@@ -789,7 +776,6 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
                 discount = newTotalCollateral.sub(adjustedTotalCollateral).wmul(
                         lpAmount.wdiv(syntheticVariants[_id].totalRawCollateral)
                     );
-                discount = discount.wmul(multiplier);
             }
 
             uint256 lpAmountWithDiscount = lpAmount.sub(discount);
