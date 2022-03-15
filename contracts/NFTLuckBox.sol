@@ -33,7 +33,7 @@ contract LuckBox is
     using SafeMath for uint256;
     using Address for address;
 
-    // POAP info (support only ERC-1155)
+    // POAP info
     struct Poap {
         address assetAddress;
         uint256 tokenId;
@@ -44,16 +44,28 @@ contract LuckBox is
     struct Event {
         string name;
         uint256[] poaps;
-        bytes32 merkleRootWL; // to verify that the user is eligible to claim
-        bytes32 merkleRootClaim; // to claim
+        bytes32 merkleRoot; // to claim
         mapping(address => bool) claimed;
         uint256 claimCount;
         bool ended;
         bool active;
     }
 
+    // Project Info
+    struct Project {
+        string name;
+        bytes32 merkleRoot;
+        uint256 timestamp;
+        bool active;
+    }
+
+    // Poap Id => Poap
     mapping(uint256 => Poap) public poaps;
+    // Event Id => Event
     mapping(uint256 => Event) public events;
+    // Project Id => Project
+    mapping(uint256 => Project) public projects;
+
     uint256 private nonce;
 
     IRegistry public registry;
@@ -77,6 +89,8 @@ contract LuckBox is
         uint256 amount,
         bool is1155
     );
+
+    event ProjectCreated(uint256 indexed projectId, string name);
 
     constructor(address _registry) public {
         registry = IRegistry(_registry);
@@ -153,21 +167,55 @@ contract LuckBox is
         emit EventCreated(_eventId, _name, _poaps);
     }
 
-    function attachMerkleRootToEvent(
-        uint256 _eventId,
-        bytes32 _merkleRoot,
-        bool _isWL
-    ) public nonReentrant onlyOwner {
-        require(events[_eventId].active == true, "Given ID is invalid");
+    function createProject(uint256 _projectId, string memory _name)
+        public
+        nonReentrant
+        onlyOwner
+    {
+        require(projects[_projectId].active == false, "Given ID is occupied");
 
-        if (_isWL) {
-            events[_eventId].merkleRootWL = _merkleRoot;
-        } else {
-            events[_eventId].merkleRootClaim = _merkleRoot;
-        }
+        projects[_projectId].active = true;
+        projects[_projectId].name = _name;
+
+        emit ProjectCreated(_projectId, _name);
     }
 
-    function updatePoapToEvent(uint256 _eventId, uint256[] memory _poaps)
+    function attachClaim(uint256 _eventId, bytes32 _merkleRoot)
+        public
+        nonReentrant
+        onlyOwner
+    {
+        require(events[_eventId].active == true, "Given ID is invalid");
+
+        events[_eventId].merkleRoot = _merkleRoot;
+    }
+
+    function attachWhitelist(uint256 _projectId, bytes32 _merkleRoot)
+        public
+        nonReentrant
+        onlyOwner
+    {
+        require(projects[_projectId].active == true, "Given ID is invalid");
+
+        projects[_projectId].merkleRoot = _merkleRoot;
+        projects[_projectId].timestamp = now;
+    }
+
+    function attachWhitelistBatch(uint256[] memory _projectIds, bytes32[] memory _merkleRoots)
+        public
+        nonReentrant
+        onlyOwner
+    {
+        require( _projectIds.length == _merkleRoots.length , "Array size is not the same length" );
+
+        for (uint256 i = 0; i < _projectIds.length; i++) {
+            projects[_projectIds[i]].merkleRoot = _merkleRoots[i];
+            projects[_projectIds[i]].timestamp = now;
+        }
+
+    }
+
+    function updatePoaps(uint256 _eventId, uint256[] memory _poaps)
         public
         nonReentrant
         onlyOwner
@@ -219,20 +267,21 @@ contract LuckBox is
                 abi.encodePacked(now, msg.sender, randomNonce, address(this))
             )
         );
-        
+
         return randomNumber;
     }
 
     function _eligible(
-        uint256 _eventId,
+        uint256 _projectId,
         address _address,
         bytes32[] memory _proof
     ) internal view returns (bool) {
-        require(events[_eventId].active == true, "Given ID is invalid");
+        require(projects[_projectId].active == true, "Given ID is invalid");
 
         bytes32 leaf = keccak256(abi.encodePacked(_address));
 
-        return MerkleProof.verify(_proof, events[_eventId].merkleRootWL, leaf);
+        return
+            MerkleProof.verify(_proof, projects[_projectId].merkleRoot, leaf);
     }
 
     // TODO : CLAIM

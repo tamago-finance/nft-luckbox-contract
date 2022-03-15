@@ -20,21 +20,20 @@ describe("LuckBox V2", () => {
 
     const LuckBox = await ethers.getContractFactory("LuckBox")
 
-    luckBox = await LuckBox.deploy()
+    luckBox = await LuckBox.deploy( ethers.constants.AddressZero )
 
     // generate merkle tree of whitelist users (without Dave)
     const leaves = [admin, alice, bob, charlie].map(item => keccak256(item.address))
     treeWL = new MerkleTree(leaves, keccak256 , { sortPairs : true})
-    // create an event
-    const popIds = [1,2,3]
-    await luckBox.createEvent(1, "TEST", popIds)
+    // create a project
+    await luckBox.createProject(1, "TEST")
     // attach WL's root
     const rootWL = treeWL.getHexRoot()
     root = treeWL.getRoot().toString('hex');
-    await luckBox.attachMerkleRootToEvent(1, rootWL , true)
+    await luckBox.attachWhitelist(1, rootWL )
   })
 
-  it("Check eligible users", async () => {
+  it("Check whitelist users for project (1)", async () => {
 
     for (let user of [admin, alice, bob, charlie, dave]) {
 
