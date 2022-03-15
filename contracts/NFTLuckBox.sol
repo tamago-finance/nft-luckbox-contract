@@ -14,6 +14,8 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+import "./interfaces/IFactory.sol";
+import "./interfaces/IRegistry.sol";
 
 /**
  * @title Luckbox v.2
@@ -52,6 +54,12 @@ contract LuckBox is
 
     mapping(uint256 => Poap) public poaps;
     mapping(uint256 => Event) public events;
+    uint256 private nonce;
+
+    IRegistry public registry;
+
+    bytes32 private constant FACTORY =
+        0x464143544f525900000000000000000000000000000000000000000000000000;
 
     event EventCreated(uint256 indexed eventId, string name, uint256[] poaps);
 
@@ -70,15 +78,17 @@ contract LuckBox is
         bool is1155
     );
 
-    constructor() public {
+    constructor(address _registry) public {
+        registry = IRegistry(_registry);
+
         _registerInterface(IERC721Receiver.onERC721Received.selector);
     }
 
-    function eligible(uint256 _eventId, address _address, bytes32[] memory _proof)
-        public
-        view
-        returns (bool)
-    {
+    function eligible(
+        uint256 _eventId,
+        address _address,
+        bytes32[] memory _proof
+    ) public view returns (bool) {
         return _eligible(_eventId, _address, _proof);
     }
 
@@ -182,6 +192,10 @@ contract LuckBox is
         );
     }
 
+    function increaseNonce() public nonReentrant onlyOwner {
+        nonce += 1;
+    }
+
     function emergencyWithdrawERC721(
         address _to,
         address _tokenAddress,
@@ -192,11 +206,28 @@ contract LuckBox is
 
     // PRIVATE FUNCTIONS
 
-    function _eligible(uint256 _eventId, address _address, bytes32[] memory _proof)
-        internal
-        view
-        returns (bool)
-    {
+    function _generateRandomNumber() internal view returns (uint256) {
+        uint256 randomNonce = nonce;
+
+        if (registry.getContractAddress(FACTORY) != address(0)) {
+            IFactory factory = IFactory(registry.getContractAddress(FACTORY));
+            randomNonce = factory.randomNonce();
+        }
+
+        uint256 randomNumber = uint256(
+            keccak256(
+                abi.encodePacked(now, msg.sender, randomNonce, address(this))
+            )
+        );
+        
+        return randomNumber;
+    }
+
+    function _eligible(
+        uint256 _eventId,
+        address _address,
+        bytes32[] memory _proof
+    ) internal view returns (bool) {
         require(events[_eventId].active == true, "Given ID is invalid");
 
         bytes32 leaf = keccak256(abi.encodePacked(_address));
