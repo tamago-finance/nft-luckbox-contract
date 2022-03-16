@@ -12,7 +12,8 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+
+import "./utility/Whitelist.sol";
 
 /**
  * @title Luckbox v.2
@@ -20,7 +21,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  */
 
 contract LuckBox is
-    Ownable,
+    Whitelist,
     ReentrancyGuard,
     IERC721Receiver,
     ERC165,
@@ -94,18 +95,32 @@ contract LuckBox is
         _registerInterface(IERC721Receiver.onERC721Received.selector);
     }
 
+    /// @notice check whether the given address has held NFTs or not
+    /// @param _projectId the project ID
+    /// @param _address the wallet address that want to check
+    /// @param _proof the proof generated off-chain
+    /// @return output the result
     function eligible(
         uint256 _projectId,
         address _address,
         bytes32[] memory _proof
-    ) public view returns (bool) {
-        return _eligible(_projectId, _address, _proof);
+    ) public view returns (bool output) {
+        output = _eligible(_projectId, _address, _proof);
     }
     
-    function checkClaim(uint256 _eventId, uint256 _poapId, bytes32[] memory _proof) public view returns (bool) {
-        return _checkClaim(_eventId, _poapId, _proof);
+    /// @notice check whether the caller can claim a POAP NFT or not
+    /// @param _eventId the event that the caller wants to claim the prize
+    /// @param _poapId ID of the POAP NFT recorded on this contract
+    /// @param _proof the proof generated off-chain
+    /// @return output the result
+    function checkClaim(uint256 _eventId, uint256 _poapId, bytes32[] memory _proof) public view returns (bool output) {
+        output = _checkClaim(_eventId, _poapId, _proof);
     }
 
+    /// @notice claim the NFT if the caller is eligible for
+    /// @param _eventId the event that the caller wants to claim the prize
+    /// @param _poapId ID of the POAP NFT recorded on this contract
+    /// @param _proof the proof generated off-chain
     function claim(
         uint256 _eventId,
         uint256 _poapId,
@@ -138,6 +153,10 @@ contract LuckBox is
         emit Claimed(msg.sender, _eventId, poaps[_poapId].assetAddress, poaps[_poapId].tokenId, poaps[_poapId].is1155);
     }
 
+    /// @notice deposit ERC-1155 NFT prior to the claim, ideally should be called by the event's owner
+    /// @param _assetAddress the NFT asset address
+    /// @param _tokenId the token ID on the NFT
+    /// @param _amount the amount of NFT to be deposited
     function depositERC1155(
         address _assetAddress,
         uint256 _tokenId,
@@ -154,6 +173,9 @@ contract LuckBox is
         emit Deposited(msg.sender, _assetAddress, _tokenId, _amount, true);
     }
 
+    /// @notice deposit ERC-721 NFT prior to the claim, ideally should be called by the event's owner
+    /// @param _assetAddress the NFT asset address
+    /// @param _tokenId the token ID on the NFT
     function depositERC721(address _assetAddress, uint256 _tokenId)
         public
         nonReentrant
@@ -167,12 +189,17 @@ contract LuckBox is
         emit Deposited(msg.sender, _assetAddress, _tokenId, 1, false);
     }
 
+    /// @notice create a record for POAP NFT which will be used during a claim period for mapping POAP ID <-> ASSET ADDRESS
+    /// @param _poapId ID for the POAP
+    /// @param _assetAddress the NFT asset address
+    /// @param _tokenId the token ID on the NFT
+    /// @param _is1155 ERC-1155 flags
     function createPoap(
         uint256 _poapId,
         address _assetAddress,
         uint256 _tokenId,
         bool _is1155
-    ) public nonReentrant onlyOwner {
+    ) public nonReentrant onlyWhitelisted {
         require(
             poaps[_poapId].assetAddress == address(0),
             "Given ID is occupied"
@@ -185,11 +212,15 @@ contract LuckBox is
         emit PoapCreated(_poapId, _assetAddress, _tokenId, _is1155);
     }
 
+    /// @notice create a campaign
+    /// @param _eventId ID for the event
+    /// @param _name name of the event
+    /// @param _poaps NFT that will be distributed 
     function createEvent(
         uint256 _eventId,
         string memory _name,
         uint256[] memory _poaps
-    ) public nonReentrant onlyOwner {
+    ) public nonReentrant onlyWhitelisted {
         require(events[_eventId].active == false, "Given ID is occupied");
 
         events[_eventId].active = true;
@@ -199,10 +230,13 @@ contract LuckBox is
         emit EventCreated(_eventId, _name, _poaps);
     }
 
+    /// @notice create a project, once set it allows users to verify that they  having the project's NFTs in the wallet
+    /// @param _projectId ID for the project
+    /// @param _name name of the project
     function createProject(uint256 _projectId, string memory _name)
         public
         nonReentrant
-        onlyOwner
+        onlyWhitelisted
     {
         require(projects[_projectId].active == false, "Given ID is occupied");
 
@@ -212,20 +246,26 @@ contract LuckBox is
         emit ProjectCreated(_projectId, _name);
     }
 
+    /// @notice upload the root of the proof identifies who will be able to claim the prizes 
+    /// @param _eventId ID for the event
+    /// @param _merkleRoot the root of the proof to be uploaded
     function attachClaim(uint256 _eventId, bytes32 _merkleRoot)
         public
         nonReentrant
-        onlyOwner
+        onlyWhitelisted
     {
         require(events[_eventId].active == true, "Given ID is invalid");
 
         events[_eventId].merkleRoot = _merkleRoot;
     }
 
+    /// @notice upload the root of the proof identifies who is holding the project's NFTs  
+    /// @param _projectId ID for the project
+    /// @param _merkleRoot the root of the proof to be uploaded
     function attachWhitelist(uint256 _projectId, bytes32 _merkleRoot)
         public
         nonReentrant
-        onlyOwner
+        onlyWhitelisted
     {
         require(projects[_projectId].active == true, "Given ID is invalid");
 
@@ -233,10 +273,13 @@ contract LuckBox is
         projects[_projectId].timestamp = now;
     }
 
+    /// @notice upload the root of the proof identifies who is holding the project's NFTs (in batch)
+    /// @param _projectIds array of ID for the project
+    /// @param _merkleRoots array of the root of the proof to be uploaded
     function attachWhitelistBatch(uint256[] memory _projectIds, bytes32[] memory _merkleRoots)
         public
         nonReentrant
-        onlyOwner
+        onlyWhitelisted
     {
         require( _projectIds.length == _merkleRoots.length , "Array size is not the same length" );
 
@@ -247,22 +290,26 @@ contract LuckBox is
 
     }
 
+    /// @notice replace POAP NFTs to be distributed on the event
+    /// @param _eventId ID of the event
+    /// @param _poaps array of the POAP ID
     function updatePoaps(uint256 _eventId, uint256[] memory _poaps)
         public
         nonReentrant
-        onlyOwner
+        onlyWhitelisted
     {
         require(events[_eventId].active == true, "Given ID is invalid");
 
         events[_eventId].poaps = _poaps;
     }
 
+    /// @notice withdraw ERC-1155 NFTs locked in the contract
     function emergencyWithdrawERC1155(
         address _to,
         address _tokenAddress,
         uint256 _tokenId,
         uint256 _amount
-    ) public nonReentrant onlyOwner {
+    ) public nonReentrant onlyWhitelisted {
         IERC1155(_tokenAddress).safeTransferFrom(
             address(this),
             _to,
@@ -272,11 +319,12 @@ contract LuckBox is
         );
     }
 
+    /// @notice withdraw ERC-721 NFTs locked in the contract
     function emergencyWithdrawERC721(
         address _to,
         address _tokenAddress,
         uint256 _tokenId
-    ) public nonReentrant onlyOwner {
+    ) public nonReentrant onlyWhitelisted {
         IERC721(_tokenAddress).safeTransferFrom(address(this), _to, _tokenId);
     }
 
@@ -300,7 +348,5 @@ contract LuckBox is
         return
             MerkleProof.verify(_proof, projects[_projectId].merkleRoot, leaf);
     }
-
-     
 
 }
