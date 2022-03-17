@@ -87,7 +87,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     // max NFT that can be minted per time
     uint256 constant MAX_NFT = 100;
 
-    uint256 constant ONE = 1 ether; // 1
+    // uint256 constant ONE = 1 ether; // 1
     uint256 constant MAX_UINT256 = uint256(-1);
     address constant ROUTER_ADDRESS =
         0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff; // Quickswap Router
@@ -645,9 +645,9 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         uint256 numerator = collateralRate.wmul(collateralAmount);
         uint256 denominator = syntheticRate.wmul(syntheticAmount);
 
-        uint256 output = (collateralRate.wdiv(syntheticRate)).wmul(
-            collateralAmount.wdiv(syntheticAmount)
-        );
+        // uint256 output = (collateralRate.wdiv(syntheticRate)).wmul(
+        //     collateralAmount.wdiv(syntheticAmount)
+        // );
         // uint256 output = (collateralRate.wdiv(syntheticRate)).mul(collateralAmount).div(syntheticAmount);
 
         return numerator.wdiv(denominator);
