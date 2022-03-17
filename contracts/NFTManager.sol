@@ -633,14 +633,30 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         totalOutstanding = totalOutstanding.sub(syntheticVariants[_id].tokenValue.mul(_tokenAmount));
     }
 
+
+    function _getSyntheticPrice() internal view returns (uint256) {
+        require(
+            priceResolver.isValid(syntheticSymbol),
+            "syntheticSymbol is not valid"
+        );
+        return priceResolver.getCurrentPrice(syntheticSymbol);
+    }
+
+
+    function _getCollateralSharePrice() internal view returns (uint256) {
+        require(
+            priceResolver.isValid(collateralShareSymbol),
+            "collateralShareSymbol is not valid"
+        );
+        return priceResolver.getCurrentPrice(collateralShareSymbol);
+    }
+
     function _calculateCollateralizationRatio(
         uint256 collateralAmount,
         uint256 syntheticAmount
     ) internal view returns (uint256) {
-        uint256 collateralRate = priceResolver.getCurrentPrice(
-            collateralShareSymbol
-        );
-        uint256 syntheticRate = priceResolver.getCurrentPrice(syntheticSymbol);
+        uint256 collateralRate = _getCollateralSharePrice();
+        uint256 syntheticRate = _getSyntheticPrice();
 
         uint256 numerator = collateralRate.wmul(collateralAmount);
         uint256 denominator = syntheticRate.wmul(syntheticAmount);
@@ -663,10 +679,8 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
             uint256 lpAmount
         )
     {
-        uint256 syntheticPrice = priceResolver.getCurrentPrice(syntheticSymbol);
-        uint256 sharePrice = priceResolver.getCurrentPrice(
-            collateralShareSymbol
-        );
+        uint256 syntheticPrice = _getSyntheticPrice();
+        uint256 sharePrice = _getCollateralSharePrice();
         uint256 mintedValue = syntheticPrice.wmul(
             syntheticVariants[_id].tokenValue.mul(_tokenAmount)
         );
