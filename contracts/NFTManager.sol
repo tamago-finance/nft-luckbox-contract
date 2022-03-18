@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155Holder.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 import "./utility/LibMath.sol";
 import "./utility/Whitelist.sol";
 import "./utility/SyntheticNFT.sol";
@@ -21,7 +22,7 @@ import "./interfaces/IPancakeFactory.sol";
  * @dev The contract heavily depends on 3rd party modules from QuickSwap, Chainlink to running. Check out docs.tamago.finance for more details
  */
 
-contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
+contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder, Pausable {
     using LibMathSigned for int256;
     using LibMathUnsigned for uint256;
 
@@ -178,6 +179,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         public
         view
         validateId(_id, _tokenAmount)
+        whenNotPaused()
         returns (
             uint256 baseTokenAmount,
             uint256 pairTokenAmount,
@@ -202,6 +204,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         public
         view
         validateId(_id, _tokenAmount)
+        whenNotPaused()
         returns (
             uint256 baseTokenAmount,
             uint256 pairTokenAmount,
@@ -278,7 +281,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         uint256 _tokenAmount,
         uint256 _minBaseAmount,
         uint256 _minPairAmount
-    ) public nonReentrant isReady validateId(_id, _tokenAmount) {
+    ) public nonReentrant isReady validateId(_id, _tokenAmount) whenNotPaused() {
         (, , uint256 lpAmount, ) = _estimateRedeem(_id, _tokenAmount);
 
         _removePosition(_id, lpAmount, _tokenAmount);
@@ -347,7 +350,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
 
     /// @notice call the price feeder registry to retrieve the latest price of NFT
     /// @return US price per a synthetic token
-    function getSyntheticPrice() public view returns (uint256) {
+    function getSyntheticPrice() public view whenNotPaused() returns (uint256) {
         require(
             priceResolver.isValid(syntheticSymbol),
             "syntheticSymbol is not valid"
@@ -357,7 +360,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
 
     /// @notice call the price feeder registry to retrieve the latest price of LP token
     /// @return US price per a LP token
-    function getCollateralSharePrice() public view returns (uint256) {
+    function getCollateralSharePrice() public view whenNotPaused() returns (uint256) {
         require(
             priceResolver.isValid(collateralShareSymbol),
             "collateralShareSymbol is not valid"
@@ -367,7 +370,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
 
     /// @notice looks for the system collateral ratio basically calculates from total collateral deposited / total NFT minted
     /// @return the system collateral ratio
-    function globalCollatelizationRatio() public view returns (uint256) {
+    function globalCollatelizationRatio() public view whenNotPaused() returns (uint256) {
         require(totalRawCollateral > 0, "No collaterals in the contract");
         return
             _calculateCollateralizationRatio(
@@ -382,6 +385,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     function variantCollatelizationRatio(uint8 _id)
         public
         view
+        whenNotPaused()
         returns (uint256)
     {
         require(syntheticVariantCount > _id, "Invalid given _id");
@@ -405,6 +409,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     function targetCollatelizationRatio(uint8 _id)
         public
         view
+        whenNotPaused()
         returns (int256, int256)
     {
         require(syntheticVariantCount > _id, "Invalid given _id");
@@ -413,12 +418,22 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
 
     // ONLY ADMIN CAN PROCEED
 
+    // pause the contract
+    function setPaused() public whenNotPaused() {
+        _pause();
+    }
+
+    // unpause the contract
+    function setUnpaused() public whenPaused() {
+        _unpause();
+    }
+
     // add NFT variant
     function addSyntheticVariant(
         string memory _name,
         uint256 _tokenId,
         uint256 _tokenValue
-    ) public nonReentrant onlyWhitelisted {
+    ) public nonReentrant onlyWhitelisted whenNotPaused() {
         syntheticVariants[syntheticVariantCount].name = _name;
         syntheticVariants[syntheticVariantCount].tokenId = _tokenId;
         syntheticVariants[syntheticVariantCount].tokenValue = _tokenValue;
@@ -431,6 +446,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         public
         nonReentrant
         onlyWhitelisted
+        whenNotPaused()
     {
         require(syntheticVariantCount > _id, "Invalid given _id");
         syntheticVariants[_id].disabled = _disabled;
@@ -441,6 +457,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         public
         nonReentrant
         onlyWhitelisted
+        whenNotPaused()
     {
         IERC20(_tokenAddress).transfer(msg.sender, _amount);
     }
@@ -450,7 +467,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         uint8 _id,
         uint256 _collateralAmount,
         uint256 _tokenAmount
-    ) public nonReentrant onlyWhitelisted validateId(_id, _tokenAmount) {
+    ) public nonReentrant onlyWhitelisted validateId(_id, _tokenAmount) whenNotPaused() {
         _createPosition(_id, _collateralAmount, _tokenAmount);
 
         // take collaterals
@@ -474,7 +491,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         uint8 _id,
         uint256 _collateralAmount,
         uint256 _tokenAmount
-    ) public nonReentrant onlyWhitelisted validateId(_id, _tokenAmount) {
+    ) public nonReentrant onlyWhitelisted validateId(_id, _tokenAmount) whenNotPaused() {
         _removePosition(_id, _collateralAmount, _tokenAmount);
 
         // burn NFT
@@ -500,6 +517,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         public
         nonReentrant
         onlyWhitelisted
+        whenNotPaused()
     {
         state = _state;
     }
@@ -509,6 +527,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         public
         nonReentrant
         onlyWhitelisted
+        whenNotPaused()
     {
         priceResolver = IPriceResolver(_priceResolverAddress);
     }
@@ -518,17 +537,18 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         public
         nonReentrant
         onlyWhitelisted
+        whenNotPaused()
     {
         devAddress = _devAddress;
     }
 
     // update NFT uri
-    function setNftUri(string memory _uri) public nonReentrant onlyWhitelisted {
+    function setNftUri(string memory _uri) public nonReentrant onlyWhitelisted whenNotPaused() {
         syntheticNFT.setUri(_uri);
     }
 
     // update redeem fees
-    function setRedeemFee(uint256 _fee) public nonReentrant onlyWhitelisted {
+    function setRedeemFee(uint256 _fee) public nonReentrant onlyWhitelisted whenNotPaused() {
         redeemFee = _fee;
     }
 
@@ -537,6 +557,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         public
         nonReentrant
         onlyWhitelisted
+        whenNotPaused()
     {
         offsetDisabled = _active;
     }
@@ -546,6 +567,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         public
         nonReentrant
         onlyWhitelisted
+        whenNotPaused()
     {
         discountDisabled = _active;
     }
@@ -580,7 +602,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         uint8 _id,
         uint256 _collateralAmount,
         uint256 _tokenAmount
-    ) internal {
+    ) internal whenNotPaused() {
         syntheticVariants[_id].totalOutstanding = syntheticVariants[_id].totalOutstanding.add(
             syntheticVariants[_id].tokenValue.mul(_tokenAmount)
         );
@@ -605,7 +627,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         uint8 _id,
         uint256 _collateralAmount,
         uint256 _tokenAmount
-    ) internal {
+    ) internal whenNotPaused() {
         syntheticVariants[_id].totalOutstanding = syntheticVariants[_id].totalOutstanding.sub(syntheticVariants[_id]
             .tokenValue
             .mul(_tokenAmount));
@@ -636,7 +658,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     function _calculateCollateralizationRatio(
         uint256 collateralAmount,
         uint256 syntheticAmount
-    ) internal view returns (uint256) {
+    ) internal whenNotPaused() view returns (uint256) {
         uint256 collateralRate = priceResolver.getCurrentPrice(
             collateralShareSymbol
         );
@@ -657,6 +679,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     function _estimateLPInputs(uint8 _id, uint256 _tokenAmount)
         internal
         view
+        whenNotPaused()
         returns (
             uint256 baseTokenAmount,
             uint256 pairTokenAmount,
@@ -692,6 +715,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     function _estimateRedeem(uint8 _id, uint256 _tokenAmount)
         internal
         view
+        whenNotPaused()
         returns (
             uint256 baseTokenAmount,
             uint256 pairTokenAmount,
@@ -740,6 +764,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     function _estimateMint(uint8 _id, uint256 _tokenAmount)
         internal
         view
+        whenNotPaused()
         returns (
             uint256 baseTokenAmount,
             uint256 pairTokenAmount,
@@ -790,6 +815,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     function _calculateTargetCROffset(uint8 _id)
         internal
         view
+        whenNotPaused()
         returns (int256)
     {
         int256 cr = variantCollatelizationRatio(_id).toInt256();
@@ -805,6 +831,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     function _calculateTargetCRDiscount(uint8 _id)
         internal
         view
+        whenNotPaused()
         returns (int256)
     {
         int256 cr = variantCollatelizationRatio(_id).toInt256();
@@ -817,7 +844,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     }
 
     // log^b(kx+1)
-    function _calculateTargetCR(int256 _cr) internal pure returns (int256) {
+    function _calculateTargetCR(int256 _cr) internal whenNotPaused() view returns (int256) {
         return BASE.logBase((K.wmul(_cr)).add(1 ether));
     }
 }
