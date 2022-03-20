@@ -1,32 +1,32 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.6.12;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721Holder.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/introspection/ERC165.sol";
-import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
-import "@openzeppelin/contracts/token/ERC1155/ERC1155Holder.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721HolderUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/introspection/ERC165Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155HolderUpgradeable.sol";
 
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@chainlink/contracts/src/v0.6/VRFConsumerBase.sol";
 
 import "./interfaces/IFactory.sol";
 
 contract LuckBox is
-  Ownable,
-  ReentrancyGuard,
-  IERC721Receiver,
-  ERC165,
-  ERC721Holder,
-  ERC1155Holder
+  OwnableUpgradeable,
+  ReentrancyGuardUpgradeable,
+  IERC721ReceiverUpgradeable,
+  ERC165Upgradeable,
+  ERC721HolderUpgradeable,
+  ERC1155HolderUpgradeable
 {
   using SafeMathChainlink for uint256;
-  using SafeERC20 for IERC20;
+  using SafeERC20Upgradeable for IERC20Upgradeable;
 
   // for identification purposes
   string public name;
@@ -102,12 +102,12 @@ contract LuckBox is
     bool is1155
   );
 
-  constructor(
+  function initialize(
     string memory _name,
     string memory _symbol,
     uint256 _ticketPrice,
     address _factory
-  ) public {
+  ) external initializer {
     require(_ticketPrice != 0, "Invalid ticket price");
 
     name = _name;
@@ -115,7 +115,7 @@ contract LuckBox is
     ticketPrice = _ticketPrice;
     factory = IFactory(_factory);
 
-    _registerInterface(IERC721Receiver.onERC721Received.selector);
+    _registerInterface(IERC721ReceiverUpgradeable.onERC721Received.selector);
   }
 
   // pays $MATIC to draws a gacha
@@ -173,7 +173,7 @@ contract LuckBox is
     require(list[_slotId].winner == msg.sender, "The caller is not the winner");
 
     if (list[_slotId].is1155) {
-      IERC1155(list[_slotId].assetAddress).safeTransferFrom(
+      IERC1155Upgradeable(list[_slotId].assetAddress).safeTransferFrom(
         address(this),
         msg.sender,
         list[_slotId].tokenId,
@@ -181,7 +181,7 @@ contract LuckBox is
         "0x00"
       );
     } else {
-      IERC721(list[_slotId].assetAddress).safeTransferFrom(
+      IERC721Upgradeable(list[_slotId].assetAddress).safeTransferFrom(
         address(this),
         msg.sender,
         list[_slotId].tokenId
@@ -264,7 +264,7 @@ contract LuckBox is
 
     // take the NFT
     if (_is1155) {
-      IERC1155(_assetAddress).safeTransferFrom(
+      IERC1155Upgradeable(_assetAddress).safeTransferFrom(
         msg.sender,
         address(this),
         _tokenId,
@@ -272,7 +272,7 @@ contract LuckBox is
         "0x00"
       );
     } else {
-      IERC721(_assetAddress).safeTransferFrom(
+      IERC721Upgradeable(_assetAddress).safeTransferFrom(
         msg.sender,
         address(this),
         _tokenId
@@ -298,7 +298,7 @@ contract LuckBox is
     );
 
     if (list[_slotId].is1155) {
-      IERC1155(list[_slotId].assetAddress).safeTransferFrom(
+      IERC1155Upgradeable(list[_slotId].assetAddress).safeTransferFrom(
         address(this),
         msg.sender,
         list[_slotId].tokenId,
@@ -306,7 +306,7 @@ contract LuckBox is
         "0x00"
       );
     } else {
-      IERC721(list[_slotId].assetAddress).safeTransferFrom(
+      IERC721Upgradeable(list[_slotId].assetAddress).safeTransferFrom(
         address(this),
         msg.sender,
         list[_slotId].tokenId
@@ -331,7 +331,7 @@ contract LuckBox is
   ) public {
     // take the NFT
     if (_is1155) {
-      IERC1155(_assetAddress).safeTransferFrom(
+      IERC1155Upgradeable(_assetAddress).safeTransferFrom(
         msg.sender,
         address(this),
         _tokenId,
@@ -339,7 +339,7 @@ contract LuckBox is
         "0x00"
       );
     } else {
-      IERC721(_assetAddress).safeTransferFrom(
+      IERC721Upgradeable(_assetAddress).safeTransferFrom(
         msg.sender,
         address(this),
         _tokenId
@@ -362,14 +362,14 @@ contract LuckBox is
     public
     onlyOwner
   {
-    IERC20(_tokenAddress).safeTransfer(msg.sender, _amount);
+    IERC20Upgradeable(_tokenAddress).safeTransfer(msg.sender, _amount);
   }
 
   function withdrawERC721(address _tokenAddress, uint256 _tokenId)
     public
     onlyOwner
   {
-    IERC721(_tokenAddress).safeTransferFrom(
+    IERC721Upgradeable(_tokenAddress).safeTransferFrom(
       address(this),
       msg.sender,
       _tokenId
@@ -381,7 +381,7 @@ contract LuckBox is
     uint256 _tokenId,
     uint256 _amount
   ) public onlyOwner {
-    IERC1155(_tokenAddress).safeTransferFrom(
+    IERC1155Upgradeable(_tokenAddress).safeTransferFrom(
       address(this),
       msg.sender,
       _tokenId,
