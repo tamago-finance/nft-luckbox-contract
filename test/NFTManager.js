@@ -159,6 +159,33 @@ describe("NFTManager contract with mocks", () => {
 
     })
 
+    it('able to pause the contract', async () => {
+        
+        const syntheticPrice = fromEther(await nftManager.getSyntheticPrice())
+        const sharePrice = fromEther(await nftManager.getCollateralSharePrice())
+        const nftValue = fromEther((await nftManager.syntheticVariants(1))[2])
+        const lpPerNft = Number(nftValue) * Number(syntheticPrice) / Number(sharePrice)
+
+        await shareToken.approve(nftManager.address, ethers.constants.MaxUint256)
+        await nftManager.forceMint(1, toEther(lpPerNft.toFixed(18)), 1)
+
+        // pause the contract
+        await nftManager.setPaused() 
+
+        try {
+            // should be failed when the contract is paused
+            await nftManager.forceMint(1, toEther(lpPerNft.toFixed(18)), 1)
+        } catch (e) {
+            expect( e.message.indexOf("Pausable: paused") !== -1).to.true
+        }
+        
+        // pause the contract
+        await nftManager.setUnpaused() 
+        // back to work
+        await nftManager.forceMint(1, toEther(lpPerNft.toFixed(18)), 1)
+
+    })
+
 })
 
 describe("NFTManager contract on forked Polygon chain", () => {
@@ -214,7 +241,6 @@ describe("NFTManager contract on forked Polygon chain", () => {
             await nftManager.addSyntheticVariant("Ang Bao 10 USD", 2, toEther(10))
             await nftManager.addSyntheticVariant("Ang Bao 100 USD", 3, toEther(100))
 
-            await nftManager.setContractState(1)
             // Set Redeem Fee to 0%
             await nftManager.setRedeemFee(0)
 
