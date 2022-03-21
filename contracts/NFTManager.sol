@@ -88,7 +88,9 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder, P
     // max NFT that can be minted per time
     uint256 constant MAX_NFT = 100;
 
-    uint256 constant ONE = 1 ether; // 1
+    int256 constant ONE_ETHER = 1 * 10**18;
+    uint256 constant UNSIGNED_ONE_ETHER = 10**18;
+    uint256 constant TEN_KWEI = 10000;
     uint256 constant MAX_UINT256 = uint256(-1);
     address constant ROUTER_ADDRESS =
         0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff; // Quickswap Router
@@ -128,7 +130,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder, P
         bytes32 _collateralShareSymbol,
         bytes32 _syntheticSymbol,
         address _devAddress
-    ) public nonReentrant {
+    ) public {
         name = _name;
         syntheticSymbol = _syntheticSymbol;
         state = ContractState.INITIAL;
@@ -323,8 +325,8 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder, P
 
         // return tokens back
         if (redeemFee != 0) {
-            uint256 baseFee = baseTokenAmount.mul(redeemFee).div(10000);
-            uint256 pairFee = pairTokenAmount.mul(redeemFee).div(10000);
+            uint256 baseFee = baseTokenAmount.mul(redeemFee).div(TEN_KWEI);
+            uint256 pairFee = pairTokenAmount.mul(redeemFee).div(TEN_KWEI);
             IERC20(collateralShare.token0()).transfer(
                 msg.sender,
                 baseTokenAmount.sub(baseFee)
@@ -398,7 +400,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder, P
                 );
         } else {
             // return 100% when no collaterals
-            return 1 ether;
+            return UNSIGNED_ONE_ETHER;
         }
     }
 
@@ -655,21 +657,37 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder, P
         totalOutstanding = totalOutstanding.sub(syntheticVariants[_id].tokenValue.mul(_tokenAmount));
     }
 
+
+    function _getSyntheticPrice() internal view returns (uint256) {
+        require(
+            priceResolver.isValid(syntheticSymbol),
+            "syntheticSymbol is not valid"
+        );
+        return priceResolver.getCurrentPrice(syntheticSymbol);
+    }
+
+
+    function _getCollateralSharePrice() internal view returns (uint256) {
+        require(
+            priceResolver.isValid(collateralShareSymbol),
+            "collateralShareSymbol is not valid"
+        );
+        return priceResolver.getCurrentPrice(collateralShareSymbol);
+    }
+
     function _calculateCollateralizationRatio(
         uint256 collateralAmount,
         uint256 syntheticAmount
-    ) internal whenNotPaused() view returns (uint256) {
-        uint256 collateralRate = priceResolver.getCurrentPrice(
-            collateralShareSymbol
-        );
-        uint256 syntheticRate = priceResolver.getCurrentPrice(syntheticSymbol);
+    ) internal view returns (uint256) {
+        uint256 collateralRate = _getCollateralSharePrice();
+        uint256 syntheticRate = _getSyntheticPrice();
 
         uint256 numerator = collateralRate.wmul(collateralAmount);
         uint256 denominator = syntheticRate.wmul(syntheticAmount);
 
-        uint256 output = (collateralRate.wdiv(syntheticRate)).wmul(
-            collateralAmount.wdiv(syntheticAmount)
-        );
+        // uint256 output = (collateralRate.wdiv(syntheticRate)).wmul(
+        //     collateralAmount.wdiv(syntheticAmount)
+        // );
         // uint256 output = (collateralRate.wdiv(syntheticRate)).mul(collateralAmount).div(syntheticAmount);
 
         return numerator.wdiv(denominator);
@@ -686,10 +704,8 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder, P
             uint256 lpAmount
         )
     {
-        uint256 syntheticPrice = priceResolver.getCurrentPrice(syntheticSymbol);
-        uint256 sharePrice = priceResolver.getCurrentPrice(
-            collateralShareSymbol
-        );
+        uint256 syntheticPrice = _getSyntheticPrice();
+        uint256 sharePrice = _getCollateralSharePrice();
         uint256 mintedValue = syntheticPrice.wmul(
             syntheticVariants[_id].tokenValue.mul(_tokenAmount)
         );
@@ -731,7 +747,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder, P
         int256 targetCR = _calculateTargetCROffset(_id);
 
         // adjusting redeemed amount when CR < 1
-        if (targetCR != 1 ether && targetCR > 0 && offsetDisabled == false) {
+        if (targetCR != ONE_ETHER && targetCR > 0 && offsetDisabled == false) {
             uint256 newTotalCollateral = syntheticVariants[_id]
                 .totalRawCollateral
                 .sub(lpAmount);
@@ -780,7 +796,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder, P
         int256 targetCR = _calculateTargetCRDiscount(_id);
 
         // adjusting minted amount when target CR > current CR > 1
-        if (targetCR > 1 ether && discountDisabled == false) {
+        if (targetCR > ONE_ETHER && discountDisabled == false) {
             uint256 newTotalCollateral = syntheticVariants[_id]
                 .totalRawCollateral
                 .add(lpAmount);
@@ -820,10 +836,10 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder, P
     {
         int256 cr = variantCollatelizationRatio(_id).toInt256();
         int256 result = _calculateTargetCR(cr);
-        if (cr > 0 && 1 ether >= result) {
+        if (cr > 0 && ONE_ETHER >= result) {
             return result;
         } else {
-            return 1 ether;
+            return ONE_ETHER;
         }
     }
 
@@ -836,15 +852,15 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder, P
     {
         int256 cr = variantCollatelizationRatio(_id).toInt256();
         int256 result = _calculateTargetCR(cr);
-        if (cr > 1 ether && cr > result) {
+        if (cr > ONE_ETHER && cr > result) {
             return _calculateTargetCR(cr);
         } else {
-            return 1 ether;
+            return ONE_ETHER;
         }
     }
 
     // log^b(kx+1)
-    function _calculateTargetCR(int256 _cr) internal whenNotPaused() view returns (int256) {
-        return BASE.logBase((K.wmul(_cr)).add(1 ether));
+    function _calculateTargetCR(int256 _cr) internal pure returns (int256) {
+        return BASE.logBase((K.wmul(_cr)).add(ONE_ETHER));
     }
 }
