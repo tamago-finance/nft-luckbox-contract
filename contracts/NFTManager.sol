@@ -127,7 +127,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         bytes32 _collateralShareSymbol,
         bytes32 _syntheticSymbol,
         address _devAddress
-    ) public nonReentrant {
+    ) public {
         name = _name;
         syntheticSymbol = _syntheticSymbol;
         state = ContractState.INITIAL;
