@@ -105,8 +105,6 @@ describe("Full Deployment Ang Pow USD - Mainnet", () => {
       await nftManager.addSyntheticVariant("Ang Bao 10 USD", 2, toEther(10))
       await nftManager.addSyntheticVariant("Ang Bao 100 USD", 3, toEther(100))
 
-      await nftManager.setContractState(1)
-
       const syntheticNftAddress = await nftManager.syntheticNFT()
       syntheticNft = await ethers.getContractAt(
         "SyntheticNFT",

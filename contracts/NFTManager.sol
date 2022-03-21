@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155Holder.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 import "./utility/LibMath.sol";
 import "./utility/Whitelist.sol";
 import "./utility/SyntheticNFT.sol";
@@ -21,18 +22,11 @@ import "./interfaces/IPancakeFactory.sol";
  * @dev The contract heavily depends on 3rd party modules from QuickSwap, Chainlink to running. Check out docs.tamago.finance for more details
  */
 
-contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
+contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder, Pausable {
     using LibMathSigned for int256;
     using LibMathUnsigned for uint256;
 
     using SafeERC20 for IERC20;
-
-    enum ContractState {
-        INITIAL,
-        NORMAL,
-        EMERGENCY,
-        EXPIRED
-    }
 
     struct SyntheticVariant {
         // name of the variant
@@ -56,8 +50,6 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
 
     // Name of the contract
     string public name;
-    // Contract state
-    ContractState public state;
     // Price resolver contract.
     IPriceResolver public priceResolver;
     // Synthetic NFT created by this contract.
@@ -132,7 +124,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     ) public {
         name = _name;
         syntheticSymbol = _syntheticSymbol;
-        state = ContractState.INITIAL;
+
         collateralShare = IPancakePair(_collateralShareAddress);
         collateralShareSymbol = _collateralShareSymbol;
 
@@ -227,7 +219,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         uint256 _tokenAmount,
         uint256 _maxBaseAmount,
         uint256 _maxPairAmount
-    ) public nonReentrant isReady validateId(_id, _tokenAmount) {
+    ) public nonReentrant validateId(_id, _tokenAmount) whenNotPaused {
         (uint256 baseAmount, uint256 pairAmount, , ) = _estimateMint(
             _id,
             _tokenAmount
@@ -280,7 +272,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         uint256 _tokenAmount,
         uint256 _minBaseAmount,
         uint256 _minPairAmount
-    ) public nonReentrant isReady validateId(_id, _tokenAmount) {
+    ) public nonReentrant validateId(_id, _tokenAmount) whenNotPaused {
         (, , uint256 lpAmount, ) = _estimateRedeem(_id, _tokenAmount);
 
         _removePosition(_id, lpAmount, _tokenAmount);
@@ -415,6 +407,16 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
 
     // ONLY ADMIN CAN PROCEED
 
+    // pause the contract
+    function setPaused() public onlyWhitelisted whenNotPaused {
+        _pause();
+    }
+
+    // unpause the contract
+    function setUnpaused() public onlyWhitelisted whenPaused {
+        _unpause();
+    }
+
     // add NFT variant
     function addSyntheticVariant(
         string memory _name,
@@ -452,7 +454,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         uint8 _id,
         uint256 _collateralAmount,
         uint256 _tokenAmount
-    ) public nonReentrant onlyWhitelisted validateId(_id, _tokenAmount) {
+    ) public nonReentrant onlyWhitelisted validateId(_id, _tokenAmount) whenNotPaused {
         _createPosition(_id, _collateralAmount, _tokenAmount);
 
         // take collaterals
@@ -476,7 +478,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
         uint8 _id,
         uint256 _collateralAmount,
         uint256 _tokenAmount
-    ) public nonReentrant onlyWhitelisted validateId(_id, _tokenAmount) {
+    ) public nonReentrant onlyWhitelisted validateId(_id, _tokenAmount) whenNotPaused {
         _removePosition(_id, _collateralAmount, _tokenAmount);
 
         // burn NFT
@@ -495,15 +497,6 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
 
         // return collaterals back to the minter
         collateralShare.transfer(msg.sender, _collateralAmount);
-    }
-
-    // update the contract state
-    function setContractState(ContractState _state)
-        public
-        nonReentrant
-        onlyWhitelisted
-    {
-        state = _state;
     }
 
     // update the price resolver contract
@@ -553,12 +546,6 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     }
 
     // INTERNAL FUNCTIONS
-
-    // Check if the state is ready
-    modifier isReady() {
-        require((state) == ContractState.NORMAL, "Contract state is not ready");
-        _;
-    }
 
     modifier validateId(uint8 _id, uint256 _tokenAmount) {
         require(syntheticVariantCount > _id, "Invalid given _id");
