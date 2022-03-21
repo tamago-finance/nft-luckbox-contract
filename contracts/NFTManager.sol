@@ -86,7 +86,7 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
     bool public discountDisabled;
     // max NFT that can be minted per time
     uint256 constant MAX_NFT = 100;
-
+    uint256 constant TEN_KWEI = 10000;
     // uint256 constant ONE = 1 ether; // 1
     uint256 constant MAX_UINT256 = uint256(-1);
     address constant ROUTER_ADDRESS =
@@ -320,8 +320,8 @@ contract NFTManager is ReentrancyGuard, Whitelist, INFTManager, ERC1155Holder {
 
         // return tokens back
         if (redeemFee != 0) {
-            uint256 baseFee = baseTokenAmount.mul(redeemFee).div(10000);
-            uint256 pairFee = pairTokenAmount.mul(redeemFee).div(10000);
+            uint256 baseFee = baseTokenAmount.mul(redeemFee).div(TEN_KWEI);
+            uint256 pairFee = pairTokenAmount.mul(redeemFee).div(TEN_KWEI);
             IERC20(collateralShare.token0()).transfer(
                 msg.sender,
                 baseTokenAmount.sub(baseFee)
