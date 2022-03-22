@@ -1,51 +1,27 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.6.12;
 
-// import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
-
-// import "@openzeppelin/contracts/token/ERC721/ERC721Holder.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721HolderUpgradeable.sol";
-
-// import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
-
-// import "@openzeppelin/contracts/introspection/ERC165.sol";
 import "@openzeppelin/contracts-upgradeable/introspection/ERC165Upgradeable.sol";
-
-// import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol";
-
-// import "@openzeppelin/contracts/token/ERC1155/ERC1155Holder.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155HolderUpgradeable.sol";
-
-// import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
-
-// import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
-
-// import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
-
-// import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts-upgradeable/cryptography/MerkleProofUpgradeable.sol";
-
-// import "./utility/Whitelist.sol";
 import "./utility/WhitelistUpgradeable.sol";
+
+import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
 
 /**
  * @title Luckbox v.2
  * @dev A contract aims to help distribute NFTs for collectors to users who met the conditions
  */
 
-// Whitelist,
-// ReentrancyGuard,
-// IERC721Receiver,
-// ERC165,
-// ERC721Holder,
-// ERC1155Holder
 contract LuckBox is
+	Initializable,
 	WhitelistUpgradeable,
 	ReentrancyGuardUpgradeable,
 	IERC721ReceiverUpgradeable,
@@ -116,9 +92,6 @@ contract LuckBox is
 
 	event ProjectCreated(uint256 indexed projectId, string name);
 
-	// constructor() public {
-	// 	_registerInterface(IERC721Receiver.onERC721Received.selector);
-	// }
 	function initialize() public initializer {
 		ERC721HolderUpgradeable.__ERC721Holder_init();
 		// IERC721ReceiverUpgradeable
@@ -130,6 +103,7 @@ contract LuckBox is
 		// AddressUpgradeable
 		// MerkleProofUpgradeable
 		WhitelistUpgradeable.__Whitelist_init();
+		_registerInterface(IERC721ReceiverUpgradeable.onERC721Received.selector);
 	}
 
 	/// @notice check whether the given address has held NFTs or not
