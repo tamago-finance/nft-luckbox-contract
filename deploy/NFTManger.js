@@ -10,7 +10,14 @@ module.exports = async ({ getNamedAccounts, deployments, network }) => {
   const priceResolverResult = await deploy(priceResolverDeployment, {
     contract: "PriceResolver",
     from: deployer,
-    args: [deployer],
+    proxy: {
+      owner: deployer,
+      proxyContract: "OpenZeppelinTransparentProxy",
+      execute: {
+        methodName: "initialize",
+        args: [dev],
+      },
+    },
     log: true,
     deterministicDeployment: false,
   })
@@ -28,20 +35,50 @@ module.exports = async ({ getNamedAccounts, deployments, network }) => {
   const nftManagerDeployment = "NFTManager"
   const nftManagerResult = await deploy(nftManagerDeployment, {
     from: deployer,
-    args: [
-      config.nft.name,
-      config.nft.tokenURI,
-      priceResolver.address,
-      shareToken.address,
-      hre.ethers.utils.formatBytes32String(config.nft.lpSymbol),
-      hre.ethers.utils.formatBytes32String(config.nft.syntheticSymbol),
-      dev,
-    ],
+    proxy: {
+      owner: deployer,
+      proxyContract: "OpenZeppelinTransparentProxy",
+      execute: {
+        methodName: "initialize",
+        args: [
+          config.nft.name,
+          config.nft.tokenURI,
+          priceResolver.address,
+          shareToken.address,
+          hre.ethers.utils.formatBytes32String(config.nft.lpSymbol),
+          hre.ethers.utils.formatBytes32String(config.nft.syntheticSymbol),
+          config.router,
+          dev,
+        ],
+      },
+    },
     log: true,
     deterministicDeployment: false,
   })
 
   console.log(`${nftManagerDeployment} was deployed`)
+
+  const syntheticNFTDeployment = "SyntheticNFT"
+  const syntheticNFTResult = await deploy(syntheticNFTDeployment, {
+    contract: "SyntheticNFT",
+    from: deployer,
+    proxy: {
+      owner: deployer,
+      proxyContract: "OpenZeppelinTransparentProxy",
+      execute: {
+        methodName: "initialize",
+        args: [
+          config.nft.name,
+          config.nft.tokenURI,
+          nftManagerResult.address,
+        ],
+      },
+    },
+    log: true,
+    deterministicDeployment: false,
+  })
+
+  console.log(`${syntheticNFTDeployment} was deployed`)
 
   const basePriceFeederDeployment = `${config.priceFeed.base.name}-ChainlinkPriceFeeder`
   const basePriceFeederResult = await deploy("ChainlinkPriceFeeder", {
@@ -98,6 +135,9 @@ module.exports = async ({ getNamedAccounts, deployments, network }) => {
 
   const FeederUsd = await hre.ethers.getContractFactory("MockPriceFeeder")
   const feederUsd = FeederUsd.attach(usdPriceFeederResult.address)
+
+  const SyntheticNFT = await hre.ethers.getContractFactory("SyntheticNFT")
+  const syntheticNFT = SyntheticNFT.attach(syntheticNFTResult.address)
 
   let updateTx, estimateGas
 
@@ -203,6 +243,16 @@ module.exports = async ({ getNamedAccounts, deployments, network }) => {
 
   console.log(">> Set ready state")
   updateTx = await nftManager.setContractState(1)
+  console.log("✅ Done on => ", updateTx.hash)
+
+  // Set synthetic nft to nft manager
+  console.log(">> Set synthetic nft to nft manager")
+  estimateGas = await nftManager.estimateGas.setSyntheticNFT(
+    syntheticNFTResult.address
+  )
+  updateTx = await nftManager.setSyntheticNFT(
+    syntheticNFTResult.address
+  )
   console.log("✅ Done on => ", updateTx.hash)
 
   const syntheticNftAddress = await nftManager.syntheticNFT()

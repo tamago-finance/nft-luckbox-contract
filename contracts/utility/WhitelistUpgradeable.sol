@@ -2,19 +2,19 @@
 
 pragma solidity ^0.6.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/utils/Context.sol";
+import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 /**
  * @dev The contract manages a list of whitelisted addresses
  */
-contract Whitelist is Ownable {
-  using Address for address;
+contract WhitelistUpgradeable is OwnableUpgradeable {
+  using AddressUpgradeable for address;
 
   mapping(address => bool) private whitelist;
 
-  constructor() public {
+  function __Whitelist_init() internal initializer {
+    OwnableUpgradeable.__Ownable_init();
     address msgSender = _msgSender();
     whitelist[msgSender] = true;
   }
