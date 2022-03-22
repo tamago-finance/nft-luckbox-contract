@@ -47,6 +47,7 @@ contract NFTBroker is
   function initialize() external initializer {
     OwnableUpgradeable.__Ownable_init();
     ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
+    ERC1155HolderUpgradeable.__ERC1155Holder_init();
   }
 
   function getNft(uint256 i) public view returns (NFT memory) {
