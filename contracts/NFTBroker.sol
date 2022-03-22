@@ -66,7 +66,7 @@ contract NFTBroker is
     require(swapRate != 0, "Cannot swap because swap rate is 0");
 
     //get nft
-    IERC1155(_nftAddress).safeTransferFrom(
+    IERC1155Upgradeable(_nftAddress).safeTransferFrom(
       msg.sender,
       address(this),
       _fromId,
@@ -75,7 +75,7 @@ contract NFTBroker is
     );
 
     //send nft to nft-sender
-    IERC1155(_nftAddress).safeTransferFrom(
+    IERC1155Upgradeable(_nftAddress).safeTransferFrom(
       address(this),
       msg.sender,
       _toId,
