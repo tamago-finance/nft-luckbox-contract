@@ -14,6 +14,14 @@ contract NFTBroker is
   ReentrancyGuardUpgradeable,
   ERC1155HolderUpgradeable
 {
+
+  struct NFT {
+    address assetAddress;
+    uint256[] tokenIds;
+  }
+
+  NFT[] private nfts;
+
   //address -> fromId -> toId -> Rate
   mapping(address => mapping(uint256 => mapping(uint256 => uint8)))
     private rates;
