@@ -165,4 +165,24 @@ contract NFTBroker is
 	) public view override returns (uint8) {
 		return rates[_nftAddress][_fromId][_toId];
 	}
+
+	function _addNft(address _assetAddress, uint256 _tokenId) private {
+		uint256[] memory tokenArr;
+
+		if (nfts.length == 0) {
+			nfts.push(NFT({ assetAddress: _assetAddress, tokenIds: tokenArr }));
+		}
+
+		for (uint256 i = 0; i < nfts.length; i++) {
+			NFT storage nft = nfts[i];
+			if (nfts[i].assetAddress == _assetAddress) {
+				nft.tokenIds.push(_tokenId);
+				return;
+			} else {
+				tokenArr[0] = _tokenId;
+				nfts.push(NFT({ assetAddress: _assetAddress, tokenIds: tokenArr }));
+				return;
+			}
+		}
+	}
 }
