@@ -1,5 +1,5 @@
 const { expect } = require("chai")
-const { ethers } = require("hardhat")
+const { ethers, upgrades } = require("hardhat")
 
 let nftBroker
 let erc1155
@@ -19,7 +19,8 @@ describe("NFTBroker", () => {
     const NFTBroker = await ethers.getContractFactory("NFTBroker")
     const MockERC1155 = await ethers.getContractFactory("MockERC1155")
 
-    nftBroker = await NFTBroker.deploy()
+    nftBroker = await upgrades.deployProxy(NFTBroker, []);
+
     erc1155 = await MockERC1155.deploy(
       "https://api.cryptokitties.co/kitties/{id}"
     )
@@ -57,7 +58,7 @@ describe("NFTBroker", () => {
 
     expect(nft.assetAddress).to.equal(erc1155.address)
     expect(nft.tokenIds.map((x) => parseInt(x, 16))).deep.to.equal([0])
-    
+
     await nftBroker.deposit(erc1155.address, 1, 1)
 
     nft = await nftBroker.getNft(0)
