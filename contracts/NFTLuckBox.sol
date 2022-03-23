@@ -12,7 +12,7 @@ import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/cryptography/MerkleProofUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import "@chainlink/contracts/src/v0.6/VRFConsumerBase.sol";
+import "./vrf/VRFConsumerBaseUpgradeable.sol";
 import "./utility/WhitelistUpgradeable.sol";
 
 import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
@@ -29,7 +29,8 @@ contract LuckBox is
   IERC721ReceiverUpgradeable,
   ERC165Upgradeable,
   ERC721HolderUpgradeable,
-  ERC1155HolderUpgradeable
+  ERC1155HolderUpgradeable,
+  VRFConsumerBaseUpgradeable
 {
   using SafeMathUpgradeable for uint256;
   using AddressUpgradeable for address;
@@ -60,8 +61,6 @@ contract LuckBox is
     uint256 timestamp;
     bool active;
   }
-
-  address public vrf;
 
   // Chainlink constants on Polygon
   address public constant VRF_COORDINATOR =
@@ -128,7 +127,7 @@ contract LuckBox is
     // MerkleProofUpgradeable
     WhitelistUpgradeable.__Whitelist_init();
     _registerInterface(IERC721ReceiverUpgradeable.onERC721Received.selector);
-    vrf = VRFConsumerBase(VRF_COORDINATOR, LINK_TOKEN);
+    VRFConsumerBaseUpgradeable.initialize(VRF_COORDINATOR, LINK_TOKEN);
   }
 
   /// @notice check whether the given address has held NFTs or not
@@ -400,7 +399,7 @@ contract LuckBox is
       "Insufficient LINK to proceed VRF"
     );
 
-    bytes32 requestId = vrf.requestRandomness(KEY_HASH, FEE);
+    bytes32 requestId = requestRandomness(KEY_HASH, FEE);
     requestIdToAddress[requestId] = msg.sender;
     requestIdToEventId[requestId] = _eventId;
 
