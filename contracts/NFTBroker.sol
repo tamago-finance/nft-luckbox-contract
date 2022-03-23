@@ -66,7 +66,7 @@ contract NFTBroker is
 		uint256 _fromId,
 		uint256 _toId,
 		uint256 _amount
-	) public override nonReentrant {
+	) public nonReentrant {
 		require(_nftAddress != address(0), "Cannot be address 0");
 
 		uint8 swapRate = getRate(_nftAddress, _fromId, _toId);
@@ -162,7 +162,7 @@ contract NFTBroker is
 		address _nftAddress,
 		uint256 _fromId,
 		uint256 _toId
-	) public view override returns (uint8) {
+	) public view returns (uint8) {
 		return rates[_nftAddress][_fromId][_toId];
 	}
 
