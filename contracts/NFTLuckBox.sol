@@ -413,7 +413,6 @@ contract LuckBox is
     uint256 _poapId,
     bytes32[] memory _proof
   ) internal view returns (bool) {
-    uint256 test = 1;
     bytes32 leaf = keccak256(abi.encodePacked(msg.sender, _poapId));
     return
       MerkleProofUpgradeable.verify(_proof, events[_eventId].merkleRoot, leaf);
