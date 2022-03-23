@@ -126,6 +126,7 @@ contract NFTManager is
 		address _routerAddress,
 		address _devAddress
 	) external initializer {
+		ERC1155HolderUpgradeable.__ERC1155Holder_init();
 		ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 		WhitelistUpgradeable.__Whitelist_init();
 		name = _name;
