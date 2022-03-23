@@ -80,8 +80,6 @@ contract NFTManager is
 	// Ignore offset/discount fees when active
 	bool public offsetDisabled;
 	bool public discountDisabled;
-	// Multiplier for discount/redeem fees
-	uint256 public multiplier = 1 ether;
 	// Router
 	address public ROUTER_ADDRESS;
 	// max NFT that can be minted per time
