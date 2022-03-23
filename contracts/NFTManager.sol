@@ -6,6 +6,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155HolderUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol";
 import "./utility/LibMath.sol";
 import "./utility/WhitelistUpgradeable.sol";
 import "./utility/SyntheticNFT.sol";
@@ -23,7 +24,8 @@ contract NFTManager is
 	ReentrancyGuardUpgradeable,
 	WhitelistUpgradeable,
 	INFTManager,
-	ERC1155HolderUpgradeable
+	ERC1155HolderUpgradeable,
+	PausableUpgradeable
 {
 	using LibMathSigned for int256;
 	using LibMathUnsigned for uint256;
@@ -129,6 +131,7 @@ contract NFTManager is
 		ERC1155HolderUpgradeable.__ERC1155Holder_init();
 		ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 		WhitelistUpgradeable.__Whitelist_init();
+		PausableUpgradeable.__Pausable_init();
 		name = _name;
 		syntheticSymbol = _syntheticSymbol;
 
