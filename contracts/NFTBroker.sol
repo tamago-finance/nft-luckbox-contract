@@ -3,17 +3,19 @@
 pragma solidity 0.6.12;
 pragma experimental ABIEncoderV2;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155HolderUpgradeable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
+import "@openzeppelin/contracts/token/ERC1155/ERC1155Holder.sol";
 
-import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract NFTBrokerUpgradeable is
-	OwnableUpgradeable,
-	ReentrancyGuardUpgradeable,
-	ERC1155HolderUpgradeable
-{
+import "./interfaces/INFTBroker.sol";
+
+contract NFTBroker is Ownable, ReentrancyGuard, ERC1155Holder, INFTBroker {
+	using SafeERC20 for IERC20;
+
 	struct NFT {
 		address assetAddress;
 		uint256[] tokenIds;
@@ -51,11 +53,7 @@ contract NFTBrokerUpgradeable is
 		uint256 _amount
 	);
 
-	function initialize() external initializer {
-		OwnableUpgradeable.__Ownable_init();
-		ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
-		ERC1155HolderUpgradeable.__ERC1155Holder_init();
-	}
+	constructor() public {}
 
 	function getNft(uint256 i) public view returns (NFT memory) {
 		return nfts[i];
@@ -66,14 +64,14 @@ contract NFTBrokerUpgradeable is
 		uint256 _fromId,
 		uint256 _toId,
 		uint256 _amount
-	) public nonReentrant {
+	) public override nonReentrant {
 		require(_nftAddress != address(0), "Cannot be address 0");
 
 		uint8 swapRate = getRate(_nftAddress, _fromId, _toId);
 		require(swapRate != 0, "Cannot swap because swap rate is 0");
 
 		//get nft
-		IERC1155Upgradeable(_nftAddress).safeTransferFrom(
+		IERC1155(_nftAddress).safeTransferFrom(
 			msg.sender,
 			address(this),
 			_fromId,
@@ -82,7 +80,7 @@ contract NFTBrokerUpgradeable is
 		);
 
 		//send nft to nft-sender
-		IERC1155Upgradeable(_nftAddress).safeTransferFrom(
+		IERC1155(_nftAddress).safeTransferFrom(
 			address(this),
 			msg.sender,
 			_toId,
@@ -100,7 +98,7 @@ contract NFTBrokerUpgradeable is
 	) public onlyOwner nonReentrant {
 		require(_amount > 0, "Amount cannot be zero");
 
-		IERC1155Upgradeable(_nftAddress).safeTransferFrom(
+		IERC1155(_nftAddress).safeTransferFrom(
 			msg.sender,
 			address(this),
 			_tokenId,
@@ -120,7 +118,7 @@ contract NFTBrokerUpgradeable is
 	) public onlyOwner nonReentrant {
 		require(_amount > 0, "Amount cannot be zero");
 
-		IERC1155Upgradeable(_nftAddress).safeTransferFrom(
+		IERC1155(_nftAddress).safeTransferFrom(
 			address(this),
 			msg.sender,
 			_tokenId,
@@ -162,7 +160,7 @@ contract NFTBrokerUpgradeable is
 		address _nftAddress,
 		uint256 _fromId,
 		uint256 _toId
-	) public view returns (uint8) {
+	) public view override returns (uint8) {
 		return rates[_nftAddress][_fromId][_toId];
 	}
 
