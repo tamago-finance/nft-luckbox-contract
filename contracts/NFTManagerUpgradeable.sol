@@ -7,10 +7,8 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgradeable.sol
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155HolderUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
 import "./utility/LibMath.sol";
 import "./utility/WhitelistUpgradeable.sol";
-import "./utility/SyntheticNFTUpgradeable.sol";
 import "./interfaces/IPriceResolver.sol";
 import "./interfaces/ISyntheticNFT.sol";
 import "./interfaces/IPancakePair.sol";
