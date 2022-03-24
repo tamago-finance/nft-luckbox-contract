@@ -7,8 +7,10 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgradeable.sol
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155HolderUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
 import "./utility/LibMath.sol";
 import "./utility/WhitelistUpgradeable.sol";
+import "./utility/SyntheticNFT.sol";
 import "./interfaces/IPriceResolver.sol";
 import "./interfaces/ISyntheticNFT.sol";
 import "./interfaces/IPancakePair.sol";
@@ -128,13 +130,15 @@ contract NFTManagerUpgradeable is
 		address _collateralShareAddress,
 		bytes32 _collateralShareSymbol,
 		bytes32 _syntheticSymbol,
-		address _routerAddress,
+		// address _routerAddress,
 		address _devAddress
 	) external initializer {
 		ERC1155HolderUpgradeable.__ERC1155Holder_init();
 		ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 		WhitelistUpgradeable.__Whitelist_init();
 		PausableUpgradeable.__Pausable_init();
+
+		// set initial parqms
 		name = _name;
 		syntheticSymbol = _syntheticSymbol;
 
@@ -143,11 +147,15 @@ contract NFTManagerUpgradeable is
 
 		priceResolver = IPriceResolver(_priceResolverAddress);
 
-		ROUTER_ADDRESS = _routerAddress;
+		ROUTER_ADDRESS = 0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff; // QUICKSWAP's ROUTER
 
 		redeemFee = 300; // 3.0%
 
 		devAddress = _devAddress;
+
+		// Deploy the synthetic NFT contract
+		SyntheticNFT deployedContract = new SyntheticNFT(_name, _nftUri);
+		syntheticNFT = ISyntheticNFT(address(deployedContract));
 
 		// add dev into the whitelist
 		addAddress(_devAddress);
