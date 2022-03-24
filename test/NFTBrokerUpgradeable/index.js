@@ -1,5 +1,5 @@
 const { expect } = require("chai")
-const { ethers } = require("hardhat")
+const { ethers, upgrades } = require("hardhat")
 
 let nftBroker
 let erc1155
@@ -12,14 +12,14 @@ let charlie
 const DEV_ADDRESS = "0x91C65f404714Ac389b38335CccA4A876a8669d32"
 const ADDRESS_ZERO = ethers.constants.AddressZero
 
-describe("NFTBroker", () => {
+describe("NFTBrokerUpgradeable", () => {
   beforeEach(async () => {
     ;[admin, alice, bob, charlie] = await ethers.getSigners()
 
-    const NFTBroker = await ethers.getContractFactory("NFTBroker")
+    const NFTBroker = await ethers.getContractFactory("NFTBrokerUpgradeable")
     const MockERC1155 = await ethers.getContractFactory("MockERC1155")
 
-    nftBroker = await NFTBroker.deploy()
+    nftBroker = await upgrades.deployProxy(NFTBroker, []);
 
     erc1155 = await MockERC1155.deploy(
       "https://api.cryptokitties.co/kitties/{id}"

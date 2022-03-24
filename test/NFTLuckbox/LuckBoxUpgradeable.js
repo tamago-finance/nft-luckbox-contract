@@ -12,7 +12,7 @@ let bob
 let charlie
 let dave
 
-describe("LuckBox V2", () => {
+describe("LuckBox V2 Upgradeable", () => {
 
   beforeEach(async () => {
     [admin, alice, bob, charlie, dave] = await ethers.getSigners()
@@ -20,10 +20,12 @@ describe("LuckBox V2", () => {
     const LuckBox = await ethers.getContractFactory("LuckBox")
     const MockERC1155 = await ethers.getContractFactory("MockERC1155")
 
-    luckBox = await LuckBox.deploy()
-    erc1155 = await MockERC1155.deploy(
-      "https://api.cryptokitties.co/kitties/{id}"
-    )
+    // luckBox = await LuckBox.deploy()
+    // erc1155 = await MockERC1155.deploy(
+    //   "https://api.cryptokitties.co/kitties/{id}"
+    // )
+    luckBox = await upgrades.deployProxy(LuckBox, []);
+    erc1155 = await MockERC1155.deploy("https://api.cryptokitties.co/kitties/{id}");
   })
 
   it("Check whitelist users for project (1)", async () => {

@@ -1,4 +1,5 @@
 const { expect } = require("chai");
+const { ethers, upgrades } = require("hardhat")
 const { fromEther, toEther, deployPriceResolverMock, deployPriceResolver } = require("./Helpers")
 
 let priceResolver
@@ -14,14 +15,14 @@ let bob
 let charlie
 let dev
 
-describe("NFTManager contract with mocks", () => {
+describe("NFTManager Upgradeable contract with mocks", () => {
 
     before(async () => {
 
         [admin, alice, bob, charlie, dev] = await ethers.getSigners();
 
         const PriceResolver = await ethers.getContractFactory("PriceResolver");
-        const NFTManager = await ethers.getContractFactory("NFTManager");
+        const NFTManager = await ethers.getContractFactory("NFTManagerUpgradeable");
         const MockLP = await ethers.getContractFactory("MockLP");
         const MockPriceFeeder = await ethers.getContractFactory("MockPriceFeeder");
 
@@ -29,15 +30,16 @@ describe("NFTManager contract with mocks", () => {
 
         shareToken = await MockLP.deploy("Share Token", "SHARE")
 
-        nftManager = await NFTManager.deploy(
-            "Ang Bao USD",
-            "ERC-1155_URI",
-            priceResolver.address,
-            shareToken.address,
-            ethers.utils.formatBytes32String("WMATIC-USDC-SHARE"),
-            ethers.utils.formatBytes32String("USD"),
-            dev.address
-        )
+        nftManager = await upgrades.deployProxy(NFTManager
+            , ["Ang Bao USD",
+                "ERC-1155_URI",
+                priceResolver.address,
+                shareToken.address,
+                ethers.utils.formatBytes32String("WMATIC-USDC-SHARE"),
+                ethers.utils.formatBytes32String("USD"),
+                "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff",
+                dev.address]
+        );
 
         // setup NFT variants
         await nftManager.addSyntheticVariant("Ang Bao 1 USD", 1, toEther(1))
@@ -160,7 +162,7 @@ describe("NFTManager contract with mocks", () => {
     })
 
     it('able to pause the contract', async () => {
-        
+
         const syntheticPrice = fromEther(await nftManager.getSyntheticPrice())
         const sharePrice = fromEther(await nftManager.getCollateralSharePrice())
         const nftValue = fromEther((await nftManager.syntheticVariants(1))[2])
@@ -170,17 +172,17 @@ describe("NFTManager contract with mocks", () => {
         await nftManager.forceMint(1, toEther(lpPerNft.toFixed(18)), 1)
 
         // pause the contract
-        await nftManager.setPaused() 
+        await nftManager.setPaused()
 
         try {
             // should be failed when the contract is paused
             await nftManager.forceMint(1, toEther(lpPerNft.toFixed(18)), 1)
         } catch (e) {
-            expect( e.message.indexOf("Pausable: paused") !== -1).to.true
+            expect(e.message.indexOf("Pausable: paused") !== -1).to.true
         }
-        
+
         // pause the contract
-        await nftManager.setUnpaused() 
+        await nftManager.setUnpaused()
         // back to work
         await nftManager.forceMint(1, toEther(lpPerNft.toFixed(18)), 1)
 
@@ -299,7 +301,7 @@ describe("NFTManager contract on forked Polygon chain", () => {
             const output = await nftManager.estimateRedeem(2, 1)
 
             // redeem fee should not be zero
-            expect( output[3] ).to.not.equal(0)
+            expect(output[3]).to.not.equal(0)
 
             await syntheticNft.setApprovalForAll(nftManager.address, true)
 
@@ -327,7 +329,7 @@ describe("NFTManager contract on forked Polygon chain", () => {
             const baseAmount = Number(ethers.utils.formatUnits(inputs[0], 18))
             const pairAmount = Number(ethers.utils.formatUnits(inputs[1], 6))
 
-            await router.addLiquidity(wmaticToken.address, usdcToken.address,  ethers.utils.parseUnits(`${baseAmount}`, 18), ethers.utils.parseUnits(`${pairAmount}`, 6), ethers.utils.parseUnits(`${(baseAmount * 0.97).toFixed(18)}`, 18), ethers.utils.parseUnits(`${(pairAmount * 0.97).toFixed(6)}`, 6), admin.address, 9999999999999)
+            await router.addLiquidity(wmaticToken.address, usdcToken.address, ethers.utils.parseUnits(`${baseAmount}`, 18), ethers.utils.parseUnits(`${pairAmount}`, 6), ethers.utils.parseUnits(`${(baseAmount * 0.97).toFixed(18)}`, 18), ethers.utils.parseUnits(`${(pairAmount * 0.97).toFixed(6)}`, 6), admin.address, 9999999999999)
 
             // mint x1 NFT with 5x collaterals to bring up the CR
             await nftManager.forceMint(1, await shareToken.balanceOf(admin.address), 1)

@@ -7,10 +7,15 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgradeable.sol
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155HolderUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
 import "./utility/LibMath.sol";
 import "./utility/WhitelistUpgradeable.sol";
 import "./utility/SyntheticNFT.sol";
 import "./interfaces/IPriceResolver.sol";
+import "./interfaces/ISyntheticNFT.sol";
+import "./interfaces/IPancakePair.sol";
+// i syntheticnft
+// i pancake pair
 import "./interfaces/INFTManager.sol";
 import "./interfaces/IPancakeRouter02.sol";
 import "./interfaces/IPancakeFactory.sol";
@@ -21,6 +26,7 @@ import "./interfaces/IPancakeFactory.sol";
  */
 
 contract NFTManager is
+	Initializable,
 	ReentrancyGuardUpgradeable,
 	WhitelistUpgradeable,
 	INFTManager,
@@ -89,6 +95,7 @@ contract NFTManager is
 	uint256 constant UNSIGNED_ONE_ETHER = 10**18;
 	uint256 constant TEN_KWEI = 10000;
 	uint256 constant MAX_UINT256 = uint256(-1);
+
 	int256 constant BASE = 10 ether;
 	int256 constant K = 9.3 ether;
 
