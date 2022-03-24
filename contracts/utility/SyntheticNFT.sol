@@ -37,7 +37,7 @@ abstract contract ContextMixin {
 /**
  * https://github.com/maticnetwork/pos-portal/blob/master/contracts/common/Initializable.sol
  */
-contract Initializable {
+contract Initializable2 {
 	bool inited = false;
 
 	modifier initializer() {
@@ -50,7 +50,7 @@ contract Initializable {
 /**
  * https://github.com/maticnetwork/pos-portal/blob/master/contracts/common/EIP712Base.sol
  */
-contract EIP712Base is Initializable {
+contract EIP712Base is Initializable2 {
 	struct EIP712Domain {
 		string name;
 		string version;
