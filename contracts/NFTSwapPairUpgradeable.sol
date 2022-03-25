@@ -2,29 +2,29 @@
 
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721Holder.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/introspection/ERC165.sol";
-import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
-import "@openzeppelin/contracts/token/ERC1155/ERC1155Holder.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721HolderUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/introspection/ERC165Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155HolderUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
 
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import "./interfaces/IFactory.sol";
 import "./interfaces/IRegistry.sol";
 
-contract NFTSwapPair is
-	Ownable,
-	ReentrancyGuard,
-	IERC721Receiver,
-	ERC165,
-	ERC721Holder,
-	ERC1155Holder
+contract NFTSwapPairUpgradeable is
+	OwnableUpgradeable,
+	ReentrancyGuardUpgradeable,
+	IERC721ReceiverUpgradeable,
+	ERC165Upgradeable,
+	ERC721HolderUpgradeable,
+	ERC1155HolderUpgradeable
 {
-	using SafeMath for uint256;
+	using SafeMathUpgradeable for uint256;
 
 	enum ContractState {
 		INITIAL,
@@ -85,13 +85,15 @@ contract NFTSwapPair is
 		bool _toTokenIs1155
 	);
 
-	constructor(
+	function initialize(
 		string memory _name,
 		string memory _symbol,
 		address _token0Address,
 		uint256 _token0Id,
 		address _registry
-	) public {
+	) external initializer {
+		OwnableUpgradeable.__Ownable_init();
+		ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 		name = _name;
 		symbol = _symbol;
 		state = ContractState.NORMAL;
@@ -103,7 +105,7 @@ contract NFTSwapPair is
 
 		registry = IRegistry(_registry);
 
-		_registerInterface(IERC721Receiver.onERC721Received.selector);
+		_registerInterface(IERC721ReceiverUpgradeable.onERC721Received.selector);
 	}
 
 	function mint(
@@ -113,7 +115,7 @@ contract NFTSwapPair is
 		bool _token1Is1155
 	) public nonReentrant isReady {
 		// take the token0's NFT
-		IERC1155(token0.assetAddress).safeTransferFrom(
+		IERC1155Upgradeable(token0.assetAddress).safeTransferFrom(
 			msg.sender,
 			address(this),
 			token0.tokenId,
@@ -126,7 +128,7 @@ contract NFTSwapPair is
 
 		// take the token1's NFT
 		if (_token1Is1155) {
-			IERC1155(_token1Address).safeTransferFrom(
+			IERC1155Upgradeable(_token1Address).safeTransferFrom(
 				msg.sender,
 				address(this),
 				_token1Id,
@@ -134,7 +136,7 @@ contract NFTSwapPair is
 				"0x00"
 			);
 		} else {
-			IERC721(_token1Address).safeTransferFrom(
+			IERC721Upgradeable(_token1Address).safeTransferFrom(
 				msg.sender,
 				address(this),
 				_token1Id
@@ -166,7 +168,7 @@ contract NFTSwapPair is
 
 		// return token1's NFT
 		if (token1[idToRemoved].is1155) {
-			IERC1155(token1[idToRemoved].assetAddress).safeTransferFrom(
+			IERC1155Upgradeable(token1[idToRemoved].assetAddress).safeTransferFrom(
 				address(this),
 				_to,
 				token1[idToRemoved].tokenId,
@@ -174,7 +176,7 @@ contract NFTSwapPair is
 				"0x00"
 			);
 		} else {
-			IERC721(token1[idToRemoved].assetAddress).safeTransferFrom(
+			IERC721Upgradeable(token1[idToRemoved].assetAddress).safeTransferFrom(
 				address(this),
 				_to,
 				token1[idToRemoved].tokenId
@@ -292,7 +294,7 @@ contract NFTSwapPair is
 		);
 
 		// taking the token0's NFT
-		IERC1155(token0.assetAddress).safeTransferFrom(
+		IERC1155Upgradeable(token0.assetAddress).safeTransferFrom(
 			msg.sender,
 			address(this),
 			token0.tokenId,
@@ -308,7 +310,7 @@ contract NFTSwapPair is
 
 		// taking the token1's NFT
 		if (_token1Is1155) {
-			IERC1155(_token1Address).safeTransferFrom(
+			IERC1155Upgradeable(_token1Address).safeTransferFrom(
 				msg.sender,
 				address(this),
 				_token1Id,
@@ -316,7 +318,7 @@ contract NFTSwapPair is
 				"0x00"
 			);
 		} else {
-			IERC721(_token1Address).safeTransferFrom(
+			IERC721Upgradeable(_token1Address).safeTransferFrom(
 				msg.sender,
 				address(this),
 				_token1Id
@@ -325,7 +327,7 @@ contract NFTSwapPair is
 
 		// returning
 		if (token1[_idToRemoved].is1155) {
-			IERC1155(token1[_idToRemoved].assetAddress).safeTransferFrom(
+			IERC1155Upgradeable(token1[_idToRemoved].assetAddress).safeTransferFrom(
 				address(this),
 				_to,
 				token1[_idToRemoved].tokenId,
@@ -333,7 +335,7 @@ contract NFTSwapPair is
 				"0x00"
 			);
 		} else {
-			IERC721(token1[_idToRemoved].assetAddress).safeTransferFrom(
+			IERC721Upgradeable(token1[_idToRemoved].assetAddress).safeTransferFrom(
 				address(this),
 				_to,
 				token1[_idToRemoved].tokenId
@@ -359,7 +361,7 @@ contract NFTSwapPair is
 
 	function _release() internal {
 		if (providerCount.sub(providerPaidCount) > 0) {
-			IERC1155(token0.assetAddress).safeTransferFrom(
+			IERC1155Upgradeable(token0.assetAddress).safeTransferFrom(
 				address(this),
 				providers[providerPaidCount],
 				token0.tokenId,

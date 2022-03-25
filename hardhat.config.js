@@ -1,5 +1,6 @@
 require("dotenv").config()
 
+require("@openzeppelin/hardhat-upgrades")
 require("hardhat-deploy")
 require("@nomiclabs/hardhat-etherscan")
 require("@nomiclabs/hardhat-waffle")
