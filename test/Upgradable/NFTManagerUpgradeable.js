@@ -1,6 +1,6 @@
 const { expect } = require("chai");
-const { ethers } = require("hardhat")
-const { fromEther, toEther, deployPriceResolverMock, deployPriceResolver } = require("./Helpers")
+const { ethers, upgrades } = require("hardhat")
+const { fromEther, toEther, deployPriceResolverMock, deployPriceResolver } = require("../Helpers")
 
 let priceResolver
 let nftManager
@@ -15,33 +15,41 @@ let bob
 let charlie
 let dev
 
-describe("NFTManager contract with mocks", () => {
+describe("NFTManager Upgradeable contract with mocks", () => {
 
     before(async () => {
 
-        [admin, alice, bob, charlie, dev] = await ethers.getSigners();
+        try {
 
-        const PriceResolver = await ethers.getContractFactory("PriceResolver");
-        const NFTManager = await ethers.getContractFactory("NFTManager");
-        const MockLP = await ethers.getContractFactory("MockLP");
-        const MockPriceFeeder = await ethers.getContractFactory("MockPriceFeeder");
+            [admin, alice, bob, charlie, dev] = await ethers.getSigners();
 
-        priceResolver = await deployPriceResolverMock({ PriceResolver, MockPriceFeeder, admin })
+            const PriceResolver = await ethers.getContractFactory("PriceResolver");
+            const NFTManagerUpgradeable = await ethers.getContractFactory("NFTManagerUpgradeable");
+            const MockLP = await ethers.getContractFactory("MockLP");
+            const MockPriceFeeder = await ethers.getContractFactory("MockPriceFeeder");
 
-        shareToken = await MockLP.deploy("Share Token", "SHARE")
+            priceResolver = await deployPriceResolverMock({ PriceResolver, MockPriceFeeder, admin })
 
-        nftManager = await NFTManager.deploy("Ang Bao USD",
-            "ERC-1155_URI",
-            priceResolver.address,
-            shareToken.address,
-            ethers.utils.formatBytes32String("WMATIC-USDC-SHARE"),
-            ethers.utils.formatBytes32String("USD"),
-            dev.address)
+            shareToken = await MockLP.deploy("Share Token", "SHARE")
 
-        // setup NFT variants
-        await nftManager.addSyntheticVariant("Ang Bao 1 USD", 1, toEther(1))
-        await nftManager.addSyntheticVariant("Ang Bao 10 USD", 2, toEther(10))
-        await nftManager.addSyntheticVariant("Ang Bao 100 USD", 3, toEther(100))
+            nftManager = await upgrades.deployProxy(NFTManagerUpgradeable, ["Ang Bao USD",
+                "ERC-1155_URI",
+                priceResolver.address,
+                shareToken.address,
+                ethers.utils.formatBytes32String("WMATIC-USDC-SHARE"),
+                ethers.utils.formatBytes32String("USD"),
+                dev.address])
+
+            // setup NFT variants
+            await nftManager.addSyntheticVariant("Ang Bao 1 USD", 1, toEther(1))
+            await nftManager.addSyntheticVariant("Ang Bao 10 USD", 2, toEther(10))
+            await nftManager.addSyntheticVariant("Ang Bao 100 USD", 3, toEther(100))
+
+        } catch (e) {
+            console.log(e)
+        }
+
+
 
     });
 
@@ -57,14 +65,14 @@ describe("NFTManager contract with mocks", () => {
         expect(await nftManager.getSyntheticPrice()).to.equal(toEther(1))
         expect(await nftManager.getCollateralSharePrice()).to.equal(toEther(2000000))
 
-        // update base URI of ERC-1155
+        // // update base URI of ERC-1155
         const syntheticNftAddress = await nftManager.syntheticNFT()
         syntheticNft = await ethers.getContractAt('SyntheticNFT', syntheticNftAddress)
 
         await nftManager.setNftUri("https://api.cryptokitties.co/kitties/{id}")
         expect(await syntheticNft.uri(0)).to.equal("https://api.cryptokitties.co/kitties/{id}")
 
-        // check variants
+        // // check variants
         const firstVariant = await nftManager.syntheticVariants(0);
         expect(firstVariant[0]).to.equal("Ang Bao 1 USD")
         expect(firstVariant[1]).to.equal(1)
@@ -148,7 +156,7 @@ describe("NFTManager contract with mocks", () => {
         expect(fromEther((await nftManager.targetCollatelizationRatio(1))[1])).to.equal("1.0") // discount
 
 
-        // mint another 1 NFT to shift the CR > 1
+        // // mint another 1 NFT to shift the CR > 1
         await nftManager.forceMint(1, toEther((lpPerNft * 3).toFixed(18)), 1)
 
         // then check the params
@@ -184,10 +192,9 @@ describe("NFTManager contract with mocks", () => {
         await nftManager.forceMint(1, toEther(lpPerNft.toFixed(18)), 1)
 
     })
-
 })
 
-describe("NFTManager contract on forked Polygon chain", () => {
+describe("NFTManager Upgradeable contract on forked Polygon chain", () => {
 
     const WMATIC_ADDRESS = "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"
     const USDC_ADDRESS = "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
@@ -204,7 +211,7 @@ describe("NFTManager contract on forked Polygon chain", () => {
             [admin, alice, bob, charlie, dev] = await ethers.getSigners();
 
             const PriceResolver = await ethers.getContractFactory("PriceResolver");
-            const NFTManager = await ethers.getContractFactory("NFTManager");
+            const NFTManagerUpgradeable = await ethers.getContractFactory("NFTManagerUpgradeable");
 
             const MockPriceFeeder = await ethers.getContractFactory("MockPriceFeeder");
             const ChainlinkPriceFeeder = await ethers.getContractFactory("ChainlinkPriceFeeder");
@@ -225,7 +232,7 @@ describe("NFTManager contract on forked Polygon chain", () => {
                 Admin: admin
             })
 
-            nftManager = await NFTManager.deploy(
+            nftManager = await NFTManagerUpgradeable.deploy(
                 "Ang Bao USD",
                 "https://api.cryptokitties.co/kitties/{id}",
                 priceResolver.address,

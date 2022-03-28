@@ -20,6 +20,7 @@ describe("NFTBroker", () => {
     const MockERC1155 = await ethers.getContractFactory("MockERC1155")
 
     nftBroker = await NFTBroker.deploy()
+
     erc1155 = await MockERC1155.deploy(
       "https://api.cryptokitties.co/kitties/{id}"
     )
@@ -57,7 +58,7 @@ describe("NFTBroker", () => {
 
     expect(nft.assetAddress).to.equal(erc1155.address)
     expect(nft.tokenIds.map((x) => parseInt(x, 16))).deep.to.equal([0])
-    
+
     await nftBroker.deposit(erc1155.address, 1, 1)
 
     nft = await nftBroker.getNft(0)
