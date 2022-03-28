@@ -115,6 +115,8 @@ contract LuckBoxUpgradeable is
 		uint256 time
 	);
 
+  event SetEndEvent(uint256 indexed projectId, bool isEnd);
+
 	function initialize() public initializer {
 		ERC721HolderUpgradeable.__ERC721Holder_init();
 		// IERC721ReceiverUpgradeable
@@ -405,6 +407,13 @@ contract LuckBoxUpgradeable is
 
 		emit FinalizeEvent(msg.sender, requestId, now);
 	}
+
+  /// @notice set end flag to event
+  function setEndEvent(uint256 _eventId, bool _isEnd) external onlyWhitelisted {
+    events[_eventId].ended = _isEnd;
+
+    emit SetEndEvent(_eventId, _isEnd);
+  }
 
 	// PRIVATE FUNCTIONS
 
