@@ -5,6 +5,7 @@ module.exports = async ({ getNamedAccounts, deployments, network }) => {
 
   const nftLuckboxDeployment = "LuckBox"
   const nftLuckboxResult = await deploy(nftLuckboxDeployment, {
+    contract: "LuckBox",
     from: deployer,
     proxy: {
       owner: deployer,
