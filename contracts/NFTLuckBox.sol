@@ -1,21 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.6.12;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721HolderUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/introspection/ERC165Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155HolderUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/cryptography/MerkleProofUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import "./vrf/VRFConsumerBaseUpgradeable.sol";
-import "./utility/WhitelistUpgradeable.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721Holder.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/introspection/ERC165.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
+import "@openzeppelin/contracts/token/ERC1155/ERC1155Holder.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 
-import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
+
+import "./utility/Whitelist.sol";
 
 /**
  * @title Luckbox v.2
@@ -23,17 +21,15 @@ import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
  */
 
 contract LuckBox is
-  Initializable,
-  WhitelistUpgradeable,
-  ReentrancyGuardUpgradeable,
-  IERC721ReceiverUpgradeable,
-  ERC165Upgradeable,
-  ERC721HolderUpgradeable,
-  ERC1155HolderUpgradeable,
-  VRFConsumerBaseUpgradeable
+  Whitelist,
+  ReentrancyGuard,
+  IERC721Receiver,
+  ERC165,
+  ERC721Holder,
+  ERC1155Holder
 {
-  using SafeMathUpgradeable for uint256;
-  using AddressUpgradeable for address;
+  using SafeMath for uint256;
+  using Address for address;
 
   // POAP info
   struct Poap {
@@ -49,7 +45,6 @@ contract LuckBox is
     bytes32 merkleRoot; // to claim
     mapping(address => bool) claimed;
     uint256 claimCount;
-    uint256 seed;
     bool ended;
     bool active;
   }
@@ -109,25 +104,10 @@ contract LuckBox is
 
   event ProjectCreated(uint256 indexed projectId, string name);
 
-  event FinalizeEvent(
-    address indexed finalizer,
-    bytes32 requestId,
-    uint256 time
-  );
+  event SetEndEvent(uint256 indexed projectId, bool isEnd);
 
-  function initialize() public initializer {
-    ERC721HolderUpgradeable.__ERC721Holder_init();
-    // IERC721ReceiverUpgradeable
-    ERC165Upgradeable.__ERC165_init();
-    // IERC1155Upgradeable
-    ERC1155HolderUpgradeable.__ERC1155Holder_init();
-    // SafeMathUpgradeable
-    ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
-    // AddressUpgradeable
-    // MerkleProofUpgradeable
-    WhitelistUpgradeable.__Whitelist_init();
-    _registerInterface(IERC721ReceiverUpgradeable.onERC721Received.selector);
-    VRFConsumerBaseUpgradeable.initialize(VRF_COORDINATOR, LINK_TOKEN);
+  constructor() public {
+    _registerInterface(IERC721Receiver.onERC721Received.selector);
   }
 
   /// @notice check whether the given address has held NFTs or not
@@ -177,7 +157,7 @@ contract LuckBox is
     );
 
     if (poaps[_poapId].is1155) {
-      IERC1155Upgradeable(poaps[_poapId].assetAddress).safeTransferFrom(
+      IERC1155(poaps[_poapId].assetAddress).safeTransferFrom(
         address(this),
         msg.sender,
         poaps[_poapId].tokenId,
@@ -185,7 +165,7 @@ contract LuckBox is
         "0x00"
       );
     } else {
-      IERC721Upgradeable(poaps[_poapId].assetAddress).safeTransferFrom(
+      IERC721(poaps[_poapId].assetAddress).safeTransferFrom(
         address(this),
         msg.sender,
         poaps[_poapId].tokenId
@@ -213,7 +193,7 @@ contract LuckBox is
     uint256 _tokenId,
     uint256 _amount
   ) public nonReentrant {
-    IERC1155Upgradeable(_assetAddress).safeTransferFrom(
+    IERC1155(_assetAddress).safeTransferFrom(
       msg.sender,
       address(this),
       _tokenId,
@@ -231,7 +211,7 @@ contract LuckBox is
     public
     nonReentrant
   {
-    IERC721Upgradeable(_assetAddress).safeTransferFrom(
+    IERC721(_assetAddress).safeTransferFrom(
       msg.sender,
       address(this),
       _tokenId
@@ -359,7 +339,7 @@ contract LuckBox is
     uint256 _tokenId,
     uint256 _amount
   ) public nonReentrant onlyWhitelisted {
-    IERC1155Upgradeable(_tokenAddress).safeTransferFrom(
+    IERC1155(_tokenAddress).safeTransferFrom(
       address(this),
       _to,
       _tokenId,
@@ -374,36 +354,14 @@ contract LuckBox is
     address _tokenAddress,
     uint256 _tokenId
   ) public nonReentrant onlyWhitelisted {
-    IERC721Upgradeable(_tokenAddress).safeTransferFrom(
-      address(this),
-      _to,
-      _tokenId
-    );
+    IERC721(_tokenAddress).safeTransferFrom(address(this), _to, _tokenId);
   }
 
-  // @notice withdraw ERC-20 locked in the contract
-  function emergencyWithdrawERC20(address _tokenAddress, uint256 _amount)
-    public
-    nonReentrant
-    onlyWhitelisted
-  {
-    IERC20Upgradeable(_tokenAddress).transfer(msg.sender, _amount);
-  }
+  /// @notice set end flag to event
+  function setEndEvent(uint256 _eventId, bool _isEnd) external onlyWhitelisted {
+    events[_eventId].ended = _isEnd;
 
-  /// @notice finalize event for get seed
-  /// @param _eventId ID of the event
-  function finalizeEvent(uint256 _eventId) public nonReentrant {
-    require(events[_eventId].active == true, "Given ID is invalid");
-    require(
-      IERC20Upgradeable(LINK_TOKEN).balanceOf(address(this)) >= FEE,
-      "Insufficient LINK to proceed VRF"
-    );
-
-    bytes32 requestId = requestRandomness(KEY_HASH, FEE);
-    requestIdToAddress[requestId] = msg.sender;
-    requestIdToEventId[requestId] = _eventId;
-
-    emit FinalizeEvent(msg.sender, requestId, now);
+    emit SetEndEvent(_eventId, _isEnd);
   }
 
   // PRIVATE FUNCTIONS
@@ -414,8 +372,7 @@ contract LuckBox is
     bytes32[] memory _proof
   ) internal view returns (bool) {
     bytes32 leaf = keccak256(abi.encodePacked(msg.sender, _poapId));
-    return
-      MerkleProofUpgradeable.verify(_proof, events[_eventId].merkleRoot, leaf);
+    return MerkleProof.verify(_proof, events[_eventId].merkleRoot, leaf);
   }
 
   function _eligible(
@@ -427,23 +384,6 @@ contract LuckBox is
 
     bytes32 leaf = keccak256(abi.encodePacked(_address));
 
-    return
-      MerkleProofUpgradeable.verify(
-        _proof,
-        projects[_projectId].merkleRoot,
-        leaf
-      );
-  }
-
-  // callback from Chainlink VRF
-  function fulfillRandomness(bytes32 requestId, uint256 _randomness)
-    internal
-    override
-  {
-    uint256 eventId = requestIdToEventId[requestId];
-
-    if (eventId != 0) {
-      events[eventId].seed = _randomness;
-    }
+    return MerkleProof.verify(_proof, projects[_projectId].merkleRoot, leaf);
   }
 }

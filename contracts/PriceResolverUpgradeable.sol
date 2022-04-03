@@ -2,8 +2,8 @@
 
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "./utility/Whitelist.sol";
+import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
+import "./utility/WhitelistUpgradeable.sol";
 import "./utility/LibMath.sol";
 import "./interfaces/IPriceResolver.sol";
 import "./interfaces/IPriceFeeder.sol";
@@ -12,7 +12,11 @@ import "./interfaces/IPriceFeeder.sol";
  * @title A contract to resolves the asset price
  */
 
-contract PriceResolver is ReentrancyGuard, Whitelist, IPriceResolver {
+contract PriceResolverUpgradeable is
+	ReentrancyGuardUpgradeable,
+	WhitelistUpgradeable,
+	IPriceResolver
+{
 	using LibMathSigned for int256;
 	using LibMathUnsigned for uint256;
 
@@ -36,7 +40,9 @@ contract PriceResolver is ReentrancyGuard, Whitelist, IPriceResolver {
 		bool invert
 	);
 
-	constructor(address _devAddress) public nonReentrant {
+	function initialize(address _devAddress) external initializer {
+		ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
+		WhitelistUpgradeable.__Whitelist_init();
 		addAddress(_devAddress);
 
 		if (_devAddress != msg.sender) {
