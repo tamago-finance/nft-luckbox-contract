@@ -22,24 +22,33 @@ describe("Registry contract", () => {
 
 
     it('register contracts', async () => {
-        
-        await registry.connect(admin).registerContract(ethers.utils.formatBytes32String( SAMPLE_NAME) , SAMPLE_ADDRESS_1 )
-        expect( await registry.connect(admin).getContractAddress( ethers.utils.formatBytes32String( SAMPLE_NAME) ) , SAMPLE_ADDRESS_1 )
+
+        await registry.connect(admin).registerContract(ethers.utils.formatBytes32String(SAMPLE_NAME), SAMPLE_ADDRESS_1)
+        expect(await registry.connect(admin).getContractAddress(ethers.utils.formatBytes32String(SAMPLE_NAME)), SAMPLE_ADDRESS_1)
 
         // update with the new address
-        await registry.connect(admin).updateContract(ethers.utils.formatBytes32String( SAMPLE_NAME) , SAMPLE_ADDRESS_2 )
-        expect( await registry.connect(admin).getContractAddress( ethers.utils.formatBytes32String( SAMPLE_NAME) ) , SAMPLE_ADDRESS_2 )
+        await registry.connect(admin).updateContract(ethers.utils.formatBytes32String(SAMPLE_NAME), SAMPLE_ADDRESS_2)
+        expect(await registry.connect(admin).getContractAddress(ethers.utils.formatBytes32String(SAMPLE_NAME)), SAMPLE_ADDRESS_2)
 
     })
 
     it('register contracts from non-admin', async () => {
-        
+
         try {
-            await registry.connect(alice).registerContract(ethers.utils.formatBytes32String( SAMPLE_NAME) , SAMPLE_ADDRESS_1 )
+            await registry.connect(alice).registerContract(ethers.utils.formatBytes32String(SAMPLE_NAME), SAMPLE_ADDRESS_1)
         } catch (e) {
-            expect( e.message.indexOf("caller is not the owner") !== -1).to.true
+            expect(e.message.indexOf("caller is not the owner") !== -1).to.true
         }
 
+    })
+
+    it('deploy a synthetic NFT', async () => {
+
+        await registry.connect(admin).deploySyntheticNFT(ethers.utils.formatBytes32String("SYNTHETIC_NFT"), "TEST", "https://api.cryptokitties.co/kitties/{id}")
+
+        const output = await registry.getContractAddress(ethers.utils.formatBytes32String("SYNTHETIC_NFT"))
+
+        expect(output).to.not.equal(ethers.constants.AddressZero)
     })
 
 })
