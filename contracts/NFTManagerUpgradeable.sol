@@ -14,15 +14,12 @@ import "./utility/SyntheticNFT.sol";
 import "./interfaces/IPriceResolver.sol";
 import "./interfaces/ISyntheticNFT.sol";
 import "./interfaces/IPancakePair.sol";
-// i syntheticnft
-// i pancake pair
 import "./interfaces/INFTManager.sol";
 import "./interfaces/IPancakeRouter02.sol";
 import "./interfaces/IPancakeFactory.sol";
 
 /**
  * @title A contract to collaterizes ERC-20 and mints NFT
- * @dev The contract heavily depends on 3rd party modules from QuickSwap, Chainlink to running. Check out docs.tamago.finance for more details
  */
 
 contract NFTManagerUpgradeable is
@@ -47,7 +44,6 @@ contract NFTManagerUpgradeable is
 		uint256 tokenValue;
 		// raw collateral on this variant
 		uint256 totalRawCollateral;
-		uint256 totalDebtCollateral;
 		// total tokens that been minted
 		uint256 totalOutstanding;
 		// total tokens that been issued
@@ -76,7 +72,6 @@ contract NFTManagerUpgradeable is
 	uint8 public syntheticVariantCount;
 	// Total raw collateral
 	uint256 public totalRawCollateral;
-	uint256 public totalDebtCollateral;
 	// Total NFT synthetics outstanding
 	uint256 public totalOutstanding;
 	// Dev address
@@ -628,18 +623,6 @@ contract NFTManagerUpgradeable is
 		syntheticVariants[_id].totalBurnt = syntheticVariants[_id].totalBurnt.add(
 			_tokenAmount
 		);
-
-		// record the debt
-		if (_collateralAmount > syntheticVariants[_id].totalRawCollateral) {
-			uint256 debt = _collateralAmount.sub(
-				syntheticVariants[_id].totalRawCollateral
-			);
-			syntheticVariants[_id].totalDebtCollateral = syntheticVariants[_id]
-				.totalDebtCollateral
-				.add(debt);
-			totalDebtCollateral = totalDebtCollateral.add(debt);
-			_collateralAmount = _collateralAmount.sub(debt);
-		}
 
 		syntheticVariants[_id].totalRawCollateral = syntheticVariants[_id]
 			.totalRawCollateral
