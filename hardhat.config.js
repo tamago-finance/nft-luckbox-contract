@@ -32,13 +32,26 @@ module.exports = {
     currency: "USD",
   },
   solidity: {
-    version: "0.6.12",
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 200,
+    compilers: [
+      {
+        version: "0.6.12",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
       },
-    },
+      {
+        version: "0.7.6",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
+    ],
   },
   networks: {
     hardhat: {
@@ -52,6 +65,11 @@ module.exports = {
         accounts: [process.env.PRIVATEKEY_DEPLOYER, process.env.PRIVATEKEY_DEV],
         // blockNumber: 13975629,
       },
+    },
+    mainnet: {
+      allowUnlimitedContractSize: true,
+      url: process.env.MAINNET_URL,
+      accounts: [process.env.PRIVATEKEY_DEPLOYER, process.env.PRIVATEKEY_DEV],
     },
     polygon: {
       allowUnlimitedContractSize: true,
@@ -88,6 +106,6 @@ module.exports = {
     },
   },
   etherscan: {
-    apiKey: process.env.POLYGON_API_KEY,
+    apiKey: process.env.MAINNET_API_KEY,
   },
 }
