@@ -16,4 +16,6 @@ interface ISyntheticNFT is IERC1155Upgradeable {
 
     function setUri(string memory uri) external;
 
+    function addAddress(address _address) external;
+
 }

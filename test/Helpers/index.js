@@ -23,10 +23,9 @@ exports.deployPriceResolverMock = async ({ PriceResolver, MockPriceFeeder, admin
     await feederUsdc.updateValue(this.toEther(0.9998));
     await feederTamg.updateValue(this.toEther(0.4));
     await feederUsd.updateValue(this.toEther(1));
-    await feederWmatic.updateValue( this.toEther(2.0))
+    await feederWmatic.updateValue(this.toEther(2.0))
     await feederUsdcTamgShare.updateValue(this.toEther(1380000))
     await feederWmaticUsdcShare.updateValue(this.toEther(2000000))
-
 
     // register them all
     await priceResolver.registerPriceFeeder(
@@ -153,7 +152,7 @@ exports.deployPriceResolver = async ({
         false,
         this.toEther(1.5)
     )
-    
+
     await priceResolver.registerPriceFeeder(
         ethers.utils.formatBytes32String("WMATIC-USDC-SHARE"),
         feederWmaticUsdcShare.address,
@@ -293,6 +292,72 @@ exports.deployPriceResolverMainnet = async ({
         feederWEthUsdcShare.address,
         false,
         this.toEther(168814574)
+    )
+
+    return priceResolver
+}
+
+exports.deployPriceResolverV2 = async ({
+    library,
+    admin
+}) => {
+
+    const { chainId, name } = (await library.provider.getNetwork())
+    const PriceResolver = await library.getContractFactory("PriceResolver");
+    const ChainlinkPriceFeeder = await library.getContractFactory("ChainlinkPriceFeeder")
+    const MockPriceFeeder = await library.getContractFactory("MockPriceFeeder")
+
+    const priceResolver = await PriceResolver.deploy(admin);
+    let feederUsdc
+    let feederUsdt
+
+    switch (chainId) {
+        case 1:
+            feederUsdc = await ChainlinkPriceFeeder.deploy(
+                "USDC/USD",
+                "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+                8
+            );
+            break
+        case 137:
+            feederUsdc = await ChainlinkPriceFeeder.deploy(
+                "USDC/USD",
+                "0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7",
+                8
+            );
+            break
+        default:
+            feederUsdc = await MockPriceFeeder.deploy("USDC/USD");
+            await feederUsdc.updateValue(this.toEther(0.9998));
+            
+            feederUsdt = await MockPriceFeeder.deploy("USDT/USD");
+            await feederUsdc.updateValue(this.toEther(0.9999));
+
+    }
+
+    const feederUsd = await MockPriceFeeder.deploy("USD")
+    await feederUsd.updateValue(this.toEther(1));
+
+    // register 
+    await priceResolver.registerPriceFeeder(
+        ethers.utils.formatBytes32String("USDC/USD"),
+        feederUsdc.address,
+        false,
+        this.toEther(0.9998) // fallback value
+    )
+
+    await priceResolver.registerPriceFeeder(
+        ethers.utils.formatBytes32String("USDT/USD"),
+        feederUsdt.address,
+        false,
+        this.toEther(0.9999) // fallback value
+    )
+
+    await priceResolver.registerPriceFeeder(
+        ethers.utils.formatBytes32String("USD"),
+        feederUsd.address,
+        false,
+        this.toEther(1)  // fallback value
     )
 
     return priceResolver
