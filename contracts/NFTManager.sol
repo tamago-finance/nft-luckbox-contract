@@ -61,7 +61,7 @@ contract NFTManager is
 	// Synthetic NFT created by this contract.
 	ISyntheticNFT public override syntheticNFT;
 	// Collateral share
-	IPancakePair public override collateralShare;
+	IPancakePair public collateralShare;
 	// Collateral share's symbol for price calculation
 	bytes32 public collateralShareSymbol;
 	// Target currency in the registry
