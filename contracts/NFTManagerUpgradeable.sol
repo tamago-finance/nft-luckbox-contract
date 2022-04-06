@@ -40,6 +40,8 @@ contract NFTManagerUpgradeable is
         bytes32 priceFeeder;
         // ERC-20 contract address
         address tokenAddress;
+        // ERC-20 decimals
+        uint8 decimals;
         // status
         bool disabled;
     }
@@ -375,7 +377,7 @@ contract NFTManagerUpgradeable is
         uint256 _tokenId,
         uint256 _tokenValue
     ) public nonReentrant onlyWhitelisted {
-        // FIXME : Validate incoming params especially the token ID
+
         syntheticVariants[syntheticVariantCount].name = _name;
         syntheticVariants[syntheticVariantCount].tokenId = _tokenId;
         syntheticVariants[syntheticVariantCount].tokenValue = _tokenValue;
@@ -406,11 +408,15 @@ contract NFTManagerUpgradeable is
     function addCollateralAsset(
         string memory _name,
         bytes32 _priceFeeder,
-        address _tokenAddress
+        address _tokenAddress,
+        uint8 _decimals
     ) public nonReentrant onlyWhitelisted {
+        require( 18 >= _decimals, "_decimals should not be exceeded 18" );
+
         collaterals[collateralCount].name = _name;
         collaterals[collateralCount].priceFeeder = _priceFeeder;
         collaterals[collateralCount].tokenAddress = _tokenAddress;
+        collaterals[collateralCount].decimals = _decimals;
 
         collateralCount += 1;
     }
@@ -701,9 +707,16 @@ contract NFTManagerUpgradeable is
 
         for (uint8 i = 0; i < collateralCount; i++) {
             uint256 collateralRate = _getCollateralPrice(i);
+            uint256 totalCollateralSynthetic = syntheticVariants[_id].totalRawCollateral[i];
+
+            if (collaterals[i].decimals != 18) {
+                uint256 offset = uint256(18-collaterals[i].decimals);
+                totalCollateralSynthetic = totalCollateralSynthetic.mul(10**offset);
+            }
+
             totalCollateral = totalCollateral.add(
                 collateralRate.wmul(
-                    syntheticVariants[_id].totalRawCollateral[i]
+                    totalCollateralSynthetic
                 )
             );
         }
@@ -731,8 +744,13 @@ contract NFTManagerUpgradeable is
 
         for (uint8 y = 0; y < collateralCount; y++) {
             uint256 collateralRate = _getCollateralPrice(y);
+            uint256 totalCollateral = totalRawCollateral[y];
+            if (collaterals[y].decimals != 18) {
+                uint256 offset = uint256(18-collaterals[y].decimals);
+                totalCollateral = totalCollateral.mul(10**offset);
+            }
             numerator = numerator.add(
-                collateralRate.wmul(totalRawCollateral[y])
+                collateralRate.wmul(totalCollateral)
             );
         }
 
@@ -742,19 +760,6 @@ contract NFTManagerUpgradeable is
         return numerator.wdiv(denominator);
     }
 
-    // function _calculateCollateralizationRatio(
-    // 	uint256 _collateralAmount,
-    //     uint8 _collateralId,
-    // 	uint256 _syntheticAmount
-    // ) internal view returns (uint256) {
-    // 	uint256 collateralRate = _getCollateralPrice(_collateralId);
-    // 	uint256 syntheticRate = _getSyntheticPrice();
-
-    // 	uint256 numerator = collateralRate.wmul(_collateralAmount);
-    // 	uint256 denominator = syntheticRate.wmul(_syntheticAmount);
-
-    // 	return numerator.wdiv(denominator);
-    // }
 
     function _estimateInput(
         uint8 _variantId,
@@ -767,6 +772,11 @@ contract NFTManagerUpgradeable is
             syntheticVariants[_variantId].tokenValue.mul(_tokenAmount)
         );
         amount = mintedValue.wdiv(collateralPrice);
+        
+        if (collaterals[_collateralId].decimals != 18) {
+            uint256 offset = uint256(18 - collaterals[_collateralId].decimals);
+            amount = amount.div(10**offset);
+        }
     }
 
     function _estimateRedeem(
@@ -805,39 +815,6 @@ contract NFTManagerUpgradeable is
         uint256 fee = amount.mul(mintFee).div(10000);
         amount = amount.add( fee );
     }
-
-    // 	int256 targetCR = _calculateTargetCRDiscount(_id);
-
-    // 	// adjusting minted amount when target CR > current CR > 1
-    // 	if (targetCR > ONE_ETHER && discountDisabled == false) {
-    // 		uint256 newTotalCollateral = syntheticVariants[_id]
-    // 			.totalRawCollateral
-    // 			.add(lpAmount);
-    // 		uint256 newCR = _calculateCollateralizationRatio(
-    // 			newTotalCollateral,
-    // 			syntheticVariants[_id].totalOutstanding.add(
-    // 				syntheticVariants[_id].tokenValue.mul(_tokenAmount)
-    // 			)
-    // 		);
-
-    // 		uint256 adjustedTotalCollateral = (
-    // 			(targetCR.toUint256()).wmul(newTotalCollateral)
-    // 		).wdiv(newCR);
-
-    // 		if (newTotalCollateral > adjustedTotalCollateral) {
-    // 			discount = newTotalCollateral
-    // 				.sub(adjustedTotalCollateral)
-    // 				.wmul(lpAmount)
-    // 				.wdiv(syntheticVariants[_id].totalRawCollateral);
-    // 		}
-
-    // 		uint256 lpAmountWithDiscount = lpAmount.sub(discount);
-
-    // 		baseTokenAmount = baseTokenAmount.mul(lpAmountWithDiscount).div(lpAmount);
-    // 		pairTokenAmount = pairTokenAmount.mul(lpAmountWithDiscount).div(lpAmount);
-    // 		lpAmount = lpAmountWithDiscount;
-    // 	}
-    // }
 
     function _targetCollatelizationRatio()
         internal
