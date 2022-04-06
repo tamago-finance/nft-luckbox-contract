@@ -1,12 +1,13 @@
 const { expect } = require("chai");
 const { ethers, upgrades } = require("hardhat")
-const { fromEther, toEther, deployPriceResolverMock, deployPriceResolver, deployPriceResolverV2 } = require("../Helpers")
+const { fromEther, toEther, fromUsdc, toUsdc, deployPriceResolverMock, deployPriceResolver, deployPriceResolverV2 } = require("../Helpers")
 
 let priceResolver
 let nftManager
 let registry
 let usdcToken
 let usdtToken
+let daiToken
 let shareToken
 let syntheticNft
 
@@ -51,18 +52,28 @@ describe("NFTManager v.0.4.x", () => {
 
         usdcToken = await MockERC20.deploy('Mock USDC', "USDC")
         usdtToken = await MockERC20.deploy('Mock USDT', "USDT")
+        daiToken = await MockERC20.deploy('Mock DAI', "DAI")
 
         // setup collateral assets
         await nftManager.addCollateralAsset(
             "USDC",
             ethers.utils.formatBytes32String("USDC/USD"),
-            usdcToken.address
+            usdcToken.address,
+            6
         )
 
         await nftManager.addCollateralAsset(
             "USDT",
             ethers.utils.formatBytes32String("USDT/USD"),
-            usdtToken.address
+            usdtToken.address,
+            6
+        )
+
+        await nftManager.addCollateralAsset(
+            "DAI",
+            ethers.utils.formatBytes32String("DAI/USD"),
+            daiToken.address,
+            18
         )
 
         // setup variants
@@ -131,28 +142,28 @@ describe("NFTManager v.0.4.x", () => {
         // this is fake USDC with 18 decimals
         await usdcToken.approve(nftManager.address, ethers.constants.MaxUint256)
 
-        await nftManager.forceMint(2, 0, toEther(usdcPerNft.toFixed(18)), 1)
+        await nftManager.forceMint(2, 0, toUsdc(usdcPerNft.toFixed(6)), 1)
 
         expect((await syntheticNft.balanceOf(admin.address, 3))).to.equal(1)
 
         let variantInfo = await nftManager.syntheticVariants(2)
 
         expect(variantInfo.totalOutstanding).to.equal(toEther(100))
-        expect((variantInfo.totalIssued)).to.equal(1)
-        expect(fromEther(await nftManager.getVariantCollateral(2, 0))).to.equal(usdcPerNft.toFixed(18))
-        expect(fromEther(await nftManager.totalRawCollateral(0))).to.equal(usdcPerNft.toFixed(18))
+        expect((variantInfo.totalIssued)).to.equal(1) 
+        expect(fromUsdc(await nftManager.getVariantCollateral(2, 0))).to.equal(usdcPerNft.toFixed(6))
+        expect(fromUsdc(await nftManager.totalRawCollateral(0))).to.equal(usdcPerNft.toFixed(6))
         expect((await nftManager.totalOutstanding())).to.equal(toEther(100))
 
         // check the collatelization ratio
-        expect(fromEther(await nftManager.globalCollatelizationRatio())).to.equal("0.999999999999999944")
+        expect(fromEther(await nftManager.globalCollatelizationRatio())).to.equal("0.999999999999")
         expect(fromEther(await nftManager.variantCollatelizationRatio(0))).to.equal("1.0")
         expect(fromEther(await nftManager.variantCollatelizationRatio(1))).to.equal("1.0")
-        expect(fromEther(await nftManager.variantCollatelizationRatio(2))).to.equal("0.999999999999999944")
+        expect(fromEther(await nftManager.variantCollatelizationRatio(2))).to.equal("0.999999999999")
 
         await syntheticNft.setApprovalForAll(nftManager.address, true)
 
         // redeem it
-        await nftManager.forceRedeem(2, 0, toEther(usdcPerNft.toFixed(18)), 1)
+        await nftManager.forceRedeem(2, 0, toUsdc(usdcPerNft.toFixed(6)), 1)
 
         variantInfo = await nftManager.syntheticVariants(2)
 
@@ -176,23 +187,23 @@ describe("NFTManager v.0.4.x", () => {
 
         // mint 1x$100 with 50% of value 
         const halfValue = usdcPerNft * 0.5
-        await nftManager.forceMint(2, 0, toEther(halfValue.toFixed(18)), 1)
+        await nftManager.forceMint(2, 0, toUsdc(halfValue.toFixed(6)), 1)
 
-        expect(fromEther(await nftManager.globalCollatelizationRatio())).to.equal("0.499999999999999972")
+        expect(fromEther(await nftManager.globalCollatelizationRatio())).to.equal("0.500000004999")
 
         // check normalized CR
-        expect(fromEther((await nftManager.targetCollatelizationRatio())[0])).to.equal("0.752048447819438508") // offset
+        expect(fromEther((await nftManager.targetCollatelizationRatio())[0])).to.equal("0.752048451393005676") // offset
         expect(fromEther((await nftManager.targetCollatelizationRatio())[1])).to.equal("1.0")  // discount
 
         // mint 1x 1 NFT with 300% value to shifting the CR > 1
         const tripleValue = usdcPerNft * 3
-        await nftManager.forceMint(2, 0, toEther(tripleValue.toFixed(18)), 1)
+        await nftManager.forceMint(2, 0, toUsdc(tripleValue.toFixed(6)), 1)
 
-        expect(fromEther(await nftManager.globalCollatelizationRatio())).to.equal("1.749999999999999759")
+        expect(fromEther(await nftManager.globalCollatelizationRatio())).to.equal("1.750000002498")
 
         // check normalized CR
         expect(fromEther((await nftManager.targetCollatelizationRatio())[0])).to.equal("1.0") // offset
-        expect(fromEther((await nftManager.targetCollatelizationRatio())[1])).to.equal("1.237418056046235961")  // discount
+        expect(fromEther((await nftManager.targetCollatelizationRatio())[1])).to.equal("1.237418056630274733")  // discount
 
     })
 
@@ -215,7 +226,7 @@ describe("NFTManager v.0.4.x", () => {
             expect((fromEther(await nftManager.variantCollatelizationRatio(variant)))).to.equal("0.9999")
         }
 
-        expect(fromEther(await usdcToken.balanceOf(nftManager.address))).to.equal("11100.0")
+        expect(fromUsdc((await usdcToken.balanceOf(nftManager.address)))).to.equal("11100.0")
         expect((fromEther(await nftManager.globalCollatelizationRatio()))).to.equal("0.9999")
 
         // mint some NFT without collaterals to bring down the CR
@@ -231,7 +242,6 @@ describe("NFTManager v.0.4.x", () => {
         for (let variant of variants) {
             const amountToRedeem = 10
 
-            console.log(fromEther(await syntheticNft.balanceOf(admin.address, variant + 1)))
             const minOutput = await nftManager.estimateRedeem(variant, 0, amountToRedeem)
             await nftManager.redeem(variant, 0, amountToRedeem, minOutput)
             
@@ -240,7 +250,62 @@ describe("NFTManager v.0.4.x", () => {
             expect((variantInfo.totalBurnt)).to.equal(amountToRedeem)
         }
 
+        // TODO : validate balances
+
     })
 
-    // FIXME: Use 6 decimals Mock USDC
+    it('able to mint all NFTs from multi-collateral assets', async () => {
+        
+        const variants = [0, 1, 2] // $1, $10, $100
+
+        await usdcToken.approve(nftManager.address, ethers.constants.MaxUint256)
+        await usdtToken.approve(nftManager.address, ethers.constants.MaxUint256)
+        await daiToken.approve(nftManager.address, ethers.constants.MaxUint256)
+
+        for (let variant of variants) {
+            // const token = variant === 0 ? usdcToken : variant === 1 ? usdcToken : daiToken
+            const collateralId = variant
+
+            const maxCollateralAmount = await nftManager.estimateMint(variant, collateralId, 100)
+            await nftManager.mint(variant, collateralId, 100, maxCollateralAmount)
+
+            expect((await syntheticNft.balanceOf(admin.address, variant + 1))).to.equal(100)
+
+            const variantInfo = await nftManager.syntheticVariants(variant)
+
+            expect(variantInfo.totalOutstanding).to.equal(toEther(100 * 10 ** variant))
+            expect((variantInfo.totalIssued)).to.equal(100)
+            expect((fromEther(await nftManager.variantCollatelizationRatio(variant)))).to.equal("0.9999")
+        }
+
+        expect(fromUsdc( await usdcToken.balanceOf(nftManager.address) )).to.equal("100.0")
+        expect(fromUsdc( await usdtToken.balanceOf(nftManager.address) )).to.equal("999.9")
+        expect(fromEther( await daiToken.balanceOf(nftManager.address) )).to.equal("10004.002001000500250125")
+
+        expect(fromEther(await nftManager.globalCollatelizationRatio())).to.equal("0.9999")
+
+        // TODO : validate balances
+    })
+
+    it('able to mint with discount when the reserve is over-collatelized', async () => {
+        
+        await usdcToken.approve(nftManager.address, ethers.constants.MaxUint256)
+
+        const maxCollateralAmount = await nftManager.estimateMint(2, 0, 100)
+        await nftManager.mint(2, 0, 10, maxCollateralAmount)
+
+        expect(fromEther(await nftManager.globalCollatelizationRatio())).to.equal("0.9999")
+        expect(fromUsdc(await nftManager.estimateMint(2, 0, 1))).to.equal("101.010101")
+        expect(fromUsdc(await nftManager.estimateRedeem(2, 0, 1))).to.equal("99.009901")
+
+        // mint 1x $100 NFT with 1000 USDC
+        await nftManager.forceMint(2, 0, toUsdc(1000), 1)
+
+        expect(fromEther(await nftManager.globalCollatelizationRatio())).to.equal("1.818")
+        // having a discount
+        expect(fromUsdc(await nftManager.estimateMint(2, 0, 1))).to.equal("100.0")
+        expect(fromUsdc(await nftManager.estimateRedeem(2, 0, 1))).to.equal("99.009901")
+
+    })
+ 
 })

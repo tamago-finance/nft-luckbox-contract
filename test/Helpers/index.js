@@ -4,8 +4,16 @@ exports.fromEther = (value) => {
     return ethers.utils.formatEther(value)
 }
 
+exports.fromUsdc = (value) => {
+    return ethers.utils.formatUnits(value, 6)
+}
+
 exports.toEther = (value) => {
     return ethers.utils.parseEther(`${value}`)
+}
+
+exports.toUsdc = (value) => {
+    return ethers.utils.parseUnits(`${value}`, 6)
 }
 
 exports.deployPriceResolverMock = async ({ PriceResolver, MockPriceFeeder, admin }) => {
@@ -310,6 +318,7 @@ exports.deployPriceResolverV2 = async ({
     const priceResolver = await PriceResolver.deploy(admin);
     let feederUsdc
     let feederUsdt
+    let feederDai
 
     switch (chainId) {
         case 1:
@@ -333,6 +342,8 @@ exports.deployPriceResolverV2 = async ({
             feederUsdt = await MockPriceFeeder.deploy("USDT/USD");
             await feederUsdc.updateValue(this.toEther(0.9999));
 
+            feederDai = await MockPriceFeeder.deploy("DAI/USD");
+            await feederDai.updateValue(this.toEther(0.9995));
     }
 
     const feederUsd = await MockPriceFeeder.deploy("USD")
@@ -351,6 +362,13 @@ exports.deployPriceResolverV2 = async ({
         feederUsdt.address,
         false,
         this.toEther(0.9999) // fallback value
+    )
+
+    await priceResolver.registerPriceFeeder(
+        ethers.utils.formatBytes32String("DAI/USD"),
+        feederDai.address,
+        false,
+        this.toEther(0.9995) // fallback value
     )
 
     await priceResolver.registerPriceFeeder(
