@@ -290,6 +290,7 @@ describe("NFTManager v.0.4.x", () => {
     it('able to mint with discount when the reserve is over-collatelized', async () => {
         
         await usdcToken.approve(nftManager.address, ethers.constants.MaxUint256)
+        await nftManager.setDiscountFee(100) // set discount 1%
 
         const maxCollateralAmount = await nftManager.estimateMint(2, 0, 100)
         await nftManager.mint(2, 0, 10, maxCollateralAmount)
@@ -305,6 +306,27 @@ describe("NFTManager v.0.4.x", () => {
         // having a discount
         expect(fromUsdc(await nftManager.estimateMint(2, 0, 1))).to.equal("100.0")
         expect(fromUsdc(await nftManager.estimateRedeem(2, 0, 1))).to.equal("99.009901")
+
+    })
+
+    it('able to mint and reem the NFT without any fee', async () => {
+        
+        await usdcToken.approve(nftManager.address, ethers.constants.MaxUint256)
+
+        await nftManager.setMintFee(0)
+        await nftManager.setOffsetFee(0)
+        await nftManager.setRedeemFee(0)
+        await nftManager.setDiscountFee(0)
+        const maxCollateralAmount = await nftManager.estimateMint(2, 0, 1)
+        await nftManager.mint(2, 0, 1, maxCollateralAmount)
+
+        const minOutput = await nftManager.estimateRedeem(2, 0, 1)
+
+        expect(maxCollateralAmount ).to.equal(minOutput)
+
+        await syntheticNft.setApprovalForAll(nftManager.address, true)
+
+        await nftManager.redeem(2,0,1, minOutput)
 
     })
  

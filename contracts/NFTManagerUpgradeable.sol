@@ -155,7 +155,7 @@ contract NFTManagerUpgradeable is
         // set default fees
         mintFee = 100; // 1.0%
         redeemFee = 100; // 1.0%
-        discountFee = 100;  // 1.0%
+        // discountFee = 100;  // 1.0%
         offsetFee = 100; // 1.0%
 
         // Deploy the synthetic NFT contract
@@ -334,6 +334,8 @@ contract NFTManagerUpgradeable is
     {
         return syntheticVariants[_variantId].totalRawCollateral[_collateralId];
     }
+
+    
 
     /// @notice looks for the system collateral ratio basically calculates from total collateral deposited / total NFT minted
     /// @return the system collateral ratio
