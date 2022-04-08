@@ -394,8 +394,9 @@ contract LuckBoxUpgradeable is
 
 	/// @notice finalize event for get seed
 	/// @param _eventId ID of the event
-	function finalizeEvent(uint256 _eventId) public nonReentrant {
+	function finalizeEvent(uint256 _eventId) public nonReentrant onlyWhitelisted {
 		require(events[_eventId].active == true, "Given ID is invalid");
+		require(events[_eventId].seed == 0, "Seed number is already generated");
 		require(
 			IERC20Upgradeable(LINK_TOKEN).balanceOf(address(this)) >= FEE,
 			"Insufficient LINK to proceed VRF"
@@ -408,12 +409,12 @@ contract LuckBoxUpgradeable is
 		emit FinalizeEvent(msg.sender, requestId, now);
 	}
 
-  /// @notice set end flag to event
-  function setEndEvent(uint256 _eventId, bool _isEnd) external onlyWhitelisted {
-    events[_eventId].ended = _isEnd;
+	/// @notice set end flag to event
+	function setEndEvent(uint256 _eventId, bool _isEnd) external onlyWhitelisted {
+		events[_eventId].ended = _isEnd;
 
-    emit SetEndEvent(_eventId, _isEnd);
-  }
+		emit SetEndEvent(_eventId, _isEnd);
+	}
 
 	// PRIVATE FUNCTIONS
 
