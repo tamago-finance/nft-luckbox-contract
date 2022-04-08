@@ -64,8 +64,7 @@ contract LuckBoxUpgradeable is
 
 	// Chainlink constants on Polygon
 
-	address public constant LINK_TOKEN =
-		0xb0897686c545045aFc77CF20eC7A532E3120E0F1;
+	address LINK_TOKEN;
 	bytes32 public constant KEY_HASH =
 		0xf86195cf7690c55907b2b611ebb7343a6f649bff128701cc542f0569e2c549da;
 	uint256 public constant FEE = 100000000000000; // 0.0001 LINK
@@ -116,7 +115,11 @@ contract LuckBoxUpgradeable is
 
 	event SetEndEvent(uint256 indexed projectId, bool isEnd);
 
-	function initialize(address VRF_COORDINATOR) public initializer {
+	function initialize(address _vrfCoordinator, address _linkToken)
+		public
+		initializer
+	{
+		LINK_TOKEN = _linkToken;
 		ERC721HolderUpgradeable.__ERC721Holder_init();
 		// IERC721ReceiverUpgradeable
 		ERC165Upgradeable.__ERC165_init();
@@ -128,7 +131,10 @@ contract LuckBoxUpgradeable is
 		// MerkleProofUpgradeable
 		WhitelistUpgradeable.__Whitelist_init();
 		_registerInterface(IERC721ReceiverUpgradeable.onERC721Received.selector);
-		VRFConsumerBaseUpgradeable.initialize(VRF_COORDINATOR, LINK_TOKEN);
+		VRFConsumerBaseUpgradeable.__vrfConsumerBase_init(
+			_vrfCoordinator,
+			_linkToken
+		);
 	}
 
 	/// @notice check whether the given address has held NFTs or not
