@@ -115,7 +115,7 @@ contract LuckBoxUpgradeable is
 		uint256 time
 	);
 
-  event SetEndEvent(uint256 indexed projectId, bool isEnd);
+	event SetEndEvent(uint256 indexed projectId, bool isEnd);
 
 	function initialize() public initializer {
 		ERC721HolderUpgradeable.__ERC721Holder_init();
@@ -141,7 +141,7 @@ contract LuckBoxUpgradeable is
 		uint256 _projectId,
 		address _address,
 		bytes32[] memory _proof
-	) public view returns (bool output) {
+	) external view returns (bool output) {
 		output = _eligible(_projectId, _address, _proof);
 	}
 
@@ -154,7 +154,7 @@ contract LuckBoxUpgradeable is
 		uint256 _eventId,
 		uint256 _poapId,
 		bytes32[] memory _proof
-	) public view returns (bool output) {
+	) external view returns (bool output) {
 		output = _checkClaim(_eventId, _poapId, _proof);
 	}
 
@@ -166,7 +166,7 @@ contract LuckBoxUpgradeable is
 		uint256 _eventId,
 		uint256 _poapId,
 		bytes32[] memory _proof
-	) public nonReentrant {
+	) external nonReentrant {
 		require(events[_eventId].active == true, "Given Event ID is invalid");
 		require(events[_eventId].ended == false, "The event is ended");
 		require(
@@ -214,7 +214,7 @@ contract LuckBoxUpgradeable is
 		address _assetAddress,
 		uint256 _tokenId,
 		uint256 _amount
-	) public nonReentrant {
+	) external nonReentrant {
 		IERC1155Upgradeable(_assetAddress).safeTransferFrom(
 			msg.sender,
 			address(this),
@@ -230,7 +230,7 @@ contract LuckBoxUpgradeable is
 	/// @param _assetAddress the NFT asset address
 	/// @param _tokenId the token ID on the NFT
 	function depositERC721(address _assetAddress, uint256 _tokenId)
-		public
+		external
 		nonReentrant
 	{
 		IERC721Upgradeable(_assetAddress).safeTransferFrom(
@@ -252,7 +252,7 @@ contract LuckBoxUpgradeable is
 		address _assetAddress,
 		uint256 _tokenId,
 		bool _is1155
-	) public nonReentrant onlyWhitelisted {
+	) external nonReentrant onlyWhitelisted {
 		require(poaps[_poapId].assetAddress == address(0), "Given ID is occupied");
 
 		poaps[_poapId].assetAddress = _assetAddress;
@@ -270,7 +270,7 @@ contract LuckBoxUpgradeable is
 		uint256 _eventId,
 		string memory _name,
 		uint256[] memory _poaps
-	) public nonReentrant onlyWhitelisted {
+	) external nonReentrant onlyWhitelisted {
 		require(events[_eventId].active == false, "Given ID is occupied");
 
 		events[_eventId].active = true;
@@ -284,7 +284,7 @@ contract LuckBoxUpgradeable is
 	/// @param _projectId ID for the project
 	/// @param _name name of the project
 	function createProject(uint256 _projectId, string memory _name)
-		public
+		external
 		nonReentrant
 		onlyWhitelisted
 	{
@@ -300,7 +300,7 @@ contract LuckBoxUpgradeable is
 	/// @param _eventId ID for the event
 	/// @param _merkleRoot the root of the proof to be uploaded
 	function attachClaim(uint256 _eventId, bytes32 _merkleRoot)
-		public
+		external
 		nonReentrant
 		onlyWhitelisted
 	{
@@ -313,7 +313,7 @@ contract LuckBoxUpgradeable is
 	/// @param _projectId ID for the project
 	/// @param _merkleRoot the root of the proof to be uploaded
 	function attachWhitelist(uint256 _projectId, bytes32 _merkleRoot)
-		public
+		external
 		nonReentrant
 		onlyWhitelisted
 	{
@@ -329,7 +329,7 @@ contract LuckBoxUpgradeable is
 	function attachWhitelistBatch(
 		uint256[] memory _projectIds,
 		bytes32[] memory _merkleRoots
-	) public nonReentrant onlyWhitelisted {
+	) external nonReentrant onlyWhitelisted {
 		require(
 			_projectIds.length == _merkleRoots.length,
 			"Array size is not the same length"
@@ -345,7 +345,7 @@ contract LuckBoxUpgradeable is
 	/// @param _eventId ID of the event
 	/// @param _poaps array of the POAP ID
 	function updatePoaps(uint256 _eventId, uint256[] memory _poaps)
-		public
+		external
 		nonReentrant
 		onlyWhitelisted
 	{
@@ -360,7 +360,7 @@ contract LuckBoxUpgradeable is
 		address _tokenAddress,
 		uint256 _tokenId,
 		uint256 _amount
-	) public nonReentrant onlyWhitelisted {
+	) external nonReentrant onlyWhitelisted {
 		IERC1155Upgradeable(_tokenAddress).safeTransferFrom(
 			address(this),
 			_to,
@@ -375,7 +375,7 @@ contract LuckBoxUpgradeable is
 		address _to,
 		address _tokenAddress,
 		uint256 _tokenId
-	) public nonReentrant onlyWhitelisted {
+	) external nonReentrant onlyWhitelisted {
 		IERC721Upgradeable(_tokenAddress).safeTransferFrom(
 			address(this),
 			_to,
@@ -385,7 +385,7 @@ contract LuckBoxUpgradeable is
 
 	// @notice withdraw ERC-20 locked in the contract
 	function emergencyWithdrawERC20(address _tokenAddress, uint256 _amount)
-		public
+		external
 		nonReentrant
 		onlyWhitelisted
 	{
@@ -394,7 +394,11 @@ contract LuckBoxUpgradeable is
 
 	/// @notice finalize event for get seed
 	/// @param _eventId ID of the event
-	function finalizeEvent(uint256 _eventId) public nonReentrant onlyWhitelisted {
+	function finalizeEvent(uint256 _eventId)
+		external
+		nonReentrant
+		onlyWhitelisted
+	{
 		require(events[_eventId].active == true, "Given ID is invalid");
 		require(events[_eventId].seed == 0, "Seed number is already generated");
 		require(
