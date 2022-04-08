@@ -63,8 +63,7 @@ contract LuckBoxUpgradeable is
 	}
 
 	// Chainlink constants on Polygon
-	address public constant VRF_COORDINATOR =
-		0x3d2341ADb2D31f1c5530cDC622016af293177AE0;
+
 	address public constant LINK_TOKEN =
 		0xb0897686c545045aFc77CF20eC7A532E3120E0F1;
 	bytes32 public constant KEY_HASH =
@@ -115,9 +114,9 @@ contract LuckBoxUpgradeable is
 		uint256 time
 	);
 
-  event SetEndEvent(uint256 indexed projectId, bool isEnd);
+	event SetEndEvent(uint256 indexed projectId, bool isEnd);
 
-	function initialize() public initializer {
+	function initialize(address VRF_COORDINATOR) public initializer {
 		ERC721HolderUpgradeable.__ERC721Holder_init();
 		// IERC721ReceiverUpgradeable
 		ERC165Upgradeable.__ERC165_init();

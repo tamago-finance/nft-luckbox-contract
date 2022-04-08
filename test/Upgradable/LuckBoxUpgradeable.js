@@ -12,19 +12,19 @@ let bob
 let charlie
 let dave
 
-describe("LuckBox V2 Upgradeable", () => {
+describe("LuckBox V2 Upgradeable - polygon", () => {
 
     beforeEach(async () => {
         [admin, alice, bob, charlie, dave] = await ethers.getSigners()
 
         const LuckBoxUpgradeable = await ethers.getContractFactory("LuckBoxUpgradeable")
         const MockERC1155 = await ethers.getContractFactory("MockERC1155")
-
+        const VRF_COORDINATOR = "0x3d2341ADb2D31f1c5530cDC622016af293177AE0"//POLYGON VRF COORDINATOR
 
         erc1155 = await MockERC1155.deploy(
             "https://api.cryptokitties.co/kitties/{id}"
         )
-        luckBox = await upgrades.deployProxy(LuckBoxUpgradeable, []);
+        luckBox = await upgrades.deployProxy(LuckBoxUpgradeable, [VRF_COORDINATOR]);
 
     })
 
