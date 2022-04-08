@@ -115,7 +115,7 @@ contract LuckBoxUpgradeable is
 		uint256 time
 	);
 
-  event SetEndEvent(uint256 indexed projectId, bool isEnd);
+	event SetEndEvent(uint256 indexed projectId, bool isEnd);
 
 	function initialize() public initializer {
 		ERC721HolderUpgradeable.__ERC721Holder_init();
@@ -423,7 +423,6 @@ contract LuckBoxUpgradeable is
 		uint256 _poapId,
 		bytes32[] memory _proof
 	) internal view returns (bool) {
-		uint256 test = 1;
 		bytes32 leaf = keccak256(abi.encodePacked(msg.sender, _poapId));
 		return
 			MerkleProofUpgradeable.verify(_proof, events[_eventId].merkleRoot, leaf);
