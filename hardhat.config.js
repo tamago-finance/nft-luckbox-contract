@@ -60,11 +60,11 @@ module.exports = {
       //   url: process.env.POLYGON_URL,
       //   blockNumber: 20480699,
       // },
-      forking: {
-        url: process.env.MAINNET_ARCHIVE_RPC,
-        accounts: [process.env.PRIVATEKEY_DEPLOYER, process.env.PRIVATEKEY_DEV],
-        // blockNumber: 13975629,
-      },
+      // forking: {
+      //   url: process.env.MAINNET_ARCHIVE_RPC,
+      //   accounts: [process.env.PRIVATEKEY_DEPLOYER, process.env.PRIVATEKEY_DEV],
+      //   // blockNumber: 13975629,
+      // },
     },
     mainnet: {
       allowUnlimitedContractSize: true,
