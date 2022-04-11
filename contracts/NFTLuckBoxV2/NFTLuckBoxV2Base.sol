@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.7;
+pragma solidity 0.6.12;
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155Holder.sol";
 
@@ -30,7 +30,7 @@ contract NFTLuckBoxV2Base is ERC1155Holder {
 		nftAddress = _nftAddress;
 	}
 
-	function setTokenId(address _tokenId) external {
+	function setTokenId(uint256 _tokenId) external {
 		require(msg.sender == coordinator, "!coordinator");
 		tokenId = _tokenId;
 	}
