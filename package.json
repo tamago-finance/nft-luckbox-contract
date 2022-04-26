@@ -12,7 +12,9 @@
     "deploy:harmony:NFTManager": "hardhat --network harmony deploy --no-compile --reset --tags NFTManager",
     "deploy:mainnetfork:NFTManager": "hardhat --network mainnetfork deploy --no-compile --reset --tags NFTManager",
     "deploy:polygon:NFTLuckbox": "hardhat --network polygon deploy --no-compile --reset --tags NFTLuckbox",
-    "deploy:mainnet:NFTLuckbox": "hardhat --network mainnet deploy --no-compile --reset --tags NFTLuckbox"
+    "deploy:mainnet:NFTLuckbox": "hardhat --network mainnet deploy --no-compile --reset --tags NFTLuckbox",
+    "deploy:kovan:NFTMarketplace": "hardhat --network kovan deploy --no-compile --reset --tags NFTMarketplace",
+    "deploy:kovan:MockNFT": "hardhat --network kovan deploy --no-compile --reset --tags MockNFT"
   },
   "dependencies": {
     "@chainlink/contracts": "^0.2.2",
