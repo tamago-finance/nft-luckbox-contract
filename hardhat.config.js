@@ -60,11 +60,11 @@ module.exports = {
       //   url: process.env.POLYGON_URL,
       //   blockNumber: 20480699,
       // },
-      // forking: {
-      //   url: process.env.MAINNET_ARCHIVE_RPC,
-      //   accounts: [process.env.PRIVATEKEY_DEPLOYER, process.env.PRIVATEKEY_DEV],
-      //   // blockNumber: 13975629,
-      // },
+      forking: {
+        url: process.env.MAINNET_ARCHIVE_RPC,
+        accounts: [process.env.PRIVATEKEY_DEPLOYER, process.env.PRIVATEKEY_DEV],
+        // blockNumber: 13975629,
+      },
     },
     mainnet: {
       allowUnlimitedContractSize: true,
@@ -93,6 +93,12 @@ module.exports = {
     },
     mainnetfork: {
       url: "http://127.0.0.1:8545",
+      accounts: [process.env.PRIVATEKEY_DEPLOYER, process.env.PRIVATEKEY_DEV],
+      timeout: 500000,
+    },
+    kovan: {
+      allowUnlimitedContractSize: true,
+      url: "https://speedy-nodes-nyc.moralis.io/2041771c8a1a3004b1608ea7/eth/kovan",
       accounts: [process.env.PRIVATEKEY_DEPLOYER, process.env.PRIVATEKEY_DEV],
       timeout: 500000,
     },
