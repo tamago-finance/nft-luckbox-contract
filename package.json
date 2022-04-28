@@ -12,6 +12,7 @@
     "deploy:harmony:NFTManager": "hardhat --network harmony deploy --no-compile --reset --tags NFTManager",
     "deploy:mainnetfork:NFTManager": "hardhat --network mainnetfork deploy --no-compile --reset --tags NFTManager",
     "deploy:polygon:NFTLuckbox": "hardhat --network polygon deploy --no-compile --reset --tags NFTLuckbox",
+    "deploy:bsc:NFTLuckbox": "hardhat --network bsc deploy --no-compile --reset --tags NFTLuckbox",
     "deploy:mainnet:NFTLuckbox": "hardhat --network mainnet deploy --no-compile --reset --tags NFTLuckbox"
   },
   "dependencies": {

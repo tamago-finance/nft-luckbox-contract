@@ -46,6 +46,13 @@ Ang Bao NFT | 0x10Fe6ecb9a49276E068274711560CDe41Deb3f34
 Price Resolver | 0x16EE94e3C07B24EbA6067eb9394BA70178aAc4c0
 LuckBox Proxy | 0xE53048D2D19338A294395D8A7f780E44A9379925
 
+
+### BNB Chain
+
+Contract Name | Contract Address 
+--- | --- 
+NFT Luckbox | 0xAF4E836b7a1f20F1519cc82529Db54c62b02E93c
+
 ## License
 
 MIT ©
