@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.6.12;
+pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
@@ -132,8 +133,48 @@ contract NFTMarketplaceUpgradeable is
         );
     }
 
-    function createOrders() public whenNotPaused nonReentrant {
-        // TODO: complete the function
+    function createBatchOrders(
+        uint256[] calldata _orderId,
+        address[] calldata _assetAddress,
+        uint256[] calldata _tokenId,
+        bool[] calldata _is1155,
+        bytes32[] calldata _root
+    ) external whenNotPaused nonReentrant {
+        for (uint256 i = 0; i < _orderId.length; i++) {
+            require(orders[_orderId[i]].active == false, "Given ID is occupied");
+
+            orders[_orderId[i]].active = true;
+            orders[_orderId[i]].assetAddress = _assetAddress[i];
+            orders[_orderId[i]].tokenId = _tokenId[i];
+            orders[_orderId[i]].is1155 = _is1155[i];
+            orders[_orderId[i]].root = _root[i];
+            orders[_orderId[i]].owner = msg.sender;
+
+            if (_is1155[i] == true) {
+                IERC1155Upgradeable(_assetAddress[i]).safeTransferFrom(
+                    msg.sender,
+                    address(this),
+                    _tokenId[i],
+                    1,
+                    "0x00"
+                );
+            } else {
+                IERC721Upgradeable(_assetAddress[i]).safeTransferFrom(
+                    msg.sender,
+                    address(this),
+                    _tokenId[i]
+                );
+            }
+
+            emit OrderCreated(
+                _orderId[i],
+                _assetAddress[i],
+                _tokenId[i],
+                _is1155[i],
+                msg.sender,
+                _root[i]
+            );
+        }
     }
 
     /// @notice cancel the order and return NFT back to the original holder
@@ -225,13 +266,63 @@ contract NFTMarketplaceUpgradeable is
         emit Swapped(_orderId, msg.sender, _assetAddress, _tokenId, orders[_orderId].owner,  orders[_orderId].assetAddress , orders[_orderId].tokenId );
     }
 
-    function swapBatch(uint256[] memory _orderIds)
+    function swapBatch(
+        uint256[] calldata _orderIds,
+        address[] calldata _assetAddress,
+        uint256[] calldata _tokenId,
+        bool[] calldata _is1155,
+        bytes32[][] calldata _proof
+    )
         public
         validateIds(_orderIds)
         whenNotPaused
         nonReentrant
     {
-         // TODO : complete the function
+         for (uint256 i = 0; i < _orderIds.length; i++) {
+            uint256 orderId = _orderIds[i];
+            require(
+                _eligibleToSwap(orderId, _assetAddress[i], _tokenId[i], _proof[i]) == true,
+                "The caller is not eligible to claim the NFT"
+            );
+
+            // taking NFT
+            if (_is1155[i] == true) {
+                IERC1155Upgradeable(_assetAddress[i]).safeTransferFrom(
+                    msg.sender,
+                    orders[orderId].owner,
+                    _tokenId[i],
+                    1,
+                    "0x00"
+                );
+            } else {
+                IERC721Upgradeable(_assetAddress[i]).safeTransferFrom(
+                    msg.sender,
+                    orders[orderId].owner,
+                    _tokenId[i]
+                );
+            }
+
+            // giving NFT
+            if (orders[orderId].is1155 == true) {
+                IERC1155Upgradeable(orders[orderId].assetAddress).safeTransferFrom(
+                    address(this),
+                    msg.sender,
+                    orders[orderId].tokenId,
+                    1,
+                    "0x00"
+                );
+            } else {
+                IERC721Upgradeable(orders[orderId].assetAddress).safeTransferFrom(
+                    address(this),
+                    msg.sender,
+                    orders[orderId].tokenId
+                );
+            }
+
+            orders[orderId].ended = true;
+
+            emit Swapped(orderId, msg.sender, _assetAddress[i], _tokenId[i], orders[orderId].owner,  orders[orderId].assetAddress , orders[orderId].tokenId );
+         }
     }
 
     // pause the contract
