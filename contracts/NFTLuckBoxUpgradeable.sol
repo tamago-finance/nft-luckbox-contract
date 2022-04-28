@@ -270,6 +270,24 @@ contract LuckBoxUpgradeable is
 		emit PoapCreated(_poapId, _assetAddress, _tokenId, _is1155);
 	}
 
+	function createPoapBatch(
+		uint256[] memory _poapId,
+		address[] memory _assetAddress,
+		uint256[] memory _tokenId,
+		bool[] memory _is1155
+	) public nonReentrant onlyWhitelisted {
+		require(
+			_poapId.length == _assetAddress.length,
+			"Array size is not the same length"
+		);
+
+		for (uint256 i = 0; i < _poapId.length; i++) {
+			poaps[_poapId[i]].assetAddress = _assetAddress[i];
+			poaps[_poapId[i]].tokenId = _tokenId[i];
+			poaps[_poapId[i]].is1155 = _is1155[i];
+		}
+	}
+
 	/// @notice create a campaign
 	/// @param _eventId ID for the event
 	/// @param _name name of the event
