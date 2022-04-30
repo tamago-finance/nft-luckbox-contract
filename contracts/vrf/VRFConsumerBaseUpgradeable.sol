@@ -199,7 +199,7 @@ abstract contract VRFConsumerBaseUpgradeable is Initializable, VRFRequestIDBase 
   //   address _vrfCoordinator,
   //   address _link
   // ) {
-  function initialize(
+  function __VRFConsumerBase_init(
     address _vrfCoordinator,
     address _link
   ) internal initializer {
