@@ -14,16 +14,9 @@ contract MockERC20 is ERC20 {
         _setupDecimals(_decimals);
     }
 
-    function setDecimals(uint8 _decimals) external {
-        _setupDecimals(_decimals);
-    }
 
     function faucet() public {
         _mint(msg.sender, 10000 * (10 ** uint256(decimals())));
-    }
-
-    function setDecimals(uint8 _decimals) external {
-        _setupDecimals(_decimals);
     }
 
     function deposit(uint256 _amount) public payable {
