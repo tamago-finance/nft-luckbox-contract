@@ -42,15 +42,6 @@ module.exports = {
           },
         },
       },
-      {
-        version: "0.7.6",
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 200,
-          },
-        },
-      },
     ],
   },
   networks: {
@@ -89,6 +80,11 @@ module.exports = {
     bscTestnet: {
       allowUnlimitedContractSize: true,
       url: "https://data-seed-prebsc-2-s2.binance.org:8545/",
+      accounts: [process.env.PRIVATEKEY_DEPLOYER, process.env.PRIVATEKEY_DEV],
+    },
+    kovan: {
+      allowUnlimitedContractSize: true,
+      url: "https://speedy-nodes-nyc.moralis.io/2041771c8a1a3004b1608ea7/eth/kovan",
       accounts: [process.env.PRIVATEKEY_DEPLOYER, process.env.PRIVATEKEY_DEV],
     },
     mainnetfork: {

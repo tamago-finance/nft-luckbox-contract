@@ -6,13 +6,12 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract MockERC20 is ERC20 {
 
-    uint256 constant private MAX_SUPPLY =  10000000 * (10 ** 18);
-
     constructor(
         string memory name,
-        string memory symbol
+        string memory symbol,
+        uint8 _decimals
     ) public ERC20(name, symbol) {
-        _mint(msg.sender, MAX_SUPPLY);
+        _setupDecimals(_decimals);
     }
 
     function setDecimals(uint8 _decimals) external {
@@ -20,7 +19,7 @@ contract MockERC20 is ERC20 {
     }
 
     function faucet() public {
-        _mint(msg.sender, 10000 * (10 ** 18));
+        _mint(msg.sender, 10000 * (10 ** uint256(decimals())));
     }
 
     function setDecimals(uint8 _decimals) external {

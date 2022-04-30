@@ -1,13 +1,10 @@
-const { config: getConfig } = require("../constants")
-const { toEther } = require("../test/Helpers")
-
 module.exports = async ({ getNamedAccounts, deployments, network }) => {
   const { deploy } = deployments
 
   const { deployer, dev } = await getNamedAccounts()
 
-  const marketPlaceDeployments = "NFTMarketplace"
-  const marketPlaceResult = await deploy(marketPlaceDeployments, {
+  const nftMarketplaceDeployment = "NFTMarketplace"
+  const nftMarketplaceResult = await deploy(nftMarketplaceDeployment, {
     contract: "NFTMarketplaceUpgradeable",
     from: deployer,
     proxy: {
@@ -22,9 +19,12 @@ module.exports = async ({ getNamedAccounts, deployments, network }) => {
     deterministicDeployment: false,
   })
 
-  console.log(`${marketPlaceDeployments} was deployed`)
+  console.log(`${nftMarketplaceDeployment} was deployed`)
 
-  console.log("✅ Done 🦄")
+  await hre.run("verify:verify", {
+    address: nftMarketplaceResult.implementation,
+    constructorArguments: [],
+  })
 }
 
 module.exports.tags = ["NFTMarketplace"]
