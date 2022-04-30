@@ -96,6 +96,12 @@ module.exports = {
       accounts: [process.env.PRIVATEKEY_DEPLOYER, process.env.PRIVATEKEY_DEV],
       timeout: 500000,
     },
+    kovan: {
+      allowUnlimitedContractSize: true,
+      url: "https://speedy-nodes-nyc.moralis.io/2041771c8a1a3004b1608ea7/eth/kovan",
+      accounts: [process.env.PRIVATEKEY_DEPLOYER, process.env.PRIVATEKEY_DEV],
+      timeout: 500000,
+    },
   },
   namedAccounts: {
     deployer: {
