@@ -1,0 +1,338 @@
+{
+  "address": "0xf3A7f98B48941cdA64e7B3F6F5aee5E5E7EdEA88",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_name",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "addAddress",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getTimestamp",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getValue",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "isWhitelisted",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "name",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "removeAddress",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_newValue",
+          "type": "uint256"
+        }
+      ],
+      "name": "updateValue",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "value",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x8ce67ad65cfb71300428211f456e653678912b665ccff89bfe687980a4020e9d",
+  "receipt": {
+    "to": null,
+    "from": "0x27dDF44eC9E32343599F7B939e4c35c034f78076",
+    "contractAddress": "0xf3A7f98B48941cdA64e7B3F6F5aee5E5E7EdEA88",
+    "transactionIndex": 0,
+    "gasUsed": "584104",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000001000000000000000000000000000000000000020000000000000000000800000000000000000000000000800000402000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000008000000000000000000020000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x49a6f01b0aa8872af2278c85e43d0ad9ceb57441b059b0468bf1b666e998e05c",
+    "transactionHash": "0x8ce67ad65cfb71300428211f456e653678912b665ccff89bfe687980a4020e9d",
+    "logs": [
+      {
+        "transactionIndex": 0,
+        "blockNumber": 30972331,
+        "transactionHash": "0x8ce67ad65cfb71300428211f456e653678912b665ccff89bfe687980a4020e9d",
+        "address": "0xf3A7f98B48941cdA64e7B3F6F5aee5E5E7EdEA88",
+        "topics": [
+          "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0",
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "0x00000000000000000000000027ddf44ec9e32343599f7b939e4c35c034f78076"
+        ],
+        "data": "0x",
+        "logIndex": 0,
+        "blockHash": "0x49a6f01b0aa8872af2278c85e43d0ad9ceb57441b059b0468bf1b666e998e05c"
+      }
+    ],
+    "blockNumber": 30972331,
+    "cumulativeGasUsed": "584104",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    "USDC/USD"
+  ],
+  "solcInputHash": "8265e4161eec9b5a7dcd6b2c71b6665f",
+  "metadata": "{\"compiler\":{\"version\":\"0.6.12+commit.27d51765\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_name\",\"type\":\"string\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"}],\"name\":\"addAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getTimestamp\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getValue\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"}],\"name\":\"isWhitelisted\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"name\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_address\",\"type\":\"address\"}],\"name\":\"removeAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_newValue\",\"type\":\"uint256\"}],\"name\":\"updateValue\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"value\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"addAddress(address)\":{\"details\":\"adds a given address to the whitelist\",\"params\":{\"_address\":\"address to add\"}},\"isWhitelisted(address)\":{\"details\":\"returns true if a given address is whitelisted, false if not\",\"params\":{\"_address\":\"address to check\"},\"returns\":{\"_0\":\"true if the address is whitelisted, false if not\"}},\"owner()\":{\"details\":\"Returns the address of the current owner.\"},\"removeAddress(address)\":{\"details\":\"removes a given address from the whitelist\",\"params\":{\"_address\":\"address to remove\"}},\"renounceOwnership()\":{\"details\":\"Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner.\"},\"transferOwnership(address)\":{\"details\":\"Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.\"}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/mocks/MockPriceFeeder.sol\":\"MockPriceFeeder\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/access/Ownable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity >=0.6.0 <0.8.0;\\n\\nimport \\\"../utils/Context.sol\\\";\\n/**\\n * @dev Contract module which provides a basic access control mechanism, where\\n * there is an account (an owner) that can be granted exclusive access to\\n * specific functions.\\n *\\n * By default, the owner account will be the one that deploys the contract. This\\n * can later be changed with {transferOwnership}.\\n *\\n * This module is used through inheritance. It will make available the modifier\\n * `onlyOwner`, which can be applied to your functions to restrict their use to\\n * the owner.\\n */\\nabstract contract Ownable is Context {\\n    address private _owner;\\n\\n    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);\\n\\n    /**\\n     * @dev Initializes the contract setting the deployer as the initial owner.\\n     */\\n    constructor () internal {\\n        address msgSender = _msgSender();\\n        _owner = msgSender;\\n        emit OwnershipTransferred(address(0), msgSender);\\n    }\\n\\n    /**\\n     * @dev Returns the address of the current owner.\\n     */\\n    function owner() public view virtual returns (address) {\\n        return _owner;\\n    }\\n\\n    /**\\n     * @dev Throws if called by any account other than the owner.\\n     */\\n    modifier onlyOwner() {\\n        require(owner() == _msgSender(), \\\"Ownable: caller is not the owner\\\");\\n        _;\\n    }\\n\\n    /**\\n     * @dev Leaves the contract without owner. It will not be possible to call\\n     * `onlyOwner` functions anymore. Can only be called by the current owner.\\n     *\\n     * NOTE: Renouncing ownership will leave the contract without an owner,\\n     * thereby removing any functionality that is only available to the owner.\\n     */\\n    function renounceOwnership() public virtual onlyOwner {\\n        emit OwnershipTransferred(_owner, address(0));\\n        _owner = address(0);\\n    }\\n\\n    /**\\n     * @dev Transfers ownership of the contract to a new account (`newOwner`).\\n     * Can only be called by the current owner.\\n     */\\n    function transferOwnership(address newOwner) public virtual onlyOwner {\\n        require(newOwner != address(0), \\\"Ownable: new owner is the zero address\\\");\\n        emit OwnershipTransferred(_owner, newOwner);\\n        _owner = newOwner;\\n    }\\n}\\n\",\"keccak256\":\"0x15e2d5bd4c28a88548074c54d220e8086f638a71ed07e6b3ba5a70066fcf458d\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/Address.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity >=0.6.2 <0.8.0;\\n\\n/**\\n * @dev Collection of functions related to the address type\\n */\\nlibrary Address {\\n    /**\\n     * @dev Returns true if `account` is a contract.\\n     *\\n     * [IMPORTANT]\\n     * ====\\n     * It is unsafe to assume that an address for which this function returns\\n     * false is an externally-owned account (EOA) and not a contract.\\n     *\\n     * Among others, `isContract` will return false for the following\\n     * types of addresses:\\n     *\\n     *  - an externally-owned account\\n     *  - a contract in construction\\n     *  - an address where a contract will be created\\n     *  - an address where a contract lived, but was destroyed\\n     * ====\\n     */\\n    function isContract(address account) internal view returns (bool) {\\n        // This method relies on extcodesize, which returns 0 for contracts in\\n        // construction, since the code is only stored at the end of the\\n        // constructor execution.\\n\\n        uint256 size;\\n        // solhint-disable-next-line no-inline-assembly\\n        assembly { size := extcodesize(account) }\\n        return size > 0;\\n    }\\n\\n    /**\\n     * @dev Replacement for Solidity's `transfer`: sends `amount` wei to\\n     * `recipient`, forwarding all available gas and reverting on errors.\\n     *\\n     * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost\\n     * of certain opcodes, possibly making contracts go over the 2300 gas limit\\n     * imposed by `transfer`, making them unable to receive funds via\\n     * `transfer`. {sendValue} removes this limitation.\\n     *\\n     * https://diligence.consensys.net/posts/2019/09/stop-using-soliditys-transfer-now/[Learn more].\\n     *\\n     * IMPORTANT: because control is transferred to `recipient`, care must be\\n     * taken to not create reentrancy vulnerabilities. Consider using\\n     * {ReentrancyGuard} or the\\n     * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].\\n     */\\n    function sendValue(address payable recipient, uint256 amount) internal {\\n        require(address(this).balance >= amount, \\\"Address: insufficient balance\\\");\\n\\n        // solhint-disable-next-line avoid-low-level-calls, avoid-call-value\\n        (bool success, ) = recipient.call{ value: amount }(\\\"\\\");\\n        require(success, \\\"Address: unable to send value, recipient may have reverted\\\");\\n    }\\n\\n    /**\\n     * @dev Performs a Solidity function call using a low level `call`. A\\n     * plain`call` is an unsafe replacement for a function call: use this\\n     * function instead.\\n     *\\n     * If `target` reverts with a revert reason, it is bubbled up by this\\n     * function (like regular Solidity function calls).\\n     *\\n     * Returns the raw returned data. To convert to the expected return value,\\n     * use https://solidity.readthedocs.io/en/latest/units-and-global-variables.html?highlight=abi.decode#abi-encoding-and-decoding-functions[`abi.decode`].\\n     *\\n     * Requirements:\\n     *\\n     * - `target` must be a contract.\\n     * - calling `target` with `data` must not revert.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCall(address target, bytes memory data) internal returns (bytes memory) {\\n      return functionCall(target, data, \\\"Address: low-level call failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with\\n     * `errorMessage` as a fallback revert reason when `target` reverts.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCall(address target, bytes memory data, string memory errorMessage) internal returns (bytes memory) {\\n        return functionCallWithValue(target, data, 0, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],\\n     * but also transferring `value` wei to `target`.\\n     *\\n     * Requirements:\\n     *\\n     * - the calling contract must have an ETH balance of at least `value`.\\n     * - the called Solidity function must be `payable`.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCallWithValue(address target, bytes memory data, uint256 value) internal returns (bytes memory) {\\n        return functionCallWithValue(target, data, value, \\\"Address: low-level call with value failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCallWithValue-address-bytes-uint256-}[`functionCallWithValue`], but\\n     * with `errorMessage` as a fallback revert reason when `target` reverts.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCallWithValue(address target, bytes memory data, uint256 value, string memory errorMessage) internal returns (bytes memory) {\\n        require(address(this).balance >= value, \\\"Address: insufficient balance for call\\\");\\n        require(isContract(target), \\\"Address: call to non-contract\\\");\\n\\n        // solhint-disable-next-line avoid-low-level-calls\\n        (bool success, bytes memory returndata) = target.call{ value: value }(data);\\n        return _verifyCallResult(success, returndata, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],\\n     * but performing a static call.\\n     *\\n     * _Available since v3.3._\\n     */\\n    function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {\\n        return functionStaticCall(target, data, \\\"Address: low-level static call failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],\\n     * but performing a static call.\\n     *\\n     * _Available since v3.3._\\n     */\\n    function functionStaticCall(address target, bytes memory data, string memory errorMessage) internal view returns (bytes memory) {\\n        require(isContract(target), \\\"Address: static call to non-contract\\\");\\n\\n        // solhint-disable-next-line avoid-low-level-calls\\n        (bool success, bytes memory returndata) = target.staticcall(data);\\n        return _verifyCallResult(success, returndata, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],\\n     * but performing a delegate call.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {\\n        return functionDelegateCall(target, data, \\\"Address: low-level delegate call failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],\\n     * but performing a delegate call.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function functionDelegateCall(address target, bytes memory data, string memory errorMessage) internal returns (bytes memory) {\\n        require(isContract(target), \\\"Address: delegate call to non-contract\\\");\\n\\n        // solhint-disable-next-line avoid-low-level-calls\\n        (bool success, bytes memory returndata) = target.delegatecall(data);\\n        return _verifyCallResult(success, returndata, errorMessage);\\n    }\\n\\n    function _verifyCallResult(bool success, bytes memory returndata, string memory errorMessage) private pure returns(bytes memory) {\\n        if (success) {\\n            return returndata;\\n        } else {\\n            // Look for revert reason and bubble it up if present\\n            if (returndata.length > 0) {\\n                // The easiest way to bubble the revert reason is using memory via assembly\\n\\n                // solhint-disable-next-line no-inline-assembly\\n                assembly {\\n                    let returndata_size := mload(returndata)\\n                    revert(add(32, returndata), returndata_size)\\n                }\\n            } else {\\n                revert(errorMessage);\\n            }\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x28911e614500ae7c607a432a709d35da25f3bc5ddc8bd12b278b66358070c0ea\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/Context.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity >=0.6.0 <0.8.0;\\n\\n/*\\n * @dev Provides information about the current execution context, including the\\n * sender of the transaction and its data. While these are generally available\\n * via msg.sender and msg.data, they should not be accessed in such a direct\\n * manner, since when dealing with GSN meta-transactions the account sending and\\n * paying for execution may not be the actual sender (as far as an application\\n * is concerned).\\n *\\n * This contract is only required for intermediate, library-like contracts.\\n */\\nabstract contract Context {\\n    function _msgSender() internal view virtual returns (address payable) {\\n        return msg.sender;\\n    }\\n\\n    function _msgData() internal view virtual returns (bytes memory) {\\n        this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691\\n        return msg.data;\\n    }\\n}\\n\",\"keccak256\":\"0x8d3cb350f04ff49cfb10aef08d87f19dcbaecc8027b0bed12f3275cd12f38cf0\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/ReentrancyGuard.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity >=0.6.0 <0.8.0;\\n\\n/**\\n * @dev Contract module that helps prevent reentrant calls to a function.\\n *\\n * Inheriting from `ReentrancyGuard` will make the {nonReentrant} modifier\\n * available, which can be applied to functions to make sure there are no nested\\n * (reentrant) calls to them.\\n *\\n * Note that because there is a single `nonReentrant` guard, functions marked as\\n * `nonReentrant` may not call one another. This can be worked around by making\\n * those functions `private`, and then adding `external` `nonReentrant` entry\\n * points to them.\\n *\\n * TIP: If you would like to learn more about reentrancy and alternative ways\\n * to protect against it, check out our blog post\\n * https://blog.openzeppelin.com/reentrancy-after-istanbul/[Reentrancy After Istanbul].\\n */\\nabstract contract ReentrancyGuard {\\n    // Booleans are more expensive than uint256 or any type that takes up a full\\n    // word because each write operation emits an extra SLOAD to first read the\\n    // slot's contents, replace the bits taken up by the boolean, and then write\\n    // back. This is the compiler's defense against contract upgrades and\\n    // pointer aliasing, and it cannot be disabled.\\n\\n    // The values being non-zero value makes deployment a bit more expensive,\\n    // but in exchange the refund on every call to nonReentrant will be lower in\\n    // amount. Since refunds are capped to a percentage of the total\\n    // transaction's gas, it is best to keep them low in cases like this one, to\\n    // increase the likelihood of the full refund coming into effect.\\n    uint256 private constant _NOT_ENTERED = 1;\\n    uint256 private constant _ENTERED = 2;\\n\\n    uint256 private _status;\\n\\n    constructor () internal {\\n        _status = _NOT_ENTERED;\\n    }\\n\\n    /**\\n     * @dev Prevents a contract from calling itself, directly or indirectly.\\n     * Calling a `nonReentrant` function from another `nonReentrant`\\n     * function is not supported. It is possible to prevent this from happening\\n     * by making the `nonReentrant` function external, and make it call a\\n     * `private` function that does the actual work.\\n     */\\n    modifier nonReentrant() {\\n        // On the first call to nonReentrant, _notEntered will be true\\n        require(_status != _ENTERED, \\\"ReentrancyGuard: reentrant call\\\");\\n\\n        // Any calls to nonReentrant after this point will fail\\n        _status = _ENTERED;\\n\\n        _;\\n\\n        // By storing the original value once again, a refund is triggered (see\\n        // https://eips.ethereum.org/EIPS/eip-2200)\\n        _status = _NOT_ENTERED;\\n    }\\n}\\n\",\"keccak256\":\"0x8bbbc2f5c10065ee272592ae0a7a6ceb23de2fbd81564ee0bb015ecf404d5f61\",\"license\":\"MIT\"},\"contracts/interfaces/IPriceFeeder.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.6.12;\\n\\ninterface IPriceFeeder {\\n\\n    function getValue() external view returns (uint256);\\n\\n    function getTimestamp() external view returns (uint);\\n\\n}\",\"keccak256\":\"0x5d1881ad205827f87c94df51d69bb851904308027b61d974bcf83c9f7a5c15f7\",\"license\":\"MIT\"},\"contracts/mocks/MockPriceFeeder.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.6.12;\\n\\nimport \\\"@openzeppelin/contracts/utils/ReentrancyGuard.sol\\\";\\nimport \\\"../utility/Whitelist.sol\\\";\\nimport \\\"../interfaces/IPriceFeeder.sol\\\";\\n\\ncontract MockPriceFeeder is ReentrancyGuard, Whitelist, IPriceFeeder {\\n\\n    string public name;\\n\\n    uint256 public value = 1 * (10 ** 18);\\n    uint256 private timestamp;\\n\\n    constructor(string memory _name) public nonReentrant {\\n        name = _name;\\n        timestamp = now;\\n        addAddress(msg.sender);\\n    }\\n\\n    function updateValue(uint256 _newValue) public onlyWhitelisted {\\n        value = _newValue;\\n        timestamp = now;\\n    }\\n\\n    function getValue() public override view returns (uint256) {\\n        return value;\\n    }\\n\\n    function getTimestamp() public override view returns (uint256) {\\n        return timestamp;\\n    }\\n\\n}\",\"keccak256\":\"0x5e9e28ddb3e24c6c44a503d6af61a22bb1934b4177b4bf22bb3f7873be377cf1\",\"license\":\"MIT\"},\"contracts/utility/Whitelist.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.6.0;\\n\\nimport \\\"@openzeppelin/contracts/access/Ownable.sol\\\";\\nimport \\\"@openzeppelin/contracts/utils/Address.sol\\\";\\nimport \\\"@openzeppelin/contracts/utils/Context.sol\\\";\\n\\n/**\\n * @dev The contract manages a list of whitelisted addresses\\n */\\ncontract Whitelist is Ownable {\\n  using Address for address;\\n\\n  mapping(address => bool) private whitelist;\\n\\n  constructor() public {\\n    address msgSender = _msgSender();\\n    whitelist[msgSender] = true;\\n  }\\n\\n  /**\\n   * @dev returns true if a given address is whitelisted, false if not\\n   *\\n   * @param _address address to check\\n   *\\n   * @return true if the address is whitelisted, false if not\\n   */\\n  function isWhitelisted(address _address) public view returns (bool) {\\n    return whitelist[_address];\\n  }\\n\\n  modifier onlyWhitelisted() {\\n    address sender = _msgSender();\\n    require(isWhitelisted(sender), \\\"Ownable: caller is not the owner\\\");\\n    _;\\n  }\\n\\n  /**\\n   * @dev adds a given address to the whitelist\\n   *\\n   * @param _address address to add\\n   */\\n  function addAddress(address _address) public onlyWhitelisted {\\n    if (whitelist[_address])\\n      // checks if the address is already whitelisted\\n      return;\\n\\n    whitelist[_address] = true;\\n  }\\n\\n  /**\\n   * @dev removes a given address from the whitelist\\n   *\\n   * @param _address address to remove\\n   */\\n  function removeAddress(address _address) public onlyWhitelisted {\\n    if (!whitelist[_address])\\n      // checks if the address is actually whitelisted\\n      return;\\n\\n    whitelist[_address] = false;\\n  }\\n}\\n\",\"keccak256\":\"0xe539e6d33b945b0f1743cb3c95cce3fbbcc2207b32a27e04208fa78da723ac92\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x6080604052670de0b6b3a764000060045534801561001c57600080fd5b50604051610a5e380380610a5e8339818101604052602081101561003f57600080fd5b810190808051604051939291908464010000000082111561005f57600080fd5b90830190602082018581111561007457600080fd5b825164010000000081118282018810171561008e57600080fd5b82525081516020918201929091019080838360005b838110156100bb5781810151838201526020016100a3565b50505050905090810190601f1680156100e85780820380516001836020036101000a031916815260200191505b5060405250506001600090815590506100ff610203565b600180546001600160a01b0319166001600160a01b038316908117909155604051919250906000907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908290a3506000610157610203565b6001600160a01b031660009081526002602081905260408220805460ff191660011790559054141590506101d2576040805162461bcd60e51b815260206004820152601f60248201527f5265656e7472616e637947756172643a207265656e7472616e742063616c6c00604482015290519081900360640190fd5b600260005580516101ea9060039060208401906102d9565b50426005556101f833610207565b50600160005561036c565b3390565b6000610211610203565b905061021c816102bb565b61026d576040805162461bcd60e51b815260206004820181905260248201527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572604482015290519081900360640190fd5b6001600160a01b03821660009081526002602052604090205460ff1615610293576102b7565b6001600160a01b0382166000908152600260205260409020805460ff191660011790555b5050565b6001600160a01b031660009081526002602052604090205460ff1690565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f1061031a57805160ff1916838001178555610347565b82800160010185558215610347579182015b8281111561034757825182559160200191906001019061032c565b50610353929150610357565b5090565b5b808211156103535760008155600101610358565b6106e38061037b6000396000f3fe608060405234801561001057600080fd5b50600436106100a95760003560e01c80633fa4f245116100715780633fa4f245146101af5780634ba79dfe146101b7578063573c0bd3146101dd578063715018a6146101fa5780638da5cb5b14610202578063f2fde38b14610226576100a9565b806306fdde03146100ae578063188ec3561461012b578063209652551461014557806338eada1c1461014d5780633af32abf14610175575b600080fd5b6100b661024c565b6040805160208082528351818301528351919283929083019185019080838360005b838110156100f05781810151838201526020016100d8565b50505050905090810190601f16801561011d5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b6101336102da565b60408051918252519081900360200190f35b6101336102e0565b6101736004803603602081101561016357600080fd5b50356001600160a01b03166102e6565b005b61019b6004803603602081101561018b57600080fd5b50356001600160a01b0316610388565b604080519115158252519081900360200190f35b6101336103a6565b610173600480360360208110156101cd57600080fd5b50356001600160a01b03166103ac565b610173600480360360208110156101f357600080fd5b5035610447565b6101736104a5565b61020a610551565b604080516001600160a01b039092168252519081900360200190f35b6101736004803603602081101561023c57600080fd5b50356001600160a01b0316610560565b6003805460408051602060026001851615610100026000190190941693909304601f810184900484028201840190925281815292918301828280156102d25780601f106102a7576101008083540402835291602001916102d2565b820191906000526020600020905b8154815290600101906020018083116102b557829003601f168201915b505050505081565b60055490565b60045490565b60006102f0610663565b90506102fb81610388565b61033a576040805162461bcd60e51b8152602060048201819052602482015260008051602061068e833981519152604482015290519081900360640190fd5b6001600160a01b03821660009081526002602052604090205460ff161561036057610384565b6001600160a01b0382166000908152600260205260409020805460ff191660011790555b5050565b6001600160a01b031660009081526002602052604090205460ff1690565b60045481565b60006103b6610663565b90506103c181610388565b610400576040805162461bcd60e51b8152602060048201819052602482015260008051602061068e833981519152604482015290519081900360640190fd5b6001600160a01b03821660009081526002602052604090205460ff1661042557610384565b506001600160a01b03166000908152600260205260409020805460ff19169055565b6000610451610663565b905061045c81610388565b61049b576040805162461bcd60e51b8152602060048201819052602482015260008051602061068e833981519152604482015290519081900360640190fd5b5060045542600555565b6104ad610663565b6001600160a01b03166104be610551565b6001600160a01b031614610507576040805162461bcd60e51b8152602060048201819052602482015260008051602061068e833981519152604482015290519081900360640190fd5b6001546040516000916001600160a01b0316907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908390a3600180546001600160a01b0319169055565b6001546001600160a01b031690565b610568610663565b6001600160a01b0316610579610551565b6001600160a01b0316146105c2576040805162461bcd60e51b8152602060048201819052602482015260008051602061068e833981519152604482015290519081900360640190fd5b6001600160a01b0381166106075760405162461bcd60e51b81526004018080602001828103825260268152602001806106686026913960400191505060405180910390fd5b6001546040516001600160a01b038084169216907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e090600090a3600180546001600160a01b0319166001600160a01b0392909216919091179055565b339056fe4f776e61626c653a206e6577206f776e657220697320746865207a65726f20616464726573734f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572a2646970667358221220d5be3de9f8841865a20b64d3dd06c64c784549bb91e07e60548709e3d4fadc2364736f6c634300060c0033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100a95760003560e01c80633fa4f245116100715780633fa4f245146101af5780634ba79dfe146101b7578063573c0bd3146101dd578063715018a6146101fa5780638da5cb5b14610202578063f2fde38b14610226576100a9565b806306fdde03146100ae578063188ec3561461012b578063209652551461014557806338eada1c1461014d5780633af32abf14610175575b600080fd5b6100b661024c565b6040805160208082528351818301528351919283929083019185019080838360005b838110156100f05781810151838201526020016100d8565b50505050905090810190601f16801561011d5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b6101336102da565b60408051918252519081900360200190f35b6101336102e0565b6101736004803603602081101561016357600080fd5b50356001600160a01b03166102e6565b005b61019b6004803603602081101561018b57600080fd5b50356001600160a01b0316610388565b604080519115158252519081900360200190f35b6101336103a6565b610173600480360360208110156101cd57600080fd5b50356001600160a01b03166103ac565b610173600480360360208110156101f357600080fd5b5035610447565b6101736104a5565b61020a610551565b604080516001600160a01b039092168252519081900360200190f35b6101736004803603602081101561023c57600080fd5b50356001600160a01b0316610560565b6003805460408051602060026001851615610100026000190190941693909304601f810184900484028201840190925281815292918301828280156102d25780601f106102a7576101008083540402835291602001916102d2565b820191906000526020600020905b8154815290600101906020018083116102b557829003601f168201915b505050505081565b60055490565b60045490565b60006102f0610663565b90506102fb81610388565b61033a576040805162461bcd60e51b8152602060048201819052602482015260008051602061068e833981519152604482015290519081900360640190fd5b6001600160a01b03821660009081526002602052604090205460ff161561036057610384565b6001600160a01b0382166000908152600260205260409020805460ff191660011790555b5050565b6001600160a01b031660009081526002602052604090205460ff1690565b60045481565b60006103b6610663565b90506103c181610388565b610400576040805162461bcd60e51b8152602060048201819052602482015260008051602061068e833981519152604482015290519081900360640190fd5b6001600160a01b03821660009081526002602052604090205460ff1661042557610384565b506001600160a01b03166000908152600260205260409020805460ff19169055565b6000610451610663565b905061045c81610388565b61049b576040805162461bcd60e51b8152602060048201819052602482015260008051602061068e833981519152604482015290519081900360640190fd5b5060045542600555565b6104ad610663565b6001600160a01b03166104be610551565b6001600160a01b031614610507576040805162461bcd60e51b8152602060048201819052602482015260008051602061068e833981519152604482015290519081900360640190fd5b6001546040516000916001600160a01b0316907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908390a3600180546001600160a01b0319169055565b6001546001600160a01b031690565b610568610663565b6001600160a01b0316610579610551565b6001600160a01b0316146105c2576040805162461bcd60e51b8152602060048201819052602482015260008051602061068e833981519152604482015290519081900360640190fd5b6001600160a01b0381166106075760405162461bcd60e51b81526004018080602001828103825260268152602001806106686026913960400191505060405180910390fd5b6001546040516001600160a01b038084169216907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e090600090a3600180546001600160a01b0319166001600160a01b0392909216919091179055565b339056fe4f776e61626c653a206e6577206f776e657220697320746865207a65726f20616464726573734f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572a2646970667358221220d5be3de9f8841865a20b64d3dd06c64c784549bb91e07e60548709e3d4fadc2364736f6c634300060c0033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "addAddress(address)": {
+        "details": "adds a given address to the whitelist",
+        "params": {
+          "_address": "address to add"
+        }
+      },
+      "isWhitelisted(address)": {
+        "details": "returns true if a given address is whitelisted, false if not",
+        "params": {
+          "_address": "address to check"
+        },
+        "returns": {
+          "_0": "true if the address is whitelisted, false if not"
+        }
+      },
+      "owner()": {
+        "details": "Returns the address of the current owner."
+      },
+      "removeAddress(address)": {
+        "details": "removes a given address from the whitelist",
+        "params": {
+          "_address": "address to remove"
+        }
+      },
+      "renounceOwnership()": {
+        "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+      },
+      "transferOwnership(address)": {
+        "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 7702,
+        "contract": "contracts/mocks/MockPriceFeeder.sol:MockPriceFeeder",
+        "label": "_status",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_uint256"
+      },
+      {
+        "astId": 2403,
+        "contract": "contracts/mocks/MockPriceFeeder.sol:MockPriceFeeder",
+        "label": "_owner",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_address"
+      },
+      {
+        "astId": 22299,
+        "contract": "contracts/mocks/MockPriceFeeder.sol:MockPriceFeeder",
+        "label": "whitelist",
+        "offset": 0,
+        "slot": "2",
+        "type": "t_mapping(t_address,t_bool)"
+      },
+      {
+        "astId": 20585,
+        "contract": "contracts/mocks/MockPriceFeeder.sol:MockPriceFeeder",
+        "label": "name",
+        "offset": 0,
+        "slot": "3",
+        "type": "t_string_storage"
+      },
+      {
+        "astId": 20593,
+        "contract": "contracts/mocks/MockPriceFeeder.sol:MockPriceFeeder",
+        "label": "value",
+        "offset": 0,
+        "slot": "4",
+        "type": "t_uint256"
+      },
+      {
+        "astId": 20595,
+        "contract": "contracts/mocks/MockPriceFeeder.sol:MockPriceFeeder",
+        "label": "timestamp",
+        "offset": 0,
+        "slot": "5",
+        "type": "t_uint256"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_bool": {
+        "encoding": "inplace",
+        "label": "bool",
+        "numberOfBytes": "1"
+      },
+      "t_mapping(t_address,t_bool)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => bool)",
+        "numberOfBytes": "32",
+        "value": "t_bool"
+      },
+      "t_string_storage": {
+        "encoding": "bytes",
+        "label": "string",
+        "numberOfBytes": "32"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  }
+}
