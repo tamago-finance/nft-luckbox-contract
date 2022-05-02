@@ -80,10 +80,10 @@ describe("LuckBox V2", () => {
     const leaves = [admin, alice, bob, charlie].map(item => ethers.utils.keccak256(ethers.utils.solidityPack(["address", "uint256"], [item.address, 2])))
     const tree = new MerkleTree(leaves, keccak256, { sortPairs: true })
 
-    const root = tree.getHexRoot()
+    const hexRoot = tree.getHexRoot()
 
     // attach the root 
-    await luckBox.attachClaim(1, root)
+    await luckBox.attachClaim(1, hexRoot)
 
     const proof = tree.getHexProof(ethers.utils.keccak256(ethers.utils.solidityPack(["address", "uint256"], [alice.address, 2])))
     const result = await luckBox.connect(alice).checkClaim(1, 2, proof)
