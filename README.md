@@ -49,14 +49,6 @@ Ang Bao NFT | 0x10Fe6ecb9a49276E068274711560CDe41Deb3f34
 Price Resolver | 0x16EE94e3C07B24EbA6067eb9394BA70178aAc4c0
 LuckBox | 0xE53048D2D19338A294395D8A7f780E44A9379925
 
-### Ethereum Kovan Testnet
-
-Contract Name | Contract Address 
---- | --- 
-NFTMarketplace | 0xD49e2D3c51F7D7845e9f91186d7ff2fc5F48b771
-LuckBox Proxy | 0xE53048D2D19338A294395D8A7f780E44A9379925
-
-
 ### BNB Chain
 
 Contract Name | Contract Address 
