@@ -21,7 +21,7 @@ describe("ERC20", () => {
 
         const MockERC20 = await ethers.getContractFactory("MockERC20");
 
-        erc20 = await MockERC20.deploy("Mock Token", "MOCK")
+        erc20 = await MockERC20.deploy("Mock Token", "MOCK", 18)
 
     })
 

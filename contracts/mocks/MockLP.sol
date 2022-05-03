@@ -12,7 +12,7 @@ contract MockLP is MockERC20 {
     constructor(
         string memory name,
         string memory symbol
-    ) public MockERC20(name, symbol) {
+    ) public MockERC20(name, symbol, 18) {
        
     }
 

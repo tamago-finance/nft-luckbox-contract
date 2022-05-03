@@ -50,9 +50,15 @@ describe("NFTManager v.0.4.x", () => {
         // allow nftManager contract to mint/burn NFT
         await registry.permitToMint(ethers.utils.formatBytes32String("USD_VOUCHER"), ethers.utils.formatBytes32String("SYNTHETIC_NFT"))
 
-        usdcToken = await MockERC20.deploy('Mock USDC', "USDC")
-        usdtToken = await MockERC20.deploy('Mock USDT', "USDT")
-        daiToken = await MockERC20.deploy('Mock DAI', "DAI")
+        usdcToken = await MockERC20.deploy('Mock USDC', "USDC", 6)
+        usdtToken = await MockERC20.deploy('Mock USDT', "USDT", 6)
+        daiToken = await MockERC20.deploy('Mock DAI', "DAI", 18)
+
+        for (let i = 0; i < 3; i++) {
+            await usdcToken.faucet()
+            await daiToken.faucet()
+            await usdtToken.faucet()
+        }
 
         // setup collateral assets
         await nftManager.addCollateralAsset(
@@ -149,7 +155,7 @@ describe("NFTManager v.0.4.x", () => {
         let variantInfo = await nftManager.syntheticVariants(2)
 
         expect(variantInfo.totalOutstanding).to.equal(toEther(100))
-        expect((variantInfo.totalIssued)).to.equal(1) 
+        expect((variantInfo.totalIssued)).to.equal(1)
         expect(fromUsdc(await nftManager.getVariantCollateral(2, 0))).to.equal(usdcPerNft.toFixed(6))
         expect(fromUsdc(await nftManager.totalRawCollateral(0))).to.equal(usdcPerNft.toFixed(6))
         expect((await nftManager.totalOutstanding())).to.equal(toEther(100))
@@ -244,7 +250,7 @@ describe("NFTManager v.0.4.x", () => {
 
             const minOutput = await nftManager.estimateRedeem(variant, 0, amountToRedeem)
             await nftManager.redeem(variant, 0, amountToRedeem, minOutput)
-            
+
             const variantInfo = await nftManager.syntheticVariants(variant)
 
             expect((variantInfo.totalBurnt)).to.equal(amountToRedeem)
@@ -255,7 +261,7 @@ describe("NFTManager v.0.4.x", () => {
     })
 
     it('able to mint all NFTs from multi-collateral assets', async () => {
-        
+
         const variants = [0, 1, 2] // $1, $10, $100
 
         await usdcToken.approve(nftManager.address, ethers.constants.MaxUint256)
@@ -288,7 +294,7 @@ describe("NFTManager v.0.4.x", () => {
     })
 
     it('able to mint with discount when the reserve is over-collatelized', async () => {
-        
+
         await usdcToken.approve(nftManager.address, ethers.constants.MaxUint256)
         await nftManager.setDiscountFee(100) // set discount 1%
 
@@ -310,7 +316,7 @@ describe("NFTManager v.0.4.x", () => {
     })
 
     it('able to mint and reem the NFT without any fee', async () => {
-        
+
         await usdcToken.approve(nftManager.address, ethers.constants.MaxUint256)
 
         await nftManager.setMintFee(0)
@@ -329,5 +335,5 @@ describe("NFTManager v.0.4.x", () => {
         await nftManager.redeem(2,0,1, minOutput)
 
     })
- 
+
 })
