@@ -175,6 +175,10 @@ contract NFTMarketplace is
     function cancelOrder(uint256 _orderId) external whenNotPaused nonReentrant {
         require(orders[_orderId].active == true, "Given ID is invalid");
         require(orders[_orderId].owner == msg.sender, "You are not the owner");
+        require(
+            orders[_orderId].isCrosschain == false,
+            "Only admin is allows to cancel a crosschain's order"
+        );
 
         TokenType currentType = TokenType.ERC721;
 
@@ -193,6 +197,30 @@ contract NFTMarketplace is
         orders[_orderId].ended = true;
 
         emit OrderCanceled(_orderId, msg.sender);
+    }
+
+    function cancelCrosschainOrder(uint256 _orderId, address _to) external onlyAdmin nonReentrant {
+        require(orders[_orderId].active == true, "Given ID is invalid");
+        require(
+            orders[_orderId].isCrosschain == true,
+            "You can cancel only a crosschain's order"
+        );
+
+        TokenType currentType = TokenType.ERC721;
+
+        if (orders[_orderId].is1155 == true) {
+            currentType = TokenType.ERC1155;
+        }   
+
+        _give(
+            orders[_orderId].assetAddress,
+            orders[_orderId].tokenId,
+            currentType,
+            _to
+        );
+
+        orders[_orderId].canceled = true;
+        orders[_orderId].ended = true;
     }
 
     /// @notice check whether the buyer can swap the NFT against given order ID

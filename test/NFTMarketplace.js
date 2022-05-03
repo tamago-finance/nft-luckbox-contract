@@ -88,10 +88,10 @@ describe("NFT Marketplace", () => {
         const leaves = [erc1155, erc721].map(item => ethers.utils.keccak256(ethers.utils.solidityPack(["address", "uint256"], [item.address, 2])))
         const tree = new MerkleTree(leaves, keccak256, { sortPairs: true })
 
-        const root = tree.getHexRoot()
+        const hexRoot = tree.getHexRoot()
 
-        await marketplace.connect(alice).createOrder(1, erc1155.address, 1, true, root , false )
-        await marketplace.connect(alice).createOrder(2, erc721.address, 1, false, root , false ) 
+        await marketplace.connect(alice).createOrder(1, erc1155.address, 1, true, hexRoot , false )
+        await marketplace.connect(alice).createOrder(2, erc721.address, 1, false, hexRoot , false ) 
         
         // verify
         const firstOrder = await marketplace.orders(1)
