@@ -158,20 +158,34 @@ describe("LuckBox V2 Upgradeable - polygon", () => {
   // })
 
   it("Should update poaps successfully", async () => {
-    const poapId = [1, 2, 3];
-    const assetAddress = [erc1155.address, erc1155.address, erc1155.address];
-    const tokentId = [1, 2, 3];
-    const is1155List = [true, false, true];
-
-    await luckBox.createPoapBatch(poapId, assetAddress, tokentId, is1155List);
+    await luckBox.createPoap(1, erc1155.address, 123, true);
+    await luckBox.createPoap(2, erc1155.address, 231, true);
+    await luckBox.createPoap(3, erc1155.address, 321, true);
 
     const eventId = 1;
-    const newPoapId = [4, 5, 6];
+    await luckBox.createEvent(eventId, "test12345", [1, 2, 3]);
 
-    console.log(await luckBox.updatePoaps(eventId, newPoapId));
+    const newPoapId = [4, 5, 6];
+    await luckBox.updatePoaps(eventId, newPoapId);
+
+    console.log(await luckBox.events(1).poaps);
+    // expect((await luckBox.events(1)).name).to.equals("test12345");
+    expect((await luckBox.events(1)).poaps).to.equals(newPoapId);
   });
 
-  // it("Should ",async ()=>{
+  it("Should emergencyWithdrawERC1155 successfully", async () => {
+    // Mint 3 NFT, 2x each
+    const tokenIds = [1, 2, 3];
 
-  // })
+    for (let id of tokenIds) {
+      await erc1155.mint(admin.address, id, 2, "0x00");
+      // also create a record
+      await luckBox.createPoap(id, erc1155.address, id, true);
+    }
+
+    await emergencyWithdrawERC1155(admin.address, erc1155.address, 1, 1);
+
+    //admin => tokenid 1 => 2 piece
+    // expect(await)
+  });
 });
