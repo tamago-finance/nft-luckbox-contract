@@ -241,24 +241,24 @@ describe("LuckBox V2 Upgradeable - polygon", () => {
     expect(await erc721.balanceOf(luckBox.address)).to.equal(0);
   });
 
-  // it("Deposit & Withdraw ERC-20 to all slots", async () => {
-  //   erc20.transfer(luckBox.address, 10);
-  // const num = await erc20.balanceOf(admin.address);
-  // console.log(num);
-  // expect(await erc20.balanceOf(admin.address)).to.equal(0);
-  // expect(await erc20.balanceOf(luckBox.address)).to.equal(10);
-  // });
+  it("Deposit & Withdraw ERC-20 to all slots", async () => {
+    await erc20.faucet();
+    await erc20.transfer(luckBox.address, 10);
+    expect(await erc20.balanceOf(luckBox.address)).to.equal(10);
 
-  // it("Should set end event successfully", async () => {
-  //   await luckBox.createPoap(1, erc1155.address, 123, true);
-  //   await luckBox.createPoap(2, erc1155.address, 231, true);
-  //   await luckBox.createPoap(3, erc1155.address, 321, true);
+    await luckBox.emergencyWithdrawERC20(erc20.address, 10);
+    expect(await erc20.balanceOf(luckBox.address)).to.equals(0);
+  });
 
-  //   const eventId = 1;
-  //   await luckBox.createEvent(eventId, "test12345", [1, 2, 3]);
+  it("Should set end event successfully", async () => {
+    await luckBox.createPoap(1, erc1155.address, 123, true);
+    await luckBox.createPoap(2, erc1155.address, 231, true);
+    await luckBox.createPoap(3, erc1155.address, 321, true);
 
-  //   await luckBox.setEndEvent(1, true);
-  //   console.log(luckBox.events(1));
-  //   // expect()
-  // });
+    const eventId = 1;
+    await luckBox.createEvent(eventId, "test12345", [1, 2, 3]);
+    await luckBox.setEndEvent(1, true);
+
+    expect((await luckBox.events(1)).ended).to.equals(true);
+  });
 });
