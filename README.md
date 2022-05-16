@@ -2,6 +2,8 @@
 
 > A value-backed NFT issuance protocol on EVM compatible chains
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/e84d4c25-ebdb-4b18-9751-5ed453015029/deploy-status)](https://app.netlify.com/sites/helpful-meerkat-01f0e9/deploys)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub last commit](https://img.shields.io/github/last-commit/tamago-finance/tamago-finance)](https://github.com/tamago-finance/tamago-finance/commits/main)
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/m/tamago-finance/tamago-finance)](https://github.com/tamago-finance/tamago-finance/commits/main)
