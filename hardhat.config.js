@@ -103,6 +103,7 @@ module.exports = {
     },
   },
   etherscan: {
-    apiKey: process.env.MAINNET_API_KEY,
+    apiKey: process.env.KOVAN_API_KEY
+    // apiKey: process.env.MAINNET_API_KEY,
   },
 }

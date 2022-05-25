@@ -16,6 +16,7 @@
     "deploy:kovan:NFTMarketplace": "hardhat --network kovan deploy --no-compile --reset --tags NFTMarketplace",
     "deploy:polygon:NFTLuckbox": "hardhat --network polygon deploy --no-compile --reset --tags NFTLuckbox",
     "deploy:mainnet:NFTLuckbox": "hardhat --network mainnet deploy --no-compile --reset --tags NFTLuckbox",
+    "deploy:kovan:NFTLuckbox": "hardhat --network kovan deploy --no-compile --reset --tags NFTLuckboxKovan",
     "deploy:kovan:MockNFT": "hardhat --network kovan deploy --no-compile --reset --tags MockNFT",
     "deploy:bsc:NFTLuckbox": "hardhat --network bsc deploy --no-compile --reset --tags NFTLuckbox"
   },
